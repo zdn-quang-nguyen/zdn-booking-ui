@@ -78,7 +78,7 @@ export default function LoginForm() {
                 </div>
 
                 {/* Password Input */}
-                <div className={s.loginWapper}>
+                <div className={s.loginWarper}>
                   <input
                     {...register("password", { required: true })}
                     id="password"

@@ -1,0 +1,22 @@
+@mixin centered-placeholder {
+  border: 1px solid theme("colors.primary.400");
+
+  outline: none;
+  &::placeholder {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: theme("colors.neutral.300");
+    pointer-events: none;
+  }
+  &:focus {
+    outline: none;
+    border-color: theme("colors.primary.400");
+  }
+  &:hover {
+    outline: none;
+    border-color: theme("colors.primary.400");
+  }
+}
