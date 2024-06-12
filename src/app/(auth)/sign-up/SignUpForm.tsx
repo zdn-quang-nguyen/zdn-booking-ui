@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
 import React from "react";
-import { Button, Input } from "antd";
+import { Button, Input, message } from "antd";
 import { FaArrowLeft } from "react-icons/fa6";
 import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 import Image from "next/image";
@@ -14,13 +14,15 @@ import s from "../sign-up/signUp.module.scss";
 import fb from "../../../../public/images/icons8-facebook (2) 1.svg";
 import gg from "../../../../public/images/icons8-google 1.svg";
 import Errors from "@/components/errors/errors";
-import { signUpUser } from "@/app/apis/auth.api";
 import { SignUpSchema } from "@/zod-schemas/signup-schema";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { signUpUser } from "../apis/auth.api";
 
 type SignUpSchemaType = z.infer<typeof SignUpSchema>;
 
 export default function SignUpForm() {
+  const [messageApi, contextHolder] = message.useMessage();
+  const router = useRouter();
   const searchParams = useSearchParams();
 
   let role = searchParams.get("role");
@@ -48,6 +50,14 @@ export default function SignUpForm() {
 
     const res = await signUpUser(dataBody);
     console.log(res);
+    if (res.status === "Success") {
+      messageApi.info("Success register!");
+      router.push(`/login`);
+      data.name = "";
+      data.email = "";
+      data.phone = "";
+      data.password = "";
+    }
   };
 
   return (
@@ -117,10 +127,12 @@ export default function SignUpForm() {
               <Controller
                 name="phone"
                 control={control}
+                rules={{ pattern: /^[0-9]*$/ }}
                 render={({ field }) => (
                   <Input
                     id="phone"
                     placeholder="Nhập số điện thoại"
+                    pattern="[0-9]*"
                     {...field}
                   />
                 )}
@@ -204,6 +216,7 @@ export default function SignUpForm() {
           </div>
         </div>
       </form>
+      {contextHolder}
     </div>
   );
 }
