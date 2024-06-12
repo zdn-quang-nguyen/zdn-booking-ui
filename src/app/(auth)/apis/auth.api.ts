@@ -15,3 +15,19 @@ export const signUpUser = async (signUpInfo: any): Promise<any> => {
     return error;
   }
 };
+export const signIn = async (username: string, password: string) => {
+  const res = await fetch(`${client}/v1/auth/login`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email: username, phone: username, password }),
+    credentials: "include",
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.message);
+  }
+
+  return data;
+};

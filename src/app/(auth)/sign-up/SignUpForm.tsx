@@ -14,9 +14,9 @@ import s from "../sign-up/signUp.module.scss";
 import fb from "../../../../public/images/icons8-facebook (2) 1.svg";
 import gg from "../../../../public/images/icons8-google 1.svg";
 import Errors from "@/components/errors/errors";
-import { signUpUser } from "@/app/apis/auth.api";
 import { SignUpSchema } from "@/zod-schemas/signup-schema";
 import { useSearchParams, useRouter } from "next/navigation";
+import { signUpUser } from "../apis/auth.api";
 
 type SignUpSchemaType = z.infer<typeof SignUpSchema>;
 
