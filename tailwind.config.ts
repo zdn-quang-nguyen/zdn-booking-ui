@@ -70,7 +70,7 @@ const config: Config = {
         "30": "7.5rem",
       },
       borderRadius: {
-        '4xl': "40px",
+        'large': "40px",
       },
     },
   },
