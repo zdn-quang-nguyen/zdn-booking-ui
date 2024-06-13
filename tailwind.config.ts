@@ -73,6 +73,10 @@ const config: Config = {
       borderRadius: {
         large: "40px",
       },
+      spacing: {
+        card: "360px",
+        "card-md": "280px",
+      },
     },
   },
   plugins: [],
