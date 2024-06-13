@@ -1,6 +1,6 @@
-import FooterColumn from "./Column";
-import FooterCopyright from "./Copyright";
-import FooterLogo from "./Logo";
+import FooterColumn from "./components/Column";
+import FooterCopyright from "./components/Copyright";
+import FooterLogo from "./components/Logo";
 
 const columns = [
     ["Solutions", "Marketing", "Analytics", "Commerce", "Insights"],
