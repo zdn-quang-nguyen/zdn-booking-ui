@@ -1,13 +1,11 @@
-import SportFieldSwiper from "@/components/common/SportFieldSwiper";
-import Banner from "../(home)/home/components/Banner/Banner";
-import Header from "../../components/header/Header";
-import SportFieldRule from "@/components/common/sport-field-rule/SportFieldRule";
+import SportFieldSwiper from '@/components/common/SportFieldSwiper';
+import Header from '../../components/header/Header';
 
 const TestPage = () => {
   return (
     <div className="">
       <Header />
-    <SportFieldSwiper />
+      <SportFieldSwiper />
     </div>
   );
 };

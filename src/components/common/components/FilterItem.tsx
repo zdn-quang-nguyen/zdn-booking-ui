@@ -1,3 +1,4 @@
+'use client';
 import React, { useEffect, useState } from 'react';
 import { TimePicker, Dropdown, Menu } from 'antd';
 import dayjs from 'dayjs';

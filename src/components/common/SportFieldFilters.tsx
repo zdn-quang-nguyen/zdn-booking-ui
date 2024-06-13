@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 import { FilterItem } from './components/FilterItem';
 import { CloseOutlined } from '@ant-design/icons';
