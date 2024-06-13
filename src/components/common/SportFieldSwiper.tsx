@@ -1,16 +1,17 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Carousel, Spin } from "antd";
 import styles from "./SportFieldSwiper.module.scss";
+import Image from "next/image";
 
 const SportFieldSwiper: React.FC = () => {
-  const images = [
+  const images = useMemo(() => [
     "https://picsum.photos/360/360",
     "https://picsum.photos/360/361",
     "https://picsum.photos/360/362",
     "https://picsum.photos/360/363",
     "https://picsum.photos/360/364",
-  ];
+  ], []);
 
   const [loading, setLoading] = useState(true);
 
@@ -27,7 +28,7 @@ const SportFieldSwiper: React.FC = () => {
       };
 
       images.forEach((image) => {
-        const img = new Image();
+        const img = new window.Image();
         img.src = image;
         img.onload = handleImageLoad;
       });
@@ -53,7 +54,12 @@ const SportFieldSwiper: React.FC = () => {
         >
           {images.map((image, index) => (
             <div key={image}>
-              <img src={image} alt={`Slide ${index + 1}`} />
+              <Image
+                src={image}
+                alt={`Slide ${index + 1}`}
+                width={360}
+                height={360}
+              />
             </div>
           ))}
         </Carousel>
