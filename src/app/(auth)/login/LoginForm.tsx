@@ -1,5 +1,6 @@
 "use client";
 import TextError from "@/components/error/TextError";
+import { FaArrowLeft } from "react-icons/fa6";
 import { cn } from "@/libs/utils";
 import { loginSchema } from "@/zod-schemas/login-schema";
 import { Button, Input, message } from "antd";
@@ -9,10 +10,12 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import s from "./login.module.scss";
 import { signIn } from "../apis/auth.api";
+import { useSearchParams, useRouter } from "next/navigation";
 
 type FormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
+  const router = useRouter();
   const [errorMessage, setErrorMessage] = useState("");
   const [messageApi, contextHolder] = message.useMessage();
   const {
@@ -40,6 +43,11 @@ export default function LoginForm() {
       setErrorMessage("Tài khoản hoặc mật khẩu không đúng");
     }
   }
+  const handleNavigateRegister = () => {
+    router.push(`/sign-up?role=${role}`);
+  };
+  const searchParams = useSearchParams();
+  let role = searchParams.get("role");
 
   return (
     <>
@@ -47,9 +55,17 @@ export default function LoginForm() {
       <div className="py-4 mx-auto">
         <div className="w-[620px] bg-primary-100 rounded-[40px] border border--primary-400 p-10 mx-auto">
           <div className="flex items-center">
-            <span className="font-bold text-[28px] leading-7 cursor-pointer">
-              Chủ sân
-            </span>
+            <div
+              className="flex items-center cursor-pointer "
+              onClick={() => {
+                router.push(`/role`);
+              }}
+            >
+              <FaArrowLeft className="text-xl mr-4 " />
+              <span className="font-bold text-[28px] leading-7 ">
+                {role === "owner" ? "Chủ sân" : "Người thuê"}
+              </span>
+            </div>
           </div>
           <form
             onSubmit={handleSubmit(onSubmit)}
@@ -119,7 +135,10 @@ export default function LoginForm() {
               Đăng nhập
             </Button>
             <div>
-              <span className="text-base cursor-pointer underline underline-offset-4 font-medium text-primary-600 mt-3">
+              <span
+                onClick={handleNavigateRegister}
+                className="text-base cursor-pointer underline underline-offset-4 font-medium text-primary-600 mt-3"
+              >
                 Bạn chưa có tài khoản đăng nhập?
               </span>
             </div>

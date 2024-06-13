@@ -14,6 +14,7 @@
     padding: 0;
     box-sizing: border-box;
   }
+
   body {
     font-family: "Montserrat", sans-serif;
   }
@@ -74,4 +75,17 @@
     font-size: 12px;
     line-height: 16px;
   }
+}
+/* CSS tùy chỉnh */
+::-webkit-scrollbar {
+  width: 4px; /* Độ rộng của thanh cuộn dọc */
+  height: 4px; /* Độ cao của thanh cuộn ngang */
+}
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.3); /* Màu của thanh cuộn */
+  border-radius: 3px; /* Bo tròn góc */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Nền thanh cuộn */
 }

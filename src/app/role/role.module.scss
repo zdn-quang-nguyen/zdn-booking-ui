@@ -6,6 +6,7 @@
     }
     .ant-btn-primary {
       @include neutral-btn;
+      border: 1px solid theme("colors.accent.400");
     }
     .ant-btn {
       font-size: 16px;
