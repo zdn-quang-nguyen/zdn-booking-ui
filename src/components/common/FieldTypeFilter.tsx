@@ -2,8 +2,6 @@
 
 import React, { useState } from 'react';
 import AccentButton from './components/AccentButton';
-import { cn } from '@/libs/utils';
-import styles from './styles/AccentButton.module.scss';
 
 const tabs = [
   { label: 'Tất cả', value: 'all' },
@@ -27,7 +25,7 @@ const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({ onSelect }) => {
     onSelect(value);
   };
   return (
-    <div className={cn(styles.buttonContainer, `flex flex-row gap-3`)}>
+    <div className={`flex flex-row gap-3`}>
       {tabs.map((tab) => (
         <AccentButton
           key={tab.value}

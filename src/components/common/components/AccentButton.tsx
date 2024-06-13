@@ -1,12 +1,14 @@
 //
 import React from 'react';
 import { Button } from 'antd';
+import styles from '../styles/AccentButton.module.scss';
 
 interface AccentButtonProps {
   label: string;
   value: string;
   isActive: boolean;
   onClick: (value: string) => void;
+  style?: string | '';
 }
 
 const AccentButton: React.FC<AccentButtonProps> = ({
@@ -14,14 +16,18 @@ const AccentButton: React.FC<AccentButtonProps> = ({
   value,
   isActive,
   onClick,
+  style,
 }) => {
   return (
-    <Button
-      type={isActive ? 'primary' : 'default'}
-      onClick={() => onClick(value)}
-    >
-      {label}
-    </Button>
+    <div className={`${styles.buttonContainer} ${style}`}>
+      <Button
+        type={isActive ? 'primary' : 'default'}
+        onClick={() => onClick(value)}
+        className={`${style} w-full`}
+      >
+        {label}
+      </Button>
+    </div>
   );
 };
 
