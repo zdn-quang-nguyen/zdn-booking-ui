@@ -27,7 +27,7 @@ const config: Config = {
           600: '#40423F ',
         },
         natural: {
-          // 100: "#F8F7F5",
+          100: '#F8F7F5',
           200: '#E1E1E1',
           300: '#C7C7C7',
           400: '#939393',
@@ -69,6 +69,13 @@ const config: Config = {
       },
       padding: {
         '30': '7.5rem',
+      },
+      borderRadius: {
+        large: '40px',
+      },
+      spacing: {
+        card: '360px',
+        'card-md': '280px',
       },
     },
   },
