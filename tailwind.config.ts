@@ -33,6 +33,7 @@ const config: Config = {
           400: "#939393",
           // 500: "#B8B08D",
           600: "#5D5E5B",
+          700: "#40423F",
         },
         accent: {
           100: "#FBF9FE",
@@ -70,7 +71,7 @@ const config: Config = {
         "30": "7.5rem",
       },
       borderRadius: {
-        'large': "40px",
+        large: "40px",
       },
     },
   },

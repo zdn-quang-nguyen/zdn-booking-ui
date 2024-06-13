@@ -40,7 +40,7 @@ export default function UserProfile() {
             >
               Chỉnh sửa
             </button>
-            <button className="relative ml-2 w-4 h-4">
+            <button className="relative ml-2 w-4 h-4 hover:opacity-50">
               <Image
                 src="/icons/logout.svg"
                 className="rounded-xl "
