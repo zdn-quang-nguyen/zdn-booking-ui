@@ -3,7 +3,7 @@ import RowCalendar from "./RowCalendar";
 
 export default function Calendar() {
   return (
-    <div className="w-[360px] h-[360px] rounded-[40px] bg-accent-100    overflow-scroll  overflow-x-hidden  ">
+    <div className="h-card rounded-large bg-accent-100    overflow-scroll  overflow-x-hidden  ">
       <div className="w-full">
         <div className="sticky top-0 bg-accent-100 ">
           <p className="font-bold text-lg left-6 pl-6 pt-6  ">Lịch tuần này</p>

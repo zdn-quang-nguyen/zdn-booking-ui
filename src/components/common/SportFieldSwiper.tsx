@@ -5,13 +5,16 @@ import styles from "./SportFieldSwiper.module.scss";
 import Image from "next/image";
 
 const SportFieldSwiper: React.FC = () => {
-  const images = useMemo(() => [
-    "https://picsum.photos/360/360",
-    "https://picsum.photos/360/361",
-    "https://picsum.photos/360/362",
-    "https://picsum.photos/360/363",
-    "https://picsum.photos/360/364",
-  ], []);
+  const images = useMemo(
+    () => [
+      "https://picsum.photos/360/360",
+      "https://picsum.photos/360/361",
+      "https://picsum.photos/360/362",
+      "https://picsum.photos/360/363",
+      "https://picsum.photos/360/364",
+    ],
+    []
+  );
 
   const [loading, setLoading] = useState(true);
 
@@ -40,12 +43,12 @@ const SportFieldSwiper: React.FC = () => {
   return (
     <div className={styles.sliderContainer}>
       {loading ? (
-        <div className="w-[360px] h-[360px] bg-accent-100 flex justify-center items-center rounded-large">
+        <div className="h-card w-full bg-accent-100 flex justify-center items-center rounded-large">
           <Spin size="large" />
         </div>
       ) : (
         <Carousel
-          className="w-[360px] h-[360px]"
+          className="w-full h-card relative"
           autoplay
           arrows
           autoplaySpeed={2000}
@@ -53,13 +56,8 @@ const SportFieldSwiper: React.FC = () => {
           effect="scrollx"
         >
           {images.map((image, index) => (
-            <div key={image}>
-              <Image
-                src={image}
-                alt={`Slide ${index + 1}`}
-                width={360}
-                height={360}
-              />
+            <div key={image} className="w-full h-card relative">
+              <Image src={image} alt={`Slide ${index + 1}`} fill />
             </div>
           ))}
         </Carousel>
