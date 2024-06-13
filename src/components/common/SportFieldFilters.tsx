@@ -1,29 +1,19 @@
 import React from 'react';
 import { FilterItem } from './components/FilterItem';
 import { CloseOutlined } from '@ant-design/icons';
-import { generateTimeSteps } from './functions/TimeSlotTable';
 import AccentButton from './components/AccentButton';
-
-const timeSlot = generateTimeSteps('00:00', '24:00', 30);
-
-const options = timeSlot.map((slot) => {
-  return {
-    label: slot,
-    value: slot.toString(),
-  };
-});
 
 const distanceFilter = {
   title: 'Khoang cach',
   name: 'distance',
   options: [
     {
-      label: 'Xa nhat',
-      value: 'far',
-    },
-    {
       label: 'Gan nhat',
       value: 'near',
+    },
+    {
+      label: 'Xa nhat',
+      value: 'far',
     },
   ],
 };
@@ -46,27 +36,26 @@ const priceFilter = {
 const timeFilter = {
   title: 'Thoi gian',
   name: 'time',
-  options: options,
+  options: [],
 };
 
 export const SportFieldFilters: React.FC = () => {
   const [price, setPrice] = React.useState<string>(
     priceFilter.options[0].value,
   );
+
+  const [isNeedReset, setIsNeedReset] = React.useState<boolean>(false);
   const [distance, setDistance] = React.useState<string>(
     distanceFilter.options[0].value,
   );
-  const handleFilterChangePrice = (value: string) => {
-    setPrice(value);
-  };
-
-  const handleFilterChangeDistance = (value: string) => {
-    setDistance(value);
-  };
 
   const handleApplyFilter = () => {
     console.log('Distance: ', distance);
     console.log('Price: ', price);
+  };
+
+  const handleClearFilter = () => {
+    setIsNeedReset(true);
   };
 
   return (
@@ -83,17 +72,23 @@ export const SportFieldFilters: React.FC = () => {
         <div className="flex flex-col gap-8">
           <FilterItem
             filter={distanceFilter}
-            onFilterChange={handleFilterChangeDistance}
+            onFilterChange={setDistance}
+            isNeedReset={isNeedReset}
+            setIsNeedReset={() => setIsNeedReset(false)}
           ></FilterItem>
 
           <FilterItem
             filter={priceFilter}
-            onFilterChange={handleFilterChangePrice}
+            onFilterChange={setPrice}
+            isNeedReset={isNeedReset}
+            setIsNeedReset={() => setIsNeedReset(false)}
           ></FilterItem>
 
           <FilterItem
             filter={timeFilter}
             onFilterChange={() => {}}
+            isNeedReset={isNeedReset}
+            setIsNeedReset={() => setIsNeedReset(false)}
           ></FilterItem>
         </div>
       </div>
@@ -108,6 +103,7 @@ export const SportFieldFilters: React.FC = () => {
         ></AccentButton>
         <button
           className={`border-b-2 text-natural-400 border-natural-400 hover:text-accent-600 hover:border-accent-600`}
+          onClick={handleClearFilter}
         >
           <span className="w w-fit body-3 font-bold">Xoa bo loc</span>
         </button>

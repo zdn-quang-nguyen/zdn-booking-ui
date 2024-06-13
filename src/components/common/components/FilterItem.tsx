@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TimePicker, Dropdown, Menu } from 'antd';
 import dayjs from 'dayjs';
 import {
@@ -8,6 +8,7 @@ import {
 } from '@ant-design/icons';
 import RadioBtn from './RadioButton';
 import DatePickerComponent from '../DatePickerComponent';
+import locale from 'antd/es/date-picker/locale/vi_VN';
 
 import styles from '../styles/FilterItem.module.scss';
 import Arrow from '@public/icons/ArrowNarrowRight.svg';
@@ -24,6 +25,8 @@ interface FilterItemProps {
     options: OptionItem[];
   };
   onFilterChange: (filter: any) => void;
+  isNeedReset: boolean;
+  setIsNeedReset: () => void;
 }
 
 const { RangePicker } = TimePicker;
@@ -31,13 +34,24 @@ const { RangePicker } = TimePicker;
 export const FilterItem: React.FC<FilterItemProps> = ({
   filter,
   onFilterChange,
+  isNeedReset,
+  setIsNeedReset,
 }) => {
-  const [activeTab, setActiveTab] = useState(filter.options[0].value);
+  const [activeTab, setActiveTab] = useState(filter.options[0]?.value || '');
   const [open, setOpen] = useState(true);
   const handleFilterChange = (value: string) => {
     onFilterChange(value);
     setActiveTab(value);
   };
+
+  useEffect(() => {
+    if (isNeedReset) {
+      console.log('Resetting filter');
+      setIsNeedReset();
+
+      setActiveTab(filter.options[0]?.value || '');
+    }
+  }, [isNeedReset]);
 
   return (
     <div className={`flex flex-col gap-5 w-full`}>
@@ -60,6 +74,7 @@ export const FilterItem: React.FC<FilterItemProps> = ({
                   minuteStep: 30,
                 }}
                 format="HH:mm"
+                locale={locale}
                 suffixIcon={
                   <ClockCircleOutlined
                     style={{ fontSize: '20px', color: '#939393' }}
@@ -67,6 +82,14 @@ export const FilterItem: React.FC<FilterItemProps> = ({
                 }
                 separator={<Image src={Arrow} alt="arrow" className={``} />}
                 className={`flex-grow flex items-center justify-start gap-4`}
+                onCalendarChange={(_, [start, end]) => {
+                  console.log('Start: ', start);
+                  console.log('End: ', end);
+                }}
+                onOk={(value) => {
+                  console.log('Time range selected:', value);
+                  // Your logic to handle the selection after clicking OK
+                }}
               />
             </div>
           </div>

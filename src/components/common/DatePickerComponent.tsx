@@ -6,6 +6,8 @@ import dayjs from 'dayjs';
 import 'dayjs/locale/vi';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import styles from './styles/DatePickerComponent.module.scss';
+import Calendar from '@public/icons/calendar.svg';
+import Image from 'next/image';
 
 const DatePickerComponent: React.FC = () => {
   return (
@@ -18,6 +20,9 @@ const DatePickerComponent: React.FC = () => {
           defaultValue={dayjs(dayjs(), 'YYYY-MM-DD')}
           format="DD/MM/YYYY"
           locale={locale}
+          suffixIcon={
+            <Image src={Calendar} alt="calendar" width={20} height={20} />
+          }
           className={`w-[312px] body-4`}
         />
       </div>
