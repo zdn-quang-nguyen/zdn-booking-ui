@@ -1,5 +1,4 @@
-import Footer from '@/components/footer/Footer';
-import Header from '@/components/header/Header';
+import CustomerHeader from '@/components/header/customer-header/CustomerHeader';
 
 type HomeLayoutProps = {
   children: React.ReactNode;
@@ -8,7 +7,7 @@ type HomeLayoutProps = {
 export default function MainLayout({ children }: HomeLayoutProps) {
   return (
     <main>
-      <Header />
+      <CustomerHeader />
       {children}
     </main>
   );
