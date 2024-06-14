@@ -1,5 +1,5 @@
-import Footer from '@/components/footer/Footer';
-import Header from '@/components/header/Header';
+import CustomerHeader from '@/components/header/customer-header/CustomerHeader';
+import PrivateRoute from './PrivateRoute';
 
 type HomeLayoutProps = {
   children: React.ReactNode;
@@ -7,9 +7,11 @@ type HomeLayoutProps = {
 
 export default function MainLayout({ children }: HomeLayoutProps) {
   return (
-    <main>
-      <Header />
+    <PrivateRoute>
+      <main>
+        <CustomerHeader />
       {children}
-    </main>
+      </main>
+    </PrivateRoute>
   );
 }
