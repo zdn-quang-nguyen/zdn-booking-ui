@@ -8,7 +8,7 @@ const CustomerHeader = () => {
   return (
     <div className="justify-between flex py-6 px-32 w-full h-20 bg-primary-100">
       <div className="flex justify-between items-center gap-6">
-        <Link href={'/'} className="">
+        <Link href={'/home'} className="">
           <Image
             src="/images/logo.png"
             className="rounded-xl"
