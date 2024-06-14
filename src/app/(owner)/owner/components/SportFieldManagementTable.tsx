@@ -114,7 +114,7 @@ const SportFieldManagementTable = () => {
         <Space size="middle">
           <Dropdown menu={{ items }} placement="bottomRight">
             <a>
-              <MoreOutlined />
+              <MoreOutlined style={{ color: '#939393' }} />
             </a>
           </Dropdown>
         </Space>
