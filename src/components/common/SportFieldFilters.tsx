@@ -41,6 +41,7 @@ const timeFilter = {
 };
 
 export const SportFieldFilters: React.FC = () => {
+  const [isOpened, setIsOpened] = React.useState<boolean>(true);
   const [price, setPrice] = React.useState<string>(
     priceFilter.options[0].value,
   );
@@ -60,13 +61,19 @@ export const SportFieldFilters: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col justify-between items-center w-[480px] px-10 rounded-s-[40px] shadow-2xl h-screen absolute top-0 right-0 bg-neutral">
+    <div
+      className={`flex flex-col justify-between items-center w-[480px] px-10 rounded-s-[40px] shadow-2xl h-screen absolute top-0 right-0 bg-neutral ${
+        isOpened
+          ? 'transform translate-x-0 duration-1000 z-10'
+          : 'transform translate-x-full duration-1000 z-0'
+      }`}
+    >
       <div className="flex flex-col w-[400px] gap-6">
         <div
           className={`flex flex-row justify-between items-center  body-1 font-bold py-6 h-[88px]`}
         >
           <span>Bộ lọc</span>
-          <button className="w-10 h-10">
+          <button className="w-10 h-10" onClick={() => setIsOpened(false)}>
             <CloseOutlined style={{ fontSize: '24px' }} spin />
           </button>
         </div>
