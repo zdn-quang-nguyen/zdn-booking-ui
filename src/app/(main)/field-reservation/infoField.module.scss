@@ -1,0 +1,52 @@
+@import './../../../styles/mixins.scss';
+.main {
+  :global {
+    .ant-picker,
+    .ant-select {
+      border: 1px solid theme('colors.natural.400');
+      border-radius: 20px;
+      width: 250px;
+      height: 40px;
+
+      .ant-select-selector {
+        border-radius: 20px;
+      }
+    }
+    .ant-btn-primary {
+      @include neutral-btn;
+      padding: 14px 40px;
+      border: 1px solid theme('colors.accent.400');
+      background: theme('colors.accent.200');
+      height: 52px;
+    }
+    .ant-btn-default {
+      @include neutral-btn;
+      padding: 14px 40px;
+      background: theme('colors.accent.600');
+      color: theme('colors.natural.100');
+      height: 52px;
+
+      &:hover {
+        background: theme('colors.accent.600') !important;
+        color: theme('colors.natural.100') !important;
+      }
+    }
+    .ant-checkbox-wrapper {
+      .ant-checkbox {
+      }
+      .ant-checkbox-input {
+      }
+      .ant-checkbox-checked {
+        .ant-checkbox-inner {
+          background-color: theme('colors.primary.500');
+          border-color: theme('colors.primary.500');
+
+          &:hover {
+            background-color: theme('colors.primary.500') !important;
+            border-color: theme('colors.primary.500') !important;
+          }
+        }
+      }
+    }
+  }
+}

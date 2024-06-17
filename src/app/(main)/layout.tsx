@@ -1,4 +1,5 @@
 import CustomerHeader from '@/components/header/customer-header/CustomerHeader';
+import PrivateRoute from './PrivateRoute';
 
 type HomeLayoutProps = {
   children: React.ReactNode;
@@ -6,9 +7,11 @@ type HomeLayoutProps = {
 
 export default function MainLayout({ children }: HomeLayoutProps) {
   return (
-    <main>
-      <CustomerHeader />
+    <PrivateRoute>
+      <main>
+        <CustomerHeader />
       {children}
-    </main>
+      </main>
+    </PrivateRoute>
   );
 }
