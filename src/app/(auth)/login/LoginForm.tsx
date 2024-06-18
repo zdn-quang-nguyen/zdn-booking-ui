@@ -5,19 +5,21 @@ import { cn } from "@/libs/utils";
 import { loginSchema } from "@/zod-schemas/login-schema";
 import { Button, Input, message } from "antd";
 import Image from "next/image";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
+import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
 import s from './login.module.scss';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import Link from 'next/link';
-import { AUTH_PROVIDERS } from '@/constants/constant';
+import { AUTH_PROVIDERS, ROLE_KEYCLOAK } from '@/constants/constant';
 
 type FormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [role, setRole] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [messageApi, contextHolder] = message.useMessage();
   const {
@@ -60,9 +62,24 @@ export default function LoginForm() {
     signIn(AUTH_PROVIDERS.KEYCLOAK);
   };
 
-  const searchParams = useSearchParams();
-  const role = searchParams.get('role');
+  useEffect(() => {
+    const updateSearchParams = () => {
+      const params = new URLSearchParams(searchParams);
 
+      let role = searchParams.get('role') as string;
+      setRole(role);
+
+      if (!ROLE_KEYCLOAK.includes(role)) {
+        params.set('role', 'user');
+        role = searchParams.get('role') as string;
+        setRole(role);
+        router.push(`login?${params.toString()}`);
+      }
+    };
+
+    updateSearchParams();
+  }, [searchParams, router]);
+  console.log(role);
   return (
     <>
       {contextHolder}
