@@ -278,6 +278,9 @@ const FormCreateSportField: React.FC = () => {
                 style={{
                   border: '2px',
                   background: 'none',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
                 }}
                 type="button"
               >
