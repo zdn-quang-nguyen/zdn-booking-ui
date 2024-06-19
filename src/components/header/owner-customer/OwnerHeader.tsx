@@ -6,11 +6,11 @@ import SearchBar from './components/Search';
 
 const OwnerHeader = () => {
   return (
-    <div className="justify-between flex py-6 px-32 w-full h-20 bg-primary-100">
-      <div className="flex justify-between items-center gap-6">
+    <div className="flex h-20 w-full justify-between bg-neutral px-32 py-6">
+      <div className="flex items-center justify-between gap-6">
         <Link
           href={'/'}
-          className="flex items-center gap-6 body-2 font-medium text-natural-400"
+          className="body-2 flex items-center gap-6 font-medium text-natural-400"
         >
           <Image
             src="/images/logo.png"
