@@ -1,24 +1,27 @@
 "use client";
 import TextError from "@/components/error/TextError";
-import { FaArrowLeft } from "react-icons/fa6";
-import { cn } from "@/libs/utils";
-import { loginSchema } from "@/zod-schemas/login-schema";
-import { Button, Input, message } from "antd";
-import Image from "next/image";
-import { useState } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { z } from "zod";
-import s from './login.module.scss';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { signIn, useSession } from 'next-auth/react';
-import Link from 'next/link';
 import { AUTH_PROVIDERS } from '@/constants/constant';
-
+import { cn, getValidRole } from '@/libs/utils';
+import { loginSchema } from '@/zod-schemas/login-schema';
+import { Button, Input, message } from 'antd';
+import { signIn, useSession } from 'next-auth/react';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { Controller, useForm } from 'react-hook-form';
+import { FaArrowLeft } from 'react-icons/fa6';
+import { z } from 'zod';
+import s from './login.module.scss';
 type FormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const router = useRouter();
   const [errorMessage, setErrorMessage] = useState('');
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
   const [messageApi, contextHolder] = message.useMessage();
   const {
     handleSubmit,
@@ -27,11 +30,13 @@ export default function LoginForm() {
   } = useForm<FormData>({
     mode: 'onBlur',
   });
-
+  const searchParams = useSearchParams();
+  const role = getValidRole(searchParams.get('role') as string);
   const { data: session } = useSession();
+  if (!mounted) return <></>;
 
   if (session?.user) {
-    router.push('/home');
+    router.push(`/home`);
   }
 
   async function onFocus() {
@@ -57,11 +62,11 @@ export default function LoginForm() {
   }
 
   const handleSocialLogin = async () => {
-    signIn(AUTH_PROVIDERS.KEYCLOAK);
+    await signIn(AUTH_PROVIDERS.KEYCLOAK, {
+      callbackUrl: `/verify-user?role=${role}`,
+      redirect: true,
+    });
   };
-
-  const searchParams = useSearchParams();
-  const role = searchParams.get('role');
 
   return (
     <>

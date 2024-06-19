@@ -39,3 +39,20 @@ export const signIn = async (username: string, password: string) => {
 
   return res.data;
 };
+
+export const createSocialUser = async (accessToken: string, role: string) => {
+  const res = await axios.post(
+    `${API_HOST}/v1/user/social-login`,
+    {
+      role,
+    },
+    {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  return res.data;
+};
