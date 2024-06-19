@@ -1,6 +1,6 @@
 "use client";
 import TextError from "@/components/error/TextError";
-import { AUTH_PROVIDERS } from '@/constants/constant';
+import { AUTH_PROVIDERS, VALID_ROLES } from '@/constants/constant';
 import { cn, getValidRole } from '@/libs/utils';
 import { loginSchema } from '@/zod-schemas/login-schema';
 import { Button, Input, message } from 'antd';
@@ -17,11 +17,20 @@ type FormData = z.infer<typeof loginSchema>;
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [errorMessage, setErrorMessage] = useState('');
-  const [mounted, setMounted] = useState(false);
+
   useEffect(() => {
-    setMounted(true);
+    const updateSearchParams = () => {
+      if (!VALID_ROLES.includes(role as string)) {
+        const params = getValidRole(role as string);
+        router.push(`login?role=${params.toString()}`);
+      }
+    };
+
+    updateSearchParams();
   }, []);
+
   const [messageApi, contextHolder] = message.useMessage();
   const {
     handleSubmit,
@@ -30,10 +39,8 @@ export default function LoginForm() {
   } = useForm<FormData>({
     mode: 'onBlur',
   });
-  const searchParams = useSearchParams();
-  const role = getValidRole(searchParams.get('role') as string);
+  const role = searchParams.get('role');
   const { data: session } = useSession();
-  if (!mounted) return <></>;
 
   if (session?.user) {
     router.push(`/home`);

@@ -18,7 +18,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { signUpUser } from "../apis/auth.api";
 import Link from 'next/link';
 import { signIn } from 'next-auth/react';
-import { AUTH_PROVIDERS } from '@/constants/constant';
+import { AUTH_PROVIDERS, VALID_ROLES } from '@/constants/constant';
 
 type SignUpSchemaType = z.infer<typeof SignUpSchema>;
 
@@ -31,9 +31,9 @@ export default function SignUpForm() {
     const updateSearchParams = () => {
       const params = new URLSearchParams(searchParams);
 
-      let role = searchParams.get('role');
+      const role = searchParams.get('role') as string;
 
-      if (role === '' || role === null) {
+      if (!VALID_ROLES.includes(role)) {
         params.set('role', 'user');
         router.push(`sign-up?${params.toString()}`);
       }
