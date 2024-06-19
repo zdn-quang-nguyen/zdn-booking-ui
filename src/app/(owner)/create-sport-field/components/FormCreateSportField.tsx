@@ -1,11 +1,13 @@
 'use client';
-import React from 'react';
-import { PlusOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import type { FormInstance, FormProps } from 'antd';
 import { Button, Form, Input, InputNumber, Select, Upload } from 'antd';
+import Image from 'next/image';
 import RangePickerComponent from '@/components/common/RangePickerComponent';
 import styles from './formCreateSportField.module.scss';
 import { cn } from '@/libs/utils';
+import iconUpImage from '/public/images/icons_add_image.png';
 const { TextArea } = Input;
 
 const normFile = (e: any) => {
@@ -58,6 +60,14 @@ const tailLayout = {
 };
 
 const FormCreateSportField: React.FC = () => {
+  const [quantity, setQuantity] = useState(0);
+
+  const handleQuantityChange = (value: number | null) => {
+    if (value !== null) {
+      setQuantity(value);
+    }
+  };
+
   return (
     <div
       className={cn(
@@ -211,12 +221,52 @@ const FormCreateSportField: React.FC = () => {
               },
             ]}
           >
-            <InputNumber />
+            <Button
+              type="text"
+              style={{
+                background: '#F4F1FF',
+                border: 'none',
+                borderRadius: '40px',
+                width: '44px',
+                height: '44px',
+              }}
+              icon={<MinusOutlined style={{ color: '#967DDD' }} />}
+              onClick={() => handleQuantityChange(quantity - 1)}
+            />
+            <InputNumber
+              value={quantity}
+              onChange={handleQuantityChange}
+              style={{
+                margin: '0 10px',
+                borderRadius: '40px',
+                borderColor: '#F4F1FF',
+                backgroundColor: '#F4F1FF',
+                width: '44px',
+                textAlign: 'center',
+              }}
+            />
+            <Button
+              type="text"
+              style={{
+                background: '#F4F1FF',
+                border: 'none',
+                borderRadius: '40px',
+                width: '44px',
+                height: '44px',
+              }}
+              icon={<PlusOutlined style={{ color: '#967DDD' }} />}
+              onClick={() => handleQuantityChange(quantity + 1)}
+            />
           </Form.Item>
         </div>
 
         <div className="flex flex-col">
-          <p className="body-2 mb-5 font-bold text-natural-700">Hình ảnh</p>
+          <p className="body-2 mb-5 font-bold text-natural-700">
+            Hình ảnh{' '}
+            <span className="body-5 mx-3 text-natural-400">
+              Kích thước tiêu chuẩn 1200*389 px
+            </span>
+          </p>
           <Form.Item
             valuePropName="fileList"
             getValueFromEvent={normFile}
@@ -224,9 +274,25 @@ const FormCreateSportField: React.FC = () => {
             rules={[{ required: true, message: 'Vui lòng nhập Hình ảnh' }]}
           >
             <Upload action="/upload.do" listType="picture-card">
-              <button style={{ border: 0, background: 'none' }} type="button">
-                <PlusOutlined />
-                <div style={{ marginTop: 8 }}>Tải hình ảnh lên</div>
+              <button
+                style={{
+                  border: '2px',
+                  background: 'none',
+                }}
+                type="button"
+              >
+                <Image
+                  src={iconUpImage}
+                  alt="icon-up-image"
+                  width={40}
+                  height={40}
+                />
+                <div
+                  style={{ marginTop: 8 }}
+                  className="body-5 text-accent-600"
+                >
+                  Tải hình ảnh lên
+                </div>
               </button>
             </Upload>
           </Form.Item>

@@ -16,7 +16,8 @@
       border-radius: 40px;
     }
 
-    .ant-input-number-affix-wrapper .ant-input-number-handler-wrap {
+    .ant-input-number-focused .ant-input-number-handler-wrap,
+    .ant-input-number-lg .ant-input-number-handler-wrap {
       display: none;
     }
   }
