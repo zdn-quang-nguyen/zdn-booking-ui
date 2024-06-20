@@ -59,7 +59,17 @@ const tailLayout = {
   wrapperCol: { offset: 8, span: 16 },
 };
 
-const FormCreateSportField: React.FC = () => {
+type FormCreateSportFieldProps = {
+  provinces: Province[];
+  districts: District[];
+  wards: Ward[];
+};
+
+const FormCreateSportField: React.FC<FormCreateSportFieldProps> = ({
+  provinces,
+  districts,
+  wards,
+}) => {
   const [quantity, setQuantity] = useState(0);
 
   const handleQuantityChange = (value: number | null) => {
@@ -150,13 +160,25 @@ const FormCreateSportField: React.FC = () => {
             />
 
             <Select placeholder="Tỉnh">
-              <Select.Option value="1">Tỉnh A</Select.Option>
+              {provinces.map((province) => (
+                <Select.Option key={province.id} value={province.id}>
+                  {province.name}
+                </Select.Option>
+              ))}
             </Select>
             <Select placeholder="Quận/Huyện">
-              <Select.Option value="1">Quận A</Select.Option>
+              {districts.map((district) => (
+                <Select.Option key={district.id} value={district.id}>
+                  {district.name}
+                </Select.Option>
+              ))}
             </Select>
             <Select placeholder="Phường/Xã">
-              <Select.Option value="1">Phường A</Select.Option>
+              {wards.map((ward) => (
+                <Select.Option key={ward.id} value={ward.id}>
+                  {ward.name}
+                </Select.Option>
+              ))}
             </Select>
           </Form.Item>
           <Form.Item
@@ -321,4 +343,4 @@ const FormCreateSportField: React.FC = () => {
   );
 };
 
-export default () => <FormCreateSportField />;
+export default FormCreateSportField;

@@ -40,7 +40,8 @@ export async function auth(req: NextApiRequest, res: NextApiResponse) {
       async jwt({ token, account }: any) {
         if (account) {
           token.account = account;
-          cookies().set('access_token', account.access_token);
+          account.access_token &&
+            cookies().set('access_token', account.access_token);
         }
         return token;
       },

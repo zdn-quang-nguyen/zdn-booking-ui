@@ -33,11 +33,15 @@ export const signIn = async (username: string, password: string) => {
     },
   );
 
-  const accessToken = res.data?.access_token;
-  if (accessToken) {
-    cookies().set('access_token', accessToken);
-  }
+  
+  const accessToken: string = res.data?.access_token
+    ? res.data.access_token
+    : '';
 
+  cookies().set('access_token', accessToken);
+
+  const cookiees = cookies().getAll();
+  console.log(cookiees);
   return res.data;
 };
 
