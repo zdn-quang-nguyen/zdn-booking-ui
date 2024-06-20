@@ -135,7 +135,14 @@ const FormCreateSportField: React.FC = () => {
             label="Địa chỉ"
             name="address"
             validateTrigger="onBlur"
-            rules={[{ required: true, message: 'Vui lòng nhập Địa chỉ' }]}
+            rules={[
+              { required: true, message: 'Vui lòng nhập Địa chỉ' },
+              {
+                type: 'string',
+                max: 64,
+                message: 'Địa chỉ không vượt quá 64 ký tự',
+              },
+            ]}
           >
             <Input
               placeholder="Nhập địa chỉ"
