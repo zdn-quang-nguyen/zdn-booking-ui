@@ -1,4 +1,4 @@
-import type { Config } from "tailwindcss";
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
   content: [
@@ -72,6 +72,8 @@ const config: Config = {
       },
       borderRadius: {
         large: '40px',
+        'large-md': '30px',
+        'large-sm': '20px',
       },
       spacing: {
         card: '360px',

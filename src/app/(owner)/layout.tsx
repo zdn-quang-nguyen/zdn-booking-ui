@@ -6,7 +6,7 @@ type OwnerLayoutProps = {
 
 export default function OwnerLayout({ children }: OwnerLayoutProps) {
   return (
-    <main>
+    <main className="flex h-screen flex-col bg-[#f7f7f7]">
       <OwnerHeader />
       {children}
     </main>
