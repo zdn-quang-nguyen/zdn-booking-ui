@@ -148,6 +148,16 @@ const FormCreateSportField: React.FC = () => {
               placeholder="Nhập địa chỉ"
               style={{ borderRadius: '40px' }}
             />
+
+            <Select placeholder="Tỉnh">
+              <Select.Option value="1">Tỉnh A</Select.Option>
+            </Select>
+            <Select placeholder="Quận/Huyện">
+              <Select.Option value="1">Quận A</Select.Option>
+            </Select>
+            <Select placeholder="Phường/Xã">
+              <Select.Option value="1">Phường A</Select.Option>
+            </Select>
           </Form.Item>
           <Form.Item
             label="Số điện thoại"
