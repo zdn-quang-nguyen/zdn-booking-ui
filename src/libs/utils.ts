@@ -21,3 +21,7 @@ export function formatDateToTime(dateTime: Date) {
 export function getValidRole(role: string = 'user') {
   return VALID_ROLES.includes(role) ? role : 'user';
 }
+
+export function getValidFilterType(tabs: any[], type: string) {
+  return tabs.find((tab) => tab.value === type) ? type : 'all';
+}
