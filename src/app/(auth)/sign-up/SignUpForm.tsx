@@ -1,29 +1,34 @@
-"use client";
-import React, { useEffect } from "react";
-import { Button, Input, message } from "antd";
-import { FaArrowLeft } from "react-icons/fa6";
-import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
-import Image from "next/image";
-import { z } from "zod";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { cn } from "@/libs/utils";
-import s from "../sign-up/signUp.module.scss";
+'use client';
+import {
+  ArrowLeftOutlined,
+  EyeInvisibleOutlined,
+  EyeTwoTone,
+} from '@ant-design/icons';
+import { Button, Input, message } from 'antd';
+import { useEffect, useState } from 'react';
 
-import fb from "../../../../public/images/icon-facebook.svg";
-import gg from "../../../../public/images/icon-google.svg";
-import Errors from "@/components/errors/errors";
-import { SignUpSchema } from "@/zod-schemas/signup-schema";
-import { useSearchParams, useRouter } from "next/navigation";
-import { signUpUser } from "../apis/auth.api";
-import Link from 'next/link';
-import { signIn } from 'next-auth/react';
+import { cn } from '@/libs/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import s from '../sign-up/signUp.module.scss';
+
+import Errors from '@/components/errors/errors';
 import { AUTH_PROVIDERS, VALID_ROLES } from '@/constants/constant';
+import { SignUpSchema } from '@/zod-schemas/signup-schema';
+import { signIn } from 'next-auth/react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import fb from '../../../../public/images/icon-facebook.svg';
+import gg from '../../../../public/images/icon-google.svg';
+import { signUpUser } from '../apis/auth.api';
 
 type SignUpSchemaType = z.infer<typeof SignUpSchema>;
 
 export default function SignUpForm() {
   const [messageApi, contextHolder] = message.useMessage();
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -52,12 +57,13 @@ export default function SignUpForm() {
   });
 
   const onSubmit = async (data: any) => {
+    setLoading(true);
     const dataBody = {
       name: data.name,
       email: data.email,
       phone: data.phone,
       password: data.password,
-      role: role ? role : 'user',
+      role: role ? role : process.env.NEXT_PUBLIC_ROLE_USER,
       accountType: 'manual',
     };
 
@@ -68,12 +74,14 @@ export default function SignUpForm() {
         type: 'success',
         content: 'Đăng kí thành công',
       });
+
       router.push(`/login?role=${role}`);
     } else {
       messageApi.open({
         type: 'error',
         content: res.message,
       });
+      setLoading(false);
     }
   };
 
@@ -92,12 +100,14 @@ export default function SignUpForm() {
           className="border--primary-400 w-[620px] rounded-[40px] border bg-primary-100 p-10"
         >
           <div className="flex items-center">
-            <FaArrowLeft className="mr-4 text-xl" />
+            <ArrowLeftOutlined className="mr-4 text-xl" />
             <Link
               href="/role"
               className="cursor-pointer text-[28px] font-bold leading-7"
             >
-              {role === 'owner' ? 'Chủ sân' : 'Người thuê'}
+              {role === process.env.NEXT_PUBLIC_ROLE_OWNER
+                ? 'Chủ sân'
+                : 'Người thuê'}
             </Link>
           </div>
           <div className={cn(s.main, 'mt-10')}>
@@ -160,7 +170,6 @@ export default function SignUpForm() {
                     <Input
                       id="phone"
                       placeholder="Nhập số điện thoại"
-                      pattern="[0-9]*"
                       {...field}
                     />
                   )}
@@ -227,7 +236,12 @@ export default function SignUpForm() {
               {<Errors error={errors.confirmPassword} />}
             </div>
             <div className="mb-4 mt-6">
-              <Button htmlType="submit" type="primary" className="w-full">
+              <Button
+                htmlType="submit"
+                type="primary"
+                className="w-full"
+                loading={loading}
+              >
                 Đăng kí
               </Button>
             </div>

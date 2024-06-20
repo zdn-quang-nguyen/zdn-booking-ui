@@ -1,5 +1,6 @@
 import { usePathname, useRouter } from 'next/navigation';
 import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
+import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 
 type PaginationProps = {
   currentPage: number;

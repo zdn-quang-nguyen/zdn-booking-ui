@@ -3,14 +3,15 @@ import TextError from "@/components/error/TextError";
 import { AUTH_PROVIDERS, VALID_ROLES } from '@/constants/constant';
 import { cn, getValidRole } from '@/libs/utils';
 import { loginSchema } from '@/zod-schemas/login-schema';
-import { Button, Input, message } from 'antd';
+import { Button, Input, notification } from 'antd';
 import { signIn, useSession } from 'next-auth/react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { FaArrowLeft } from 'react-icons/fa6';
 import { z } from 'zod';
 import s from './login.module.scss';
 type FormData = z.infer<typeof loginSchema>;
@@ -19,7 +20,8 @@ export default function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [errorMessage, setErrorMessage] = useState('');
-
+  const [loading, setLoading] = useState(false);
+  const [api, contextHolder] = notification.useNotification();
   useEffect(() => {
     const updateSearchParams = () => {
       if (!VALID_ROLES.includes(role as string)) {
@@ -31,7 +33,6 @@ export default function LoginForm() {
     updateSearchParams();
   }, []);
 
-  const [messageApi, contextHolder] = message.useMessage();
   const {
     handleSubmit,
     control,
@@ -51,20 +52,23 @@ export default function LoginForm() {
   }
 
   async function onSubmit({ username, password }: FormData) {
+    setLoading(true);
     const res = await signIn('credentials', {
       username,
       password,
       redirect: false,
     });
-
-    if (res?.error) {
+    setLoading(false);
+    if (!res?.ok) {
       setErrorMessage('Tài khoản hoặc mật khẩu không đúng');
       return;
     }
 
-    messageApi.open({
-      type: 'success',
-      content: 'Đăng nhập thành công',
+    api.success({
+      message: 'Đăng nhập thành công',
+      placement: 'top',
+      showProgress: true,
+      pauseOnHover: false,
     });
   }
 
@@ -82,7 +86,7 @@ export default function LoginForm() {
         <div className="border--primary-400 mx-auto w-[620px] rounded-[40px] border bg-primary-100 p-10">
           <div className="flex items-center">
             <Link href="/role" className="flex cursor-pointer items-center">
-              <FaArrowLeft className="mr-4 text-xl" />
+              <ArrowLeftOutlined className="mr-4 text-xl" />
               <span className="text-[28px] font-bold leading-7">
                 {role === 'owner' ? 'Chủ sân' : 'Người thuê'}
               </span>
@@ -152,6 +156,7 @@ export default function LoginForm() {
               htmlType="submit"
               className="mb-6 mt-2 w-full"
               disabled={isSubmitting}
+              loading={loading}
             >
               Đăng nhập
             </Button>

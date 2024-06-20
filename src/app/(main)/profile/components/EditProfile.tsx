@@ -3,8 +3,7 @@ import UploadAvatar from "./UploadAvatar";
 import { Button, Input } from "antd";
 import { cn } from "@/libs/utils";
 import s from "./profile.module.scss";
-import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
-import { FaArrowLeft } from "react-icons/fa6";
+import { ArrowLeftOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
 
 type EditProfileProps = {
   onCancel: () => void;
@@ -20,11 +19,11 @@ export default function EditProfile({ onCancel }: EditProfileProps) {
     >
       <div className="flex items-center">
         <button className="hover:opacity-75" key="back" onClick={onCancel}>
-          <FaArrowLeft className="mr-4 text-xl" />
+          <ArrowLeftOutlined className="mr-4 text-xl" />
         </button>
 
         <span className="cursor-pointer text-[28px] font-bold leading-7">
-          Chỉnh sửa thông tin
+          Edit profile
         </span>
       </div>
 

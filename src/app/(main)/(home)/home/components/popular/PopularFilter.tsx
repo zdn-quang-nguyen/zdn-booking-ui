@@ -1,9 +1,9 @@
 'use client';
-import React from 'react';
-import SportFieldFilters from '@/components/filter/sport-field-filter/SportFieldFilter';
 import { SportFieldFilters as Filter } from '@/components/common/SportFieldFilters';
+import SportFieldFilters from '@/components/filter/sport-field-filter/SportFieldFilter';
+import { FilterOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import { RiFilter2Fill } from 'react-icons/ri';
+import React from 'react';
 
 const PopularFilter = () => {
   const [isFilterOpen, setIsFilterOpen] = React.useState<boolean>(false);
@@ -16,7 +16,7 @@ const PopularFilter = () => {
     <div>
       <SportFieldFilters>
         <Button onClick={toggleFilter}>
-          <RiFilter2Fill />
+          <FilterOutlined />
           <span>Lọc</span>
         </Button>
         {isFilterOpen && <Filter />}

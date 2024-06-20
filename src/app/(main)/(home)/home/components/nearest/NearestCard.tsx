@@ -1,5 +1,5 @@
+import { ArrowRightOutlined } from '@ant-design/icons';
 import Link from 'next/link';
-import { HiArrowNarrowRight } from 'react-icons/hi';
 
 const NearestCard = () => {
     return (
@@ -17,7 +17,7 @@ const NearestCard = () => {
           className="flex w-fit items-center border-b-2 border-accent-600 text-accent-600"
         >
           <span className="body-3 font-bold">Xem tất cả</span>
-          <HiArrowNarrowRight className="font-bold" />
+          <ArrowRightOutlined className="font-bold" />
         </Link>
       </section>
     );
