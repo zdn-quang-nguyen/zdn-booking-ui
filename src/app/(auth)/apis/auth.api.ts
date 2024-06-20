@@ -5,6 +5,7 @@ import { cookies } from 'next/headers';
 const API_HOST = process.env.NEXT_PUBLIC_API_HOST || 'http://127.0.0.1:3000';
 export const signUpUser = async (signUpInfo: any): Promise<any> => {
   try {
+    console.log(signUpInfo);
     const data = await axios.post(`${API_HOST}/v1/auth/sign-up`, signUpInfo, {
       headers: {
         'Content-Type': 'application/json',
