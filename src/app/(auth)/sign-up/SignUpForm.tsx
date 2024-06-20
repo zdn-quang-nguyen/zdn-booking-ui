@@ -244,14 +244,14 @@ export default function SignUpForm() {
               <div className="mt-4 flex items-center">
                 <div
                   className="mr-5 w-fit cursor-pointer rounded-full bg-primary-500 p-3"
-                  onClick={handleSocialLogin}
+                  onClick={() => handleSocialLogin()}
                 >
                   <Image src={fb} alt="Facebook" width={24} height={24} />
                 </div>
 
                 <div
                   className="w-fit cursor-pointer rounded-full bg-primary-500 p-3"
-                  onClick={handleSocialLogin}
+                  onClick={() => handleSocialLogin()}
                 >
                   <Image src={gg} alt="Google" width={24} height={24} />
                 </div>
