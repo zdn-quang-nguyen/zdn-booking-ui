@@ -32,7 +32,7 @@ const FieldMap = () => {
     <div
       className={cn(
         styles.fieldMapContainer,
-        'rounded-large-sm mx-auto mt-12 flex w-fit flex-col gap-8 bg-neutral p-10',
+        'rounded-large-sm mx-auto mt-12 flex h-fit w-fit flex-col gap-8 bg-neutral p-10',
       )}
     >
       <div className="flex items-center">
