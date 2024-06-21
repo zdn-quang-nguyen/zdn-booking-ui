@@ -194,7 +194,7 @@ const FormCreateSportField: React.FC<FormCreateSportFieldProps> = ({
               {districts
                 .filter(
                   (district) =>
-                    district.province_id === selectedProvince?.toString(),
+                    district.provinceId === selectedProvince?.toString(),
                 )
                 .map((district) => (
                   <Select.Option key={district.id} value={district.id}>
@@ -209,7 +209,7 @@ const FormCreateSportField: React.FC<FormCreateSportFieldProps> = ({
             >
               {wards
                 .filter(
-                  (ward) => ward.district_id === selectedDistrict?.toString(),
+                  (ward) => ward.districtId === selectedDistrict?.toString(),
                 )
                 .map((ward) => (
                   <Select.Option key={ward.id} value={ward.id}>
