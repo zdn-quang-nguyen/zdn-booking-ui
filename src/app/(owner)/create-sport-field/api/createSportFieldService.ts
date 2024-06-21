@@ -1,6 +1,4 @@
 'use server';
-
-import clsx from 'clsx';
 import { cookies } from 'next/headers';
 
 export async function getLocation() {
