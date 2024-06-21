@@ -8,6 +8,7 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 import styles from './formCreateSportField.module.scss';
 import iconUpImage from '/public/images/icons_add_image.png';
+import { postData } from '../api/createSportFieldService';
 const { TextArea } = Input;
 
 const normFile = (e: any) => {
@@ -49,6 +50,9 @@ type FieldType = {
 
 const onFinish: FormProps<FieldType>['onFinish'] = (values) => {
   console.log('Success:', values);
+  postData(values).then((result) => {
+    console.log('Server response:', result);
+  });
 };
 
 const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
