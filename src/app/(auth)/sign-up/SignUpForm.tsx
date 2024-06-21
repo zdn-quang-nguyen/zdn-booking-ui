@@ -1,27 +1,34 @@
-"use client";
-import React, { useEffect } from "react";
-import { Button, Input, message } from "antd";
-import { FaArrowLeft } from "react-icons/fa6";
-import { EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
-import Image from "next/image";
-import { z } from "zod";
-import { useForm, Controller } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { cn } from "@/libs/utils";
-import s from "../sign-up/signUp.module.scss";
+'use client';
+import {
+  ArrowLeftOutlined,
+  EyeInvisibleOutlined,
+  EyeTwoTone,
+} from '@ant-design/icons';
+import { Button, Input, message } from 'antd';
+import { useEffect, useState } from 'react';
 
-import fb from "../../../../public/images/icon-facebook.svg";
-import gg from "../../../../public/images/icon-google.svg";
-import Errors from "@/components/errors/errors";
-import { SignUpSchema } from "@/zod-schemas/signup-schema";
-import { useSearchParams, useRouter } from "next/navigation";
-import { signUpUser } from "../apis/auth.api";
+import { cn } from '@/libs/utils';
+import { zodResolver } from '@hookform/resolvers/zod';
+import Image from 'next/image';
+import { Controller, useForm } from 'react-hook-form';
+import { z } from 'zod';
+import s from '../sign-up/signUp.module.scss';
+
+import Errors from '@/components/errors/errors';
+import { AUTH_PROVIDERS, VALID_ROLES } from '@/constants/constant';
+import { SignUpSchema } from '@/zod-schemas/signup-schema';
+import { signIn } from 'next-auth/react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import fb from '../../../../public/images/icon-facebook.svg';
+import gg from '../../../../public/images/icon-google.svg';
+import { signUpUser } from '../apis/auth.api';
 
 type SignUpSchemaType = z.infer<typeof SignUpSchema>;
 
 export default function SignUpForm() {
   const [messageApi, contextHolder] = message.useMessage();
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -29,9 +36,9 @@ export default function SignUpForm() {
     const updateSearchParams = () => {
       const params = new URLSearchParams(searchParams);
 
-      let role = searchParams.get('role');
+      const role = searchParams.get('role') as string;
 
-      if (role === '' || role === null) {
+      if (!VALID_ROLES.includes(role)) {
         params.set('role', 'user');
         router.push(`sign-up?${params.toString()}`);
       }
@@ -50,12 +57,13 @@ export default function SignUpForm() {
   });
 
   const onSubmit = async (data: any) => {
+    setLoading(true);
     const dataBody = {
       name: data.name,
       email: data.email,
       phone: data.phone,
       password: data.password,
-      role: role ? role : 'user',
+      role: role ? role : process.env.NEXT_PUBLIC_ROLE_USER,
       accountType: 'manual',
     };
 
@@ -66,41 +74,47 @@ export default function SignUpForm() {
         type: 'success',
         content: 'Đăng kí thành công',
       });
+
       router.push(`/login?role=${role}`);
-      // data.name = "";
-      // data.email = "";
-      // data.phone = "";
-      // data.password = "";
     } else {
       messageApi.open({
         type: 'error',
         content: res.message,
       });
+      setLoading(false);
     }
   };
 
+  const handleSocialLogin = async () => {
+    await signIn(AUTH_PROVIDERS.KEYCLOAK, {
+      callbackUrl: `/verify-user?role=${role}`,
+      redirect: true,
+    });
+  };
   return (
     <>
       {contextHolder}
       <div className="py-12">
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="w-[620px] bg-primary-100 rounded-[40px] border border--primary-400 p-10"
+          className="border--primary-400 w-[620px] rounded-[40px] border bg-primary-100 p-10"
         >
           <div className="flex items-center">
-            <FaArrowLeft className="text-xl mr-4" />
+            <ArrowLeftOutlined className="mr-4 text-xl" />
             <Link
               href="/role"
-              className="font-bold text-[28px] leading-7 cursor-pointer"
+              className="cursor-pointer text-[28px] font-bold leading-7"
             >
-              {role === 'owner' ? 'Chủ sân' : 'Người thuê'}
+              {role === process.env.NEXT_PUBLIC_ROLE_OWNER
+                ? 'Chủ sân'
+                : 'Người thuê'}
             </Link>
           </div>
           <div className={cn(s.main, 'mt-10')}>
             <div className={cn(s.inputContainer, 'flex flex-col items-center')}>
               <label
                 htmlFor="name"
-                className="text-primary-600 text-lg leading-6 font-bold mb-2"
+                className="mb-2 text-lg font-bold leading-6 text-primary-600"
               >
                 Tên
               </label>
@@ -114,16 +128,16 @@ export default function SignUpForm() {
               {<Errors error={errors.name} />}
             </div>
 
-            <div className="flex items-center justify-between mt-6">
+            <div className="mt-6 flex items-center justify-between">
               <div
                 className={cn(
                   s.inputContainer,
-                  'flex flex-col items-center w-1/2 mr-2',
+                  'mr-2 flex w-1/2 flex-col items-center',
                 )}
               >
                 <label
                   htmlFor="email"
-                  className="text-primary-600 text-lg leading-6 font-bold mb-2"
+                  className="mb-2 text-lg font-bold leading-6 text-primary-600"
                 >
                   Email
                 </label>
@@ -139,12 +153,12 @@ export default function SignUpForm() {
               <div
                 className={cn(
                   s.inputContainer,
-                  'flex flex-col items-center w-1/2 ml-2',
+                  'ml-2 flex w-1/2 flex-col items-center',
                 )}
               >
                 <label
                   htmlFor="phone"
-                  className="text-primary-600 text-lg leading-6 font-bold mb-2"
+                  className="mb-2 text-lg font-bold leading-6 text-primary-600"
                 >
                   Số điện thoại
                 </label>
@@ -156,12 +170,11 @@ export default function SignUpForm() {
                     <Input
                       id="phone"
                       placeholder="Nhập số điện thoại"
-                      pattern="[0-9]*"
                       {...field}
                     />
                   )}
                 />
-                <span className="text-red-500 h-3">
+                <span className="h-3 text-red-500">
                   {<Errors error={errors.phone} />}
                 </span>
               </div>
@@ -169,12 +182,12 @@ export default function SignUpForm() {
             <div
               className={cn(
                 s.inputContainer,
-                'flex flex-col items-center mt-6',
+                'mt-6 flex flex-col items-center',
               )}
             >
               <label
                 htmlFor="password"
-                className="text-primary-600 text-lg leading-6 font-bold mb-2"
+                className="mb-2 text-lg font-bold leading-6 text-primary-600"
               >
                 Password
               </label>
@@ -197,12 +210,12 @@ export default function SignUpForm() {
             <div
               className={cn(
                 s.inputContainer,
-                'flex flex-col items-center mt-6',
+                'mt-6 flex flex-col items-center',
               )}
             >
               <label
                 htmlFor="confirmPassword"
-                className="text-primary-600 text-lg leading-6 font-bold mb-2"
+                className="mb-2 text-lg font-bold leading-6 text-primary-600"
               >
                 Confirm password
               </label>
@@ -222,27 +235,38 @@ export default function SignUpForm() {
               />
               {<Errors error={errors.confirmPassword} />}
             </div>
-            <div className="mt-6 mb-4">
-              <Button htmlType="submit" type="primary" className="w-full ">
+            <div className="mb-4 mt-6">
+              <Button
+                htmlType="submit"
+                type="primary"
+                className="w-full"
+                loading={loading}
+              >
                 Đăng kí
               </Button>
             </div>
             <div>
               <Link
                 href={`/login?role=${role}`}
-                className="text-base cursor-pointer underline underline-offset-4 font-medium text-primary-600 mt-3"
+                className="mt-3 cursor-pointer text-base font-medium text-primary-600 underline underline-offset-4"
               >
                 Bạn đã có tài khoản đăng nhập?
               </Link>
             </div>
-            <div className="flex flex-col justify-center items-center mt-10">
+            <div className="mt-10 flex flex-col items-center justify-center">
               <span>Hoặc đăng nhập bằng</span>
-              <div className="flex items-center mt-4">
-                <div className="bg-primary-500 rounded-full w-fit p-3 mr-5 cursor-pointer">
+              <div className="mt-4 flex items-center">
+                <div
+                  className="mr-5 w-fit cursor-pointer rounded-full bg-primary-500 p-3"
+                  onClick={() => handleSocialLogin()}
+                >
                   <Image src={fb} alt="Facebook" width={24} height={24} />
                 </div>
 
-                <div className="bg-primary-500 rounded-full w-fit p-3 cursor-pointer">
+                <div
+                  className="w-fit cursor-pointer rounded-full bg-primary-500 p-3"
+                  onClick={() => handleSocialLogin()}
+                >
                   <Image src={gg} alt="Google" width={24} height={24} />
                 </div>
               </div>
