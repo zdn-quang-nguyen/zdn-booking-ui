@@ -11,21 +11,25 @@ import {
   message,
 } from 'antd';
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
+import ImgCrop from 'antd-img-crop';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
-import styles from './SportFieldForm.module.scss';
 import iconUpImage from '/public/images/icons_add_image.png';
 import CustomNumberInput from './CustomNumberInput';
 import RangePickerComponent from '@/components/common/RangePickerComponent';
 import { District, Province, Ward } from '@/types/location.type';
 import { uploadImage } from '../../apis/upload-img.api';
 import { getLocation, postData } from '../../apis/create-sport-field.api';
+import styles from './SportFieldForm.module.scss';
 
 import { cn } from '@/libs/utils';
+import { max } from 'moment';
 
 const { TextArea } = Input;
 const { Option } = Select;
+
+const MAX_IMAGE_COUNT = 2;
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -45,7 +49,8 @@ const beforeUpload = (file: FileType) => {
   if (!isLt2M) {
     message.error('Image must smaller than 2MB!');
   }
-  return isJpgOrPng && isLt2M;
+
+  return (isJpgOrPng && isLt2M) || Upload.LIST_IGNORE;
 };
 
 type SportFieldFormProps = {
@@ -105,7 +110,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
     const startTime = time[0].format('HH:mm');
     const endTime = time[1].format('HH:mm');
 
-    postData(
+    const result = await postData(
       {
         ...rest,
         sportFieldImages: [...uploadImages],
@@ -114,10 +119,16 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
       },
       'create',
     );
+
+    if (result.status === 201) {
+      message.success('Tạo sân thành công');
+    } else {
+      message.error('Tạo sân thất bại');
+    }
   };
 
   const onFinishFailed: FormProps<any>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    message.error('Lỗi: ' + errorInfo);
   };
 
   return (
@@ -346,7 +357,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
           <p className="body-2 mb-5 font-bold text-natural-700">
             Hình ảnh{' '}
             <span className="body-5 mx-3 text-natural-400">
-              Kích thước tiêu chuẩn 1200*389 px
+              Kích thước tiêu chuẩn 360*280 px
             </span>
           </p>
           <Form.Item
@@ -355,35 +366,38 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
             name="images"
             rules={[{ required: true, message: 'Vui lòng thêm hình ảnh' }]}
           >
-            <Upload
-              action=""
-              beforeUpload={beforeUpload}
-              listType="picture-card"
-            >
-              <button
-                style={{
-                  border: '2px',
-                  background: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                }}
-                type="button"
+            <ImgCrop rotationSlider aspect={36 / 28}>
+              <Upload
+                action=""
+                beforeUpload={beforeUpload}
+                listType="picture-card"
+                maxCount={MAX_IMAGE_COUNT}
               >
-                <Image
-                  src={iconUpImage}
-                  alt="icon-up-image"
-                  width={40}
-                  height={40}
-                />
-                <div
-                  style={{ marginTop: 8 }}
-                  className="body-5 text-accent-600"
+                <button
+                  style={{
+                    border: '2px',
+                    background: 'none',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                  }}
+                  type="button"
                 >
-                  Tải hình ảnh lên
-                </div>
-              </button>
-            </Upload>
+                  <Image
+                    src={iconUpImage}
+                    alt="icon-up-image"
+                    width={40}
+                    height={40}
+                  />
+                  <div
+                    style={{ marginTop: 8 }}
+                    className="body-5 text-accent-600"
+                  >
+                    Tải hình ảnh lên
+                  </div>
+                </button>
+              </Upload>
+            </ImgCrop>
           </Form.Item>
         </div>
 
