@@ -1,6 +1,6 @@
 'use client';
-import React, { useEffect, useState } from 'react';
-import { TimePicker, Dropdown, Menu } from 'antd';
+import React from 'react';
+import { TimePicker } from 'antd';
 import dayjs from 'dayjs';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import locale from 'antd/es/date-picker/locale/vi_VN';
@@ -34,14 +34,9 @@ const RangePickerComponent: React.FC<rangePickerProps> = (props) => {
         }
         separator={<Image src={Arrow} alt="arrow" className={``} />}
         className={`flex flex-grow items-center justify-start gap-3`}
-        onCalendarChange={(_, [start, end]) => {
-          console.log('Time range changed:', start, end);
-        }}
+        onCalendarChange={(_, [start, end]) => {}}
         onOk={(value) => {
-          console.log('Time range selected:', value);
           onChange && onChange(value);
-
-          // Your logic to handle the selection after clicking OK
         }}
       />
     </div>

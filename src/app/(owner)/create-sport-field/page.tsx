@@ -4,6 +4,7 @@ import FormCreateSportField from './components/SportFieldForm';
 
 const OwnerCreateSportFieldPage = async () => {
   const { provinces, districts, wards } = await getLocation();
+
   const { sportFieldTypes } = await getSportFieldTypes();
 
   return (

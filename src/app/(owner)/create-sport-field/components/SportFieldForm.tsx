@@ -1,7 +1,4 @@
 'use client';
-import RangePickerComponent from '@/components/common/RangePickerComponent';
-import { cn } from '@/libs/utils';
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import type { FormProps, GetProp, UploadProps } from 'antd';
 import {
   Button,
@@ -9,18 +6,26 @@ import {
   Input,
   InputNumber,
   Select,
+  Space,
   Upload,
   message,
 } from 'antd';
+import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import Image from 'next/image';
 import React, { useState } from 'react';
+
 import styles from './SportFieldForm.module.scss';
 import iconUpImage from '/public/images/icons_add_image.png';
-import { District, Province, Ward } from '@/types/location.type';
-import { getLocation, postData } from '../../apis/create-sport-field.api';
 import CustomNumberInput from './CustomNumberInput';
+import RangePickerComponent from '@/components/common/RangePickerComponent';
+import { District, Province, Ward } from '@/types/location.type';
 import { uploadImage } from '../../apis/upload-img.api';
+import { getLocation, postData } from '../../apis/create-sport-field.api';
+
+import { cn } from '@/libs/utils';
+
 const { TextArea } = Input;
+const { Option } = Select;
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
 
@@ -56,8 +61,6 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
   wards,
   sportFieldTypes,
 }) => {
-  // const { provinces, districts, wards } = await getLocation();
-
   const [selectedProvince, setSelectedProvince] = useState<number | undefined>(
     undefined,
   );
@@ -68,19 +71,27 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
     undefined,
   );
 
+  const [form] = Form.useForm();
+
   const handleProvinceChange = (value: number) => {
     setSelectedProvince(value);
-    setSelectedDistrict(undefined); // Reset district when province changes
-    setSelectedWard(undefined); // Reset ward when province changes
+    setSelectedDistrict(undefined);
+    setSelectedWard(undefined);
+    form.setFieldsValue({
+      district: undefined,
+      ward: undefined,
+    });
   };
 
   const handleDistrictChange = (value: number) => {
     setSelectedDistrict(value);
-    setSelectedWard(undefined); // Reset ward when district changes
+    setSelectedWard(undefined);
+    form.setFieldsValue({
+      ward: undefined,
+    });
   };
 
   const onFinish: FormProps<any>['onFinish'] = async (values) => {
-    console.log('Success:', values);
     const { images, time, ...rest } = values;
     let uploadImages: any[] = [];
 
@@ -118,7 +129,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
     >
       <h4 className="font-bold text-natural-700">Tạo sân</h4>
       <Form
-        // form={form}
+        form={form}
         name="Create Sport Field"
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 20 }}
@@ -173,64 +184,85 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
             </Select>
           </Form.Item>
 
-          <div>
-            <p className="body-2 mb-5 font-bold text-natural-700">Địa chỉ</p>
-            <Form.Item label="Tỉnh/Thành Phố" name="province">
-              <Select
-                placeholder="Tỉnh"
-                onChange={handleProvinceChange}
-                value={selectedProvince}
+          <Form.Item label="Địa chỉ">
+            <Space.Compact block>
+              <Form.Item noStyle label="Tỉnh/Thành Phố" name="province">
+                <Select
+                  placeholder="Tinh/Thành Phố"
+                  onChange={handleProvinceChange}
+                  value={selectedProvince}
+                >
+                  {provinces.map((province) => {
+                    return (
+                      <Select.Option key={province.id} value={province.id}>
+                        {province.name}
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="Quận/Huyện"
+                noStyle
+                name="district"
+                dependencies={['province']}
               >
-                {provinces.map((province) => (
-                  <Select.Option key={province.id} value={province.id}>
-                    {province.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item label="Quận/Huyện" name="district">
-              <Select
-                placeholder="Quận/Huyện"
-                onChange={handleDistrictChange}
-                value={selectedDistrict}
+                <Select
+                  disabled={!selectedProvince}
+                  placeholder="Quận/Huyện"
+                  onChange={handleDistrictChange}
+                  value={selectedDistrict}
+                >
+                  {districts
+                    .filter(
+                      (district) =>
+                        district.provinceId === selectedProvince?.toString(),
+                    )
+                    .map((district) => (
+                      <Option key={district.id} value={district.id}>
+                        {district.name}
+                      </Option>
+                    ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                noStyle
+                label="Phường/Xã"
+                name="ward"
+                dependencies={['province', 'district']}
               >
-                {districts
-                  .filter(
-                    (district) =>
-                      district.provinceId === selectedProvince?.toString(),
-                  )
-                  .map((district) => (
-                    <Select.Option key={district.id} value={district.id}>
-                      {district.name}
-                    </Select.Option>
-                  ))}
-              </Select>
-            </Form.Item>
-            <Form.Item label="Phường/Xã" name="ward">
-              <Select
-                placeholder="Phường/Xã"
-                value={selectedWard}
-                onChange={(value) => setSelectedWard(value)}
-              >
-                {wards
-                  .filter(
-                    (ward) => ward.districtId === selectedDistrict?.toString(),
-                  )
-                  .map((ward) => (
-                    <Select.Option key={ward.id} value={ward.id}>
-                      {ward.name}
-                    </Select.Option>
-                  ))}
-              </Select>
-            </Form.Item>
+                <Select
+                  disabled={!selectedDistrict}
+                  placeholder="Phường/Xã"
+                  value={selectedWard}
+                  onChange={(value) => setSelectedWard(value)}
+                >
+                  {wards
+                    .filter(
+                      (ward) =>
+                        ward.districtId === selectedDistrict?.toString(),
+                    )
+                    .map((ward) => (
+                      <Option key={ward.id} value={ward.id}>
+                        {ward.name}
+                      </Option>
+                    ))}
+                </Select>
+              </Form.Item>
+            </Space.Compact>
+            <br />
             <Form.Item
-              label="Địa chỉ"
+              // label="Địa chỉ"
               name="address"
               rules={[{ required: true, message: 'Vui lòng nhập Địa chỉ' }]}
             >
-              <Input placeholder="Nhập địa chỉ" />
+              <Input
+                placeholder="Nhập địa chỉ chi tiết"
+                style={{ width: '100%', borderRadius: '40px' }}
+              />
             </Form.Item>
-          </div>
+          </Form.Item>
+
           <Form.Item
             label="Số điện thoại"
             name="phone"

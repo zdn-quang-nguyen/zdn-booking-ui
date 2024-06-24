@@ -68,33 +68,7 @@ export const FilterItem: React.FC<FilterItemProps> = ({
           <div className={`flex flex-col gap-3 w-full`}>
             <DatePickerComponent></DatePickerComponent>
             <RangePickerComponent label="Thời gian"></RangePickerComponent>
-            {/* <div
-              className={`${styles.rangePicker} flex flex-row gap-3 items-center`}
-            >
-              <label className={`body-3 text-natural-700`}>Thời gian</label>
-              <RangePicker
-                showTime={{
-                  minuteStep: 30,
-                }}
-                format="HH:mm"
-                locale={locale}
-                suffixIcon={
-                  <ClockCircleOutlined
-                    style={{ fontSize: '20px', color: '#939393' }}
-                  />
-                }
-                separator={<Image src={Arrow} alt="arrow" className={``} />}
-                className={`flex-grow flex items-center justify-start gap-4`}
-                onCalendarChange={(_, [start, end]) => {
-                  console.log('Start: ', start);
-                  console.log('End: ', end);
-                }}
-                onOk={(value) => {
-                  console.log('Time range selected:', value);
-                  // Your logic to handle the selection after clicking OK
-                }}
-              />
-            </div> */}
+
           </div>
         ) : (
           <div className={`flex flex-col gap-3 w-full`}>

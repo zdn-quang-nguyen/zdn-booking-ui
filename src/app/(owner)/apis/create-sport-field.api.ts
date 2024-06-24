@@ -7,7 +7,6 @@ export async function getLocation() {
   let districts: BaseResponse;
   let wards: BaseResponse;
   const auth = `Bearer ${cookies().get('access_token')?.value}`;
-  console.log(auth);
   try {
     // Fetch provinces
     const provincesResponse = await fetch(
@@ -75,7 +74,6 @@ export const postData = async (data: any, method: string) => {
 
   switch (method) {
     case 'create':
-      console.log('Data:', data);
       try {
         const response = await fetch('http://localhost:5000/sport-field', {
           method: 'POST',
@@ -89,7 +87,6 @@ export const postData = async (data: any, method: string) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        console.log('Data sent successfully:', result);
         return result;
       } catch (error) {
         console.error('Error sending data:', error);
@@ -108,7 +105,6 @@ export const postData = async (data: any, method: string) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        console.log('Data sent successfully:', result);
         return result;
       } catch (error) {
         console.error('Error sending data:', error);
@@ -132,7 +128,6 @@ export const postData = async (data: any, method: string) => {
 //     throw new Error(`HTTP error! status: ${response.status}`);
 //   }
 //   const result = await response.json();
-//   console.log('Data sent successfully:', result);
 //   return result;
 // } catch (error) {
 //   console.error('Error sending data:', error);

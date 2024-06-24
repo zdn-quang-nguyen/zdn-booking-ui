@@ -68,7 +68,6 @@ export default function SignUpForm() {
     };
 
     const res = await signUpUser(dataBody);
-    console.log(res);
     if (res.status === 'Success') {
       messageApi.open({
         type: 'success',
