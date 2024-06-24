@@ -3,9 +3,9 @@ import { District, Province, Ward } from '@/types/location.type';
 import { cookies } from 'next/headers';
 
 export async function getLocation() {
-  let provinces: Province[] = [];
-  let districts: District[] = [];
-  let wards: Ward[] = [];
+  let provinces: BaseResponse;
+  let districts: BaseResponse;
+  let wards: BaseResponse;
   const auth = `Bearer ${cookies().get('access_token')?.value}`;
   console.log(auth);
   try {
@@ -55,15 +55,15 @@ export async function getLocation() {
     wards = await wardsResponse.json();
 
     return {
-      provinces,
-      districts,
-      wards,
+      provinces: provinces.data,
+      districts: districts.data,
+      wards: wards.data,
     };
   } catch (error: any) {
     return {
-      provinces,
-      districts,
-      wards,
+      provinces: [],
+      districts: [],
+      wards: [],
       error: 'Failed to fetch data',
     };
   } finally {
