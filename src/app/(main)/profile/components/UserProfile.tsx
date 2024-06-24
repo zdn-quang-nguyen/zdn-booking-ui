@@ -6,11 +6,12 @@ import styles from "./profile.module.scss";
 import { cn } from "@/libs/utils";
 import EditProfile from "./EditProfile";
 import { signOut, useSession } from 'next-auth/react';
+import { cookies } from 'next/headers';
 
 export default function UserProfile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { data: session } = useSession();
-  console.log(123, session);
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -21,6 +22,11 @@ export default function UserProfile() {
 
   const handleCancel = () => {
     setIsModalOpen(false);
+  };
+  const handleSignOut = async () => {
+    document.cookie =
+      'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    await signOut();
   };
 
   return (
@@ -49,7 +55,10 @@ export default function UserProfile() {
               Chỉnh sửa
             </Button>
 
-            <button className="relative ml-2 h-4 w-4" onClick={() => signOut()}>
+            <button
+              className="relative ml-2 h-4 w-4"
+              onClick={() => handleSignOut()}
+            >
               <Image
                 src="/icons/logout.svg"
                 className="rounded-xl"

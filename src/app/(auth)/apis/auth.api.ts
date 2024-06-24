@@ -11,10 +11,9 @@ export const signUpUser = async (signUpInfo: any): Promise<any> => {
         'Content-Type': 'application/json',
       },
     });
-    console.log(data.data);
+
     return data.data;
   } catch (error) {
-    console.log(error);
     return error;
   }
 };
@@ -41,7 +40,7 @@ export const signIn = async (username: string, password: string) => {
   cookies().set('access_token', accessToken);
 
   const cookiees = cookies().getAll();
-  console.log(cookiees);
+
   return res.data;
 };
 
