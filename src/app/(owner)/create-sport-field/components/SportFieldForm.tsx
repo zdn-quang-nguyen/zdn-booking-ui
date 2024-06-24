@@ -23,6 +23,8 @@ import { uploadImage } from '../../apis/upload-img.api';
 import { getLocation, postData } from '../../apis/create-sport-field.api';
 import styles from './SportFieldForm.module.scss';
 
+import { CATEGORY_MAPING } from '@/constants/constant';
+
 import { cn } from '@/libs/utils';
 import { max } from 'moment';
 
@@ -189,7 +191,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
                   key={sportFieldType.id}
                   value={sportFieldType.id}
                 >
-                  {sportFieldType.name}
+                  {CATEGORY_MAPING[sportFieldType.name]}
                 </Select.Option>
               ))}
             </Select>
@@ -197,7 +199,14 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
 
           <Form.Item label="Địa chỉ">
             <Space.Compact block>
-              <Form.Item noStyle label="Tỉnh/Thành Phố" name="province">
+              <Form.Item
+                noStyle
+                label="Tỉnh/Thành Phố"
+                name="province"
+                rules={[
+                  { required: true, message: 'Vui lòng chọn tỉnh/thành phố' },
+                ]}
+              >
                 <Select
                   placeholder="Tinh/Thành Phố"
                   onChange={handleProvinceChange}
@@ -217,6 +226,9 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
                 noStyle
                 name="district"
                 dependencies={['province']}
+                rules={[
+                  { required: true, message: 'Vui lòng chọn quận/huyện' },
+                ]}
               >
                 <Select
                   disabled={!selectedProvince}
@@ -241,6 +253,9 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
                 label="Phường/Xã"
                 name="ward"
                 dependencies={['province', 'district']}
+                rules={[
+                  { required: false, message: 'Vui lòng chọn phường/xã' },
+                ]}
               >
                 <Select
                   disabled={!selectedDistrict}
@@ -265,7 +280,9 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
             <Form.Item
               // label="Địa chỉ"
               name="address"
-              rules={[{ required: true, message: 'Vui lòng nhập Địa chỉ' }]}
+              rules={[
+                { required: true, message: 'Vui lòng nhập Địa chỉ chi tiết' },
+              ]}
             >
               <Input
                 placeholder="Nhập địa chỉ chi tiết"
@@ -282,7 +299,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
               { required: true, message: 'Vui lòng nhập Số điện thoại' },
               {
                 type: 'string',
-                max: 9,
+                len: 9,
                 message: 'Số điện thoại không vượt quá 9 số',
               },
             ]}
@@ -318,7 +335,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
             ]}
           >
             <InputNumber
-              suffix="đ / tiếng"
+              suffix="VND/giờ"
               style={{ width: '120%', borderRadius: '40px' }}
             />
           </Form.Item>
@@ -401,7 +418,10 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
           </Form.Item>
         </div>
 
-        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+        <Form.Item
+          wrapperCol={{ offset: 8, span: 16 }}
+          className={cn(styles.buttonCustom, 'flex justify-end')}
+        >
           <Button type="primary" htmlType="submit">
             Xác nhận
           </Button>
