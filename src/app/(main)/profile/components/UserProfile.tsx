@@ -6,7 +6,7 @@ import styles from "./profile.module.scss";
 import { cn } from "@/libs/utils";
 import EditProfile from "./EditProfile";
 import { signOut, useSession } from 'next-auth/react';
-import { cookies } from 'next/headers';
+import { removeTokens } from '@/app/(auth)/apis/auth.api';
 
 export default function UserProfile() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,10 +23,10 @@ export default function UserProfile() {
   const handleCancel = () => {
     setIsModalOpen(false);
   };
-  const handleSignOut = async () => {
-    document.cookie =
-      'access_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    await signOut();
+
+  const handleSignOut = () => {
+    removeTokens();
+    signOut();
   };
 
   return (
