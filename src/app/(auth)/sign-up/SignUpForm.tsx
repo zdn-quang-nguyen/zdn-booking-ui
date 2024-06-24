@@ -54,6 +54,7 @@ export default function SignUpForm() {
     // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useForm<SignUpSchemaType>({
     resolver: zodResolver(SignUpSchema),
+    mode: 'onBlur',
   });
 
   const onSubmit = async (data: any) => {
@@ -189,14 +190,14 @@ export default function SignUpForm() {
                 htmlFor="password"
                 className="mb-2 text-lg font-bold leading-6 text-primary-600"
               >
-                Password
+                Mật khẩu
               </label>
               <Controller
                 name="password"
                 control={control}
                 render={({ field }) => (
                   <Input.Password
-                    placeholder="Nhập password"
+                    placeholder="Nhập mật khẩu"
                     id="password"
                     iconRender={(visible) =>
                       visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -217,14 +218,14 @@ export default function SignUpForm() {
                 htmlFor="confirmPassword"
                 className="mb-2 text-lg font-bold leading-6 text-primary-600"
               >
-                Confirm password
+                Xác nhận mật khẩu
               </label>
               <Controller
                 name="confirmPassword"
                 control={control}
                 render={({ field }) => (
                   <Input.Password
-                    placeholder="Nhập password"
+                    placeholder="Nhập xác nhận mật khẩu"
                     id="confirmPassword"
                     iconRender={(visible) =>
                       visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />

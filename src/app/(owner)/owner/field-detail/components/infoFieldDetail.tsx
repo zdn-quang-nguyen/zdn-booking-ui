@@ -2,13 +2,18 @@
 import { LeftOutlined, StarFilled, StarOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
 import fieldImg from '../../../../../../public/images/Field.png';
-import Image from 'next/image';
+// import Image from 'next/image';
 import s from '../components/infoFieldDetail.module.scss';
-import { cn } from '@/libs/utils';
+import { cn, formatCurrency } from '@/libs/utils';
 import DeleteFieldBooking from './deleteFieldBooking';
 import { useRouter } from 'next/navigation';
+import { Image } from 'antd';
 
-export default function InfoFieldDetail({ sportField }: { sportField: any }) {
+export default function InfoFieldDetail({
+  sportField,
+}: {
+  sportField: SportField;
+}) {
   const route = useRouter();
   const [openModal, setOpenModal] = useState<boolean>(false);
 
@@ -21,6 +26,7 @@ export default function InfoFieldDetail({ sportField }: { sportField: any }) {
   const handleBack = () => {
     route.push('/owner');
   };
+  console.log(sportField);
   return (
     <div className="flex h-full w-full justify-center">
       <DeleteFieldBooking isOpen={openModal} onClose={handleCloseModal} />
@@ -73,20 +79,20 @@ export default function InfoFieldDetail({ sportField }: { sportField: any }) {
           <p className="mb-6 text-base font-normal leading-6 text-natural-500">
             Địa chỉ{' '}
             <span className="ml-3 font-bold text-natural-700">
-              12 Nguyễn Thị Nhung, Hiệp Bình Phước, Thủ Đức, Tp. Hồ Chí Minh
+              {sportField.location.addressDetail}
             </span>
           </p>
           <p className="mb-6 text-base font-normal leading-6 text-natural-500">
             Số điện thoại{' '}
             <span className="ml-3 font-bold text-natural-700">
-              (+84) {sportField.phone}
+              {sportField.phone}
             </span>
           </p>
           <p className="mb-6 text-base font-normal leading-6 text-natural-500">
             Thời gian mở cửa{' '}
             <span className="ml-3 font-bold text-natural-700">
               {' '}
-              {sportField.startTime}-{sportField.endTime}
+              {sportField.startTime} - {sportField.endTime}
             </span>
           </p>
           <div className="mb-6 flex items-center text-base font-normal leading-6 text-natural-700">
@@ -105,7 +111,10 @@ export default function InfoFieldDetail({ sportField }: { sportField: any }) {
               >
                 Giá tiền
               </p>
-              <span className="font-bold"> {sportField.price}/ tiếng</span>
+              <span className="font-bold">
+                {' '}
+                {formatCurrency(sportField.price)}/ tiếng
+              </span>
             </div>
           </div>
           <div className="mb-6 text-base font-normal leading-6 text-natural-700">
@@ -114,18 +123,16 @@ export default function InfoFieldDetail({ sportField }: { sportField: any }) {
               Hình ảnh
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              {Array.from({ length: 5 }, (_, index) => index + 1).map(
-                (image) => (
-                  <Image
-                    key={image}
-                    className="rounded-xl"
-                    src={fieldImg}
-                    alt={`Image ${image}`}
-                    width={144}
-                    height={100}
-                  />
-                ),
-              )}
+              {sportField.sportFieldImages.map((sportFieldImage) => (
+                <Image
+                  key={sportFieldImage.id}
+                  className="rounded-xl"
+                  src={sportFieldImage.url}
+                  alt={`Image ${sportFieldImage.name}`}
+                  width={144}
+                  height={100}
+                />
+              ))}
             </div>
           </div>
         </div>
