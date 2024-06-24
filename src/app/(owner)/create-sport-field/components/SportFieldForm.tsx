@@ -41,7 +41,7 @@ const beforeUpload = (file: FileType) => {
   if (!isLt2M) {
     message.error('Image must smaller than 2MB!');
   }
-  console.log(isJpgOrPng, isLt2M);
+
   return (isJpgOrPng && isLt2M) || Upload.LIST_IGNORE;
 };
 
@@ -96,7 +96,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
     const startTime = time[0].format('HH:mm');
     const endTime = time[1].format('HH:mm');
 
-    postData(
+    const result = await postData(
       {
         ...rest,
         sportFieldImages: [...uploadImages],
@@ -105,10 +105,16 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
       },
       'create',
     );
+
+    if (result.status === 201) {
+      message.success('Tạo sân thành công');
+    } else {
+      message.error('Tạo sân thất bại');
+    }
   };
 
   const onFinishFailed: FormProps<any>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    message.error('Lỗi: ' + errorInfo);
   };
 
   return (
