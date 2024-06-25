@@ -1,5 +1,5 @@
 'use client';
-import type { FormProps, GetProp, UploadProps } from 'antd';
+import type { FormProps, GetProp, UploadFile, UploadProps } from 'antd';
 import {
   Button,
   Form,
@@ -13,8 +13,9 @@ import {
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
+import dayjs from 'dayjs';
 import iconUpImage from '/public/images/icons_add_image.png';
 import CustomNumberInput from './CustomNumberInput';
 import RangePickerComponent from '@/components/common/RangePickerComponent';
@@ -23,24 +24,17 @@ import { uploadImage } from '../../apis/upload-img.api';
 import { getLocation, postData } from '../../apis/create-sport-field.api';
 import styles from './SportFieldForm.module.scss';
 
-import { CATEGORY_MAPING } from '@/constants/constant';
+import { CATEGORY_MAPPING, CRUD_ACTIONS } from '@/constants/constant';
 
 import { cn } from '@/libs/utils';
-import { max } from 'moment';
+import { isObject } from 'util';
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-const MAX_IMAGE_COUNT = 2;
+const MAX_IMAGE_COUNT = 5;
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
-
-const normalFiles = (e: any) => {
-  if (Array.isArray(e)) {
-    return e;
-  }
-  return e?.fileList;
-};
 
 const beforeUpload = (file: FileType) => {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -60,6 +54,8 @@ type SportFieldFormProps = {
   districts: District[];
   wards: Ward[];
   sportFieldTypes: SportFieldType[];
+  defaultValues?: SportField | null;
+  label?: string | 'create';
 };
 
 const SportFieldForm: React.FC<SportFieldFormProps> = ({
@@ -67,6 +63,8 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
   districts,
   wards,
   sportFieldTypes,
+  defaultValues,
+  label = 'create',
 }) => {
   const [selectedProvince, setSelectedProvince] = useState<number | undefined>(
     undefined,
@@ -77,6 +75,28 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
   const [selectedWard, setSelectedWard] = useState<number | undefined>(
     undefined,
   );
+
+  const [fileList, setFileList] = useState<UploadFile[]>(
+    defaultValues?.sportFieldImages.map((img) => {
+      return {
+        uid: img.id || '',
+        name: img.name,
+        status: 'done',
+        url: img.url,
+      };
+    }) || [],
+  );
+
+  const [removeFile, setRemoveFile] = useState<string[]>([]);
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const handleChangeFile: UploadProps['onChange'] = ({
+    fileList: newFileList,
+  }) => {
+    setFileList(newFileList);
+    form.setFieldsValue({ images: newFileList });
+  };
 
   const [form] = Form.useForm();
 
@@ -99,33 +119,76 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
   };
 
   const onFinish: FormProps<any>['onFinish'] = async (values) => {
-    const { images, time, ...rest } = values;
+    setLoading(true);
+    message.loading({ content: 'Đang xử lý...', key: 'loading' });
+    const { fields, images, time, ...rest } = values;
     let uploadImages: any[] = [];
 
     for (let i = 0; i < images.length; i++) {
-      const formData = new FormData();
-      formData.append('file', images[i].originFileObj as File);
-      const img = await uploadImage(formData);
-      uploadImages.push(img);
+      if (images[i].originFileObj) {
+        const formData = new FormData();
+        formData.append('file', images[i].originFileObj as File);
+        const result = await uploadImage(formData);
+        uploadImages.push(result);
+      }
     }
+    const province = provinces.find((p) => p.id === selectedProvince);
+    const district = districts.find((d) => d.id === selectedDistrict);
+    const ward = wards.find((w) => w.id === selectedWard);
 
-    const startTime = time[0].format('HH:mm');
-    const endTime = time[1].format('HH:mm');
+    const startTime = isObject(time[0]) ? time[0].format('HH:mm') : time[0];
+    const endTime = isObject(time[1]) ? time[1].format('HH:mm') : time[1];
+
+    const location = {
+      provinceId: selectedProvince,
+      districtId: selectedDistrict,
+      wardId: selectedWard,
+      addressDetail: `${rest.address} -- ${ward?.name} -- ${district?.name} -- ${province?.name}`,
+    };
+
+    console.log({
+      id: defaultValues?.id,
+      ...rest,
+      sportFieldImages: [...uploadImages],
+      removeImageIds: removeFile.map((uid) => {
+        if (uid.includes('rc-upload')) {
+          return;
+        } else {
+          return uid;
+        }
+      }),
+      location,
+      startTime,
+      endTime,
+    });
 
     const result = await postData(
       {
+        id: defaultValues?.id,
         ...rest,
         sportFieldImages: [...uploadImages],
-        startTime,
-        endTime,
+        removeImageIds: removeFile.map((uid) => {
+          if (uid.includes('rc-upload')) {
+            return;
+          } else {
+            return uid;
+          }
+        }),
+        location,
+        startTime: startTime < endTime ? startTime : endTime,
+        endTime: startTime < endTime ? endTime : startTime,
       },
-      'create',
+      label,
     );
 
-    if (result.status === 201) {
-      message.success('Tạo sân thành công');
+    if (result.statusCode === 201 || result.statusCode === 200) {
+      setLoading(false);
+      message.success(result.message);
+      // } else if (result.status === 200) {
+      //   message.success(result.message);
     } else {
-      message.error('Tạo sân thất bại');
+      setLoading(false);
+      message.error(result.message);
     }
   };
 
@@ -133,14 +196,53 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
     message.error('Lỗi: ' + errorInfo);
   };
 
+  useEffect(() => {
+    if (defaultValues) {
+      form.setFieldsValue({
+        name: defaultValues.name,
+        sportFieldTypeId: defaultValues.sportFieldTypeId,
+        phone: defaultValues.phone,
+        address: defaultValues.location ? defaultValues.location.address : '',
+        price: defaultValues.price,
+        rule: defaultValues.rule,
+        quantity: defaultValues.quantity,
+        images: defaultValues.sportFieldImages,
+        time: [defaultValues.startTime, defaultValues.endTime],
+      });
+
+      if (defaultValues.location) {
+        form.setFieldsValue({
+          province: defaultValues.location?.provinceId
+            ? defaultValues.location.provinceId
+            : '',
+          district: defaultValues.location?.districtId
+            ? defaultValues.location.districtId
+            : '',
+          ward: defaultValues.location?.wardId
+            ? defaultValues.location.wardId
+            : '',
+
+          address: defaultValues.location.addressDetail.split(' -- ')[0],
+        });
+        setSelectedProvince(defaultValues.location.provinceId);
+        setSelectedDistrict(defaultValues.location.districtId);
+        setSelectedWard(defaultValues.location.wardId);
+      }
+    } else {
+      form.setFieldsValue({
+        quantity: 1,
+      });
+    }
+  }, [defaultValues]);
+
   return (
     <div
       className={cn(
         styles.createSportFileContainer,
-        'mx-auto mt-12 flex w-1/2 flex-col gap-8 rounded-form bg-neutral p-10',
+        '3xl:w-1/2 mx-auto mt-12 flex w-1/2 flex-col gap-8 rounded-form bg-neutral p-10 md:w-11/12 lg:w-4/5 xl:w-3/4 2xl:w-2/3',
       )}
     >
-      <h4 className="font-bold text-natural-700">Tạo sân</h4>
+      <h4 className="font-bold text-natural-700">{`${CRUD_ACTIONS[label]} sân`}</h4>
       <Form
         form={form}
         name="Create Sport Field"
@@ -191,7 +293,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
                   key={sportFieldType.id}
                   value={sportFieldType.id}
                 >
-                  {CATEGORY_MAPING[sportFieldType.name]}
+                  {CATEGORY_MAPPING[sportFieldType.name]}
                 </Select.Option>
               ))}
             </Select>
@@ -316,9 +418,18 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
             rules={[
               { required: true, message: 'Vui lòng nhập Thời gian mở cửa' },
             ]}
-            getValueFromEvent={(e) => e}
+            getValueFromEvent={(e) => {
+              console.log(e);
+              return e;
+            }}
           >
-            <RangePickerComponent />
+            <RangePickerComponent
+              defaultValue={
+                defaultValues
+                  ? [defaultValues.startTime, defaultValues.endTime]
+                  : undefined
+              }
+            />
           </Form.Item>
         </div>
 
@@ -366,7 +477,10 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
             ]}
             getValueFromEvent={(e) => e}
           >
-            <CustomNumberInput />
+            <CustomNumberInput
+              value={defaultValues?.quantity}
+              isDisabled={label === 'edit'}
+            />
           </Form.Item>
         </div>
 
@@ -376,43 +490,51 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
             <span className="body-5 mx-3 text-natural-400">
               Kích thước tiêu chuẩn 360*280 px
             </span>
+            <span className="body-5 mx-3 text-natural-400">
+              Tối đa 5 hình ảnh
+            </span>
           </p>
           <Form.Item
             valuePropName="fileList"
-            getValueFromEvent={normalFiles}
             name="images"
             rules={[{ required: true, message: 'Vui lòng thêm hình ảnh' }]}
           >
             <ImgCrop rotationSlider aspect={36 / 28}>
               <Upload
                 action=""
+                fileList={fileList}
                 beforeUpload={beforeUpload}
+                onChange={handleChangeFile}
+                onRemove={(file) => setRemoveFile([...removeFile, file.uid])}
                 listType="picture-card"
                 maxCount={MAX_IMAGE_COUNT}
               >
-                <button
-                  style={{
-                    border: '2px',
-                    background: 'none',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                  }}
-                  type="button"
-                >
-                  <Image
-                    src={iconUpImage}
-                    alt="icon-up-image"
-                    width={40}
-                    height={40}
-                  />
-                  <div
-                    style={{ marginTop: 8 }}
-                    className="body-5 text-accent-600"
+                {fileList.length < MAX_IMAGE_COUNT && (
+                  <button
+                    disabled={fileList.length == MAX_IMAGE_COUNT}
+                    style={{
+                      border: '2px',
+                      background: 'none',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}
+                    type="button"
                   >
-                    Tải hình ảnh lên
-                  </div>
-                </button>
+                    <Image
+                      src={iconUpImage}
+                      alt="icon-up-image"
+                      width={40}
+                      height={40}
+                    />
+                    <div
+                      style={{ marginTop: 8 }}
+                      className="body-5 text-accent-600"
+                    >
+                      Tải hình ảnh lên
+                    </div>
+                  </button>
+                )}
               </Upload>
             </ImgCrop>
           </Form.Item>
@@ -422,7 +544,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
           wrapperCol={{ offset: 8, span: 16 }}
           className={cn(styles.buttonCustom, 'flex justify-end')}
         >
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" disabled={loading}>
             Xác nhận
           </Button>
         </Form.Item>

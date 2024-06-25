@@ -14,13 +14,13 @@ type SportField = {
   name: string;
   quantity: number;
   phone: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   price: number;
   rule: string | '';
-  sportFieldType: SportFieldType;
+  sportFieldTypeId: string;
   ownerId: string;
   sportFieldImages: SportFieldImage[];
   location: LocationType;
-  fields?: Field[];
+  fields?: string[];
 };

@@ -89,25 +89,36 @@ export const postData = async (data: any, method: string) => {
         const result = await response.json();
         return result;
       } catch (error) {
-        console.error('Error sending data:', error);
+        return {
+          statusCode: 500,
+          message: 'Failed to create sport field',
+        };
       }
       break;
-    case 'update':
+    case 'edit':
       try {
-        const response = await fetch('http://localhost:5000/sport-field', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
+        console.log(data);
+        const response = await fetch(
+          `http://localhost:5000/sport-field/${data.id}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: auth,
+            },
+            body: JSON.stringify(data),
           },
-          body: JSON.stringify(data),
-        });
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
         return result;
       } catch (error) {
-        console.error('Error sending data:', error);
+        return {
+          statusCode: 500,
+          message: 'Failed to update sport field',
+        };
       }
       break;
     default:
