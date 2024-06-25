@@ -52,7 +52,9 @@ export const getSportField = async (slug: string) => {
     }
     const response: BaseResponse = await sportFieldResponse.json();
 
-    sportField = response.data[0];
+    console.log('response', response);
+
+    sportField = response.data;
 
     return { sportField };
   } catch (error: any) {

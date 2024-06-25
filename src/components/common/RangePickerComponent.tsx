@@ -38,9 +38,7 @@ const RangePickerComponent: React.FC<rangePickerProps> = (props) => {
             : undefined
         }
         value={defaultValue ? time : undefined}
-        showTime={{
-          minuteStep: 30,
-        }}
+        minuteStep={30}
         format="HH:mm"
         locale={locale}
         suffixIcon={

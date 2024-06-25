@@ -121,7 +121,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
   const onFinish: FormProps<any>['onFinish'] = async (values) => {
     setLoading(true);
     message.loading({ content: 'Đang xử lý...', key: 'loading' });
-    const { fields, images, time, ...rest } = values;
+    const { phone, fields, images, time, ...rest } = values;
     let uploadImages: any[] = [];
 
     for (let i = 0; i < images.length; i++) {
@@ -140,6 +140,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
     const endTime = isObject(time[1]) ? time[1].format('HH:mm') : time[1];
 
     const location = {
+      id: defaultValues?.location?.id,
       provinceId: selectedProvince,
       districtId: selectedDistrict,
       wardId: selectedWard,
@@ -160,12 +161,14 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
       location,
       startTime,
       endTime,
+      label,
     });
 
     const result = await postData(
       {
         id: defaultValues?.id,
         ...rest,
+        phone: `0${phone}`,
         sportFieldImages: [...uploadImages],
         removeImageIds: removeFile.map((uid) => {
           if (uid.includes('rc-upload')) {
@@ -201,7 +204,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
       form.setFieldsValue({
         name: defaultValues.name,
         sportFieldTypeId: defaultValues.sportFieldTypeId,
-        phone: defaultValues.phone,
+        phone: defaultValues.phone.slice(1),
         address: defaultValues.location ? defaultValues.location.address : '',
         price: defaultValues.price,
         rule: defaultValues.rule,
