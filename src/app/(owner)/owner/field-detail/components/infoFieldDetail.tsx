@@ -14,6 +14,7 @@ export default function InfoFieldDetail({
 }: {
   sportField: SportField;
 }) {
+  console.log(sportField);
   const route = useRouter();
   const [openModal, setOpenModal] = useState<boolean>(false);
 
@@ -26,6 +27,11 @@ export default function InfoFieldDetail({
   const handleBack = () => {
     route.push('/owner');
   };
+
+  const pushEdit = () => {
+    route.push(`/edit-sport-field/${sportField.id}`);
+  };
+
   console.log(sportField);
   return (
     <div className="flex h-full w-full justify-center">
@@ -48,7 +54,9 @@ export default function InfoFieldDetail({
             >
               Xóa sân
             </p>
-            <p className="cursor-pointer text-accent-600">Chỉnh sửa</p>
+            <p onClick={pushEdit} className="cursor-pointer text-accent-600">
+              Chỉnh sửa
+            </p>
           </div>
         </div>
         <div className={cn(s.main, '')}>
@@ -79,7 +87,9 @@ export default function InfoFieldDetail({
           <p className="mb-6 text-base font-normal leading-6 text-natural-500">
             Địa chỉ{' '}
             <span className="ml-3 font-bold text-natural-700">
-              {sportField.location.addressDetail}
+              {sportField?.location
+                ? sportField?.location?.addressDetail
+                : 'Chưa cập nhật'}
             </span>
           </p>
           <p className="mb-6 text-base font-normal leading-6 text-natural-500">
