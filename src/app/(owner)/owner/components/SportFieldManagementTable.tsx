@@ -26,14 +26,20 @@ const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
   const router = useRouter();
 
   const items = (fieldId: string) => [
-    { key: '1', label: 'Chỉnh sửa' },
-    { key: '2', label: 'Chi tiết', onClick: () => handleEdit(fieldId) },
+    { key: '1', label: 'Chỉnh sửa', onClick: () => handleEdit(fieldId) },
+    { key: '2', label: 'Chi tiết', onClick: () => handleView(fieldId) },
     { key: '3', label: 'Quản lý đặt chỗ' },
   ];
-  const handleEdit = (id: string) => {
+  const handleView = (id: string) => {
     console.log(id);
     router.push(`owner/field-detail/${id}`);
   };
+
+  const handleEdit = (id: string) => {
+    console.log(id);
+    router.push(`edit-sport-field/${id}`);
+  };
+
   const dataSource = sportFields?.map((sportField, index) => ({
     key: index + 1,
     id: sportField.id,

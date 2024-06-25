@@ -91,7 +91,6 @@ export default function DeleteFieldBooking({
     onClose(); // Call the function to close the modal
   };
   const handleDeleteAllField = () => {
-    console.log(12);
     setFieldBooking([]);
   };
   const handleDeleteBookings = () => {

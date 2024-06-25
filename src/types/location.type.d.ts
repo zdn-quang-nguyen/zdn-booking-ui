@@ -1,9 +1,9 @@
 type LocationType = {
   id: string;
   sportFieldId?: string;
-  province: Province;
-  district: District;
-  ward: Ward;
+  provinceId: string;
+  districtId: string;
+  wardId: string;
   addressDetail: string;
   longitude: number;
   latitude: number;

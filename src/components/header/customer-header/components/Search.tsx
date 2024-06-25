@@ -7,7 +7,7 @@ import { cn } from "@/libs/utils";
 
 const { Search } = Input;
 
-const onSearch: SearchProps["onSearch"] = (value, _e, info) =>
+const onSearch: SearchProps['onSearch'] = (value, _e, info) =>
   console.log(info?.source, value);
 
 const SearchBar: React.FC = () => (
