@@ -2,6 +2,7 @@
 import { Button, Tooltip } from 'antd';
 import React, { useState } from 'react';
 import styles from './ScheduleTable.module.scss';
+import ReservationBooking from './ReservationBooking';
 
 export interface BookingData {
   id: string;
@@ -192,6 +193,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
 
   return (
     <div className={styles.wrapper}>
+      <ReservationBooking />
       <div className={styles.navigation}>
         <button className="w-28" onClick={handlePrevWeek}>
           -

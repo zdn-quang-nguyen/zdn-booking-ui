@@ -55,7 +55,7 @@ const dummyBookings: BookingData[] = [
 
 const OwnerHomePage = () => {
   return (
-    <div className="flex h-full w-full items-end justify-center">
+    <div className="flex w-full items-end justify-center">
       <ScheduleTable fieldData={dummyData} bookings={dummyBookings} />
     </div>
   );
