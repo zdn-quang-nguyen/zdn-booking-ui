@@ -2,6 +2,7 @@
 import { Button, Tooltip } from 'antd';
 import React, { useState } from 'react';
 import styles from './ScheduleTable.module.scss';
+import { useRouter } from 'next/navigation';
 
 export interface BookingData {
   id: string;
@@ -97,9 +98,12 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   fieldData,
   bookings,
 }) => {
+  const router = useRouter();
   const columns = generateColumns(fieldData.startTime, fieldData.endTime);
   const [startWeek, setStartWeek] = React.useState(new Date());
   const weekDates = getCurrentWeekDates(startWeek);
+  const [checkedBookings, setCheckedBookings] = useState<string[]>([]);
+  const [uncheckedBookings, setUncheckedBookings] = useState<string>();
 
   const [status, setStatus] = useState<CheckStatus>(CheckStatus.DEFAULT);
 
@@ -113,6 +117,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const id = e.target.getAttribute('data-id');
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     if (status === CheckStatus.UNCHECKED_BOOKING) {
       const nextSibling =
         e.target.parentElement?.nextElementSibling?.getElementsByTagName(
@@ -127,25 +132,50 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
         e.target.checked = false;
       }
 
-      console.log(nextSibling, previousSibling);
-
       return;
     }
     if (id) {
       setStatus(CheckStatus.CHECKED_BOOKING);
-      document
-        .querySelectorAll('input[type="checkbox"]')
-        .forEach((el: Element) => {
-          if (el.getAttribute('data-id') === id) {
-            if (el !== e.target) {
-              (el as HTMLInputElement).checked = e.target.checked;
-            }
+      checkboxes.forEach((el: Element) => {
+        if (el.getAttribute('data-id') === id) {
+          if (el !== e.target) {
+            (el as HTMLInputElement).checked = e.target.checked;
           }
-        });
+        }
+      });
+      setUncheckedBookings(!e.target.checked ? id : '');
+      // if (uncheckedBookings)
+      checkboxes.forEach((el: Element) => {
+        if (
+          el.getAttribute('data-id') !== id &&
+          status !== CheckStatus.DEFAULT
+        ) {
+          (el as HTMLInputElement).checked = !!el.getAttribute('data-id');
+        }
+      });
     } else {
       setStatus(CheckStatus.UNCHECKED_BOOKING);
-      // check next element or previous element checkbox is adjacent
     }
+  };
+
+  // clear all state
+  const handleReset = () => {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach((el: Element) => {
+      if (!el.getAttribute('data-id')) {
+        (el as HTMLInputElement).checked = false;
+      } else {
+        (el as HTMLInputElement).checked = true;
+      }
+
+      // (el as HTMLInputElement).checked = false;
+    });
+    setStatus(CheckStatus.DEFAULT);
+    setUncheckedBookings('');
+  };
+
+  const handleSubmit = () => {
+    console.log(uncheckedBookings);
   };
 
   function isTimeSlotBooked(
@@ -180,6 +210,9 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     inputTime.setHours(Number(time.split(':')[0]), Number(time.split(':')[1]));
 
     // return inputDate < currentDate && inputTime < currentTime;
+    if (startWeek.getFullYear() < inputDate.getFullYear()) {
+      return true;
+    }
     if (inputDate.getTime() < currentDate.getTime()) {
       return true;
     } else if (inputDate.getTime() === currentDate.getTime()) {
@@ -209,8 +242,8 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
           </tr>
         </thead>
         <tbody>
-          {weekDates.map((date, dateIndex) => (
-            <tr key={dateIndex}>
+          {weekDates.map((date) => (
+            <tr key={date}>
               <td>{date}</td>
               {columns.map((column, columnIndex) => {
                 const booking = isTimeSlotBooked(
@@ -219,9 +252,11 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                   date,
                 );
 
+                console.log({ booking });
+
                 return (
                   <td
-                    key={columnIndex}
+                    key={column.label + startWeek.toDateString()}
                     className={
                       isPastSlot(date, column.label.split('-')[1])
                         ? styles.pastSlot
@@ -276,13 +311,20 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
           ))}
         </tbody>
       </table>
-      <Button type="primary" htmlType="submit">
-        {status === CheckStatus.UNCHECKED_BOOKING
-          ? 'Đặt sân'
-          : status === CheckStatus.CHECKED_BOOKING
-            ? 'Hủy'
-            : 'Xác nhận'}
-      </Button>
+      <div className="flex gap-20">
+        <Button type="primary" htmlType="submit" onClick={handleSubmit}>
+          {status === CheckStatus.UNCHECKED_BOOKING
+            ? 'Đặt sân'
+            : status === CheckStatus.CHECKED_BOOKING
+              ? 'Hủy'
+              : 'Xác nhận'}
+        </Button>
+        {status !== CheckStatus.DEFAULT && (
+          <Button type="primary" htmlType="reset" onClick={handleReset}>
+            Đặt lại
+          </Button>
+        )}
+      </div>
     </div>
   );
 };
