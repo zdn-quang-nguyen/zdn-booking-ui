@@ -1,7 +1,7 @@
 'use client';
+import { Button, Tooltip } from 'antd';
 import React, { useState } from 'react';
 import styles from './ScheduleTable.module.scss';
-import { Button, Tooltip } from 'antd';
 
 export interface BookingData {
   id: string;
@@ -88,13 +88,20 @@ interface ScheduleTableProps {
   bookings: BookingData[];
 }
 
+enum CheckStatus {
+  CHECKED_BOOKING = 'checked_booking',
+  UNCHECKED_BOOKING = 'unchecked_booking',
+  DEFAULT = 'default',
+}
 const ScheduleTable: React.FC<ScheduleTableProps> = ({
   fieldData,
   bookings,
 }) => {
   const columns = generateColumns(fieldData.startTime, fieldData.endTime);
-
   const [startWeek, setStartWeek] = React.useState(new Date());
+  const weekDates = getCurrentWeekDates(startWeek);
+
+  const [status, setStatus] = useState<CheckStatus>(CheckStatus.DEFAULT);
 
   const handleNextWeek = () => {
     setStartWeek(new Date(startWeek.setDate(startWeek.getDate() + 7)));
@@ -104,9 +111,42 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     setStartWeek(new Date(startWeek.setDate(startWeek.getDate() - 7)));
   };
 
-  const weekDates = getCurrentWeekDates(startWeek);
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const id = e.target.getAttribute('data-id');
+    if (status === CheckStatus.UNCHECKED_BOOKING) {
+      const nextSibling =
+        e.target.parentElement?.nextElementSibling?.getElementsByTagName(
+          'input',
+        )[0];
+      const previousSibling =
+        e.target.parentElement?.previousElementSibling?.getElementsByTagName(
+          'input',
+        )[0];
 
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {};
+      if (!nextSibling?.checked && !previousSibling?.checked) {
+        e.target.checked = false;
+      }
+
+      console.log(nextSibling, previousSibling);
+
+      return;
+    }
+    if (id) {
+      setStatus(CheckStatus.CHECKED_BOOKING);
+      document
+        .querySelectorAll('input[type="checkbox"]')
+        .forEach((el: Element) => {
+          if (el.getAttribute('data-id') === id) {
+            if (el !== e.target) {
+              (el as HTMLInputElement).checked = e.target.checked;
+            }
+          }
+        });
+    } else {
+      setStatus(CheckStatus.UNCHECKED_BOOKING);
+      // check next element or previous element checkbox is adjacent
+    }
+  };
 
   function isTimeSlotBooked(
     columnStart: number,
@@ -178,13 +218,18 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                   column.end,
                   date,
                 );
+
                 return (
                   <td
                     key={columnIndex}
                     className={
                       isPastSlot(date, column.label.split('-')[1])
                         ? styles.pastSlot
-                        : ''
+                        : status === CheckStatus.UNCHECKED_BOOKING && booking
+                          ? styles.checkedBooking
+                          : status === CheckStatus.CHECKED_BOOKING && !booking
+                            ? styles.uncheckedBooking
+                            : ''
                     }
                   >
                     <Tooltip
@@ -212,10 +257,16 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                       key={'green'}
                     >
                       <input
+                        data-id={booking?.id}
                         type="checkbox"
                         defaultChecked={!!booking}
-                        onChange={(e) => console.log('abc')}
-                        disabled={isPastSlot(date, column.label.split('-')[1])}
+                        onChange={(e) => handleCheckboxChange(e)}
+                        disabled={
+                          isPastSlot(date, column.label.split('-')[1]) ||
+                          (status === CheckStatus.UNCHECKED_BOOKING &&
+                            !!booking) ||
+                          (status === CheckStatus.CHECKED_BOOKING && !booking)
+                        }
                       />
                     </Tooltip>
                   </td>
@@ -226,7 +277,11 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
         </tbody>
       </table>
       <Button type="primary" htmlType="submit">
-        Xác nhận
+        {status === CheckStatus.UNCHECKED_BOOKING
+          ? 'Đặt sân'
+          : status === CheckStatus.CHECKED_BOOKING
+            ? 'Hủy'
+            : 'Xác nhận'}
       </Button>
     </div>
   );
