@@ -10,18 +10,17 @@ import {
   Upload,
   message,
 } from 'antd';
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import ImgCrop from 'antd-img-crop';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
-
-import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
+// import dayjs from 'dayjs';
 import iconUpImage from '/public/images/icons_add_image.png';
 import CustomNumberInput from './CustomNumberInput';
 import RangePickerComponent from '@/components/common/RangePickerComponent';
 // import { District, Province, Ward } from '@/types/location.type';
 import { uploadImage } from '../../apis/upload-img.api';
-import { getLocation, postData } from '../../apis/create-sport-field.api';
+import { postData } from '../../apis/create-sport-field.api';
 import styles from './SportFieldForm.module.scss';
 
 import { CATEGORY_MAPPING, CRUD_ACTIONS } from '@/constants/constant';
@@ -91,14 +90,15 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
 
   const [loading, setLoading] = useState<boolean>(false);
 
+  const route = useRouter();
+  const [form] = Form.useForm();
+
   const handleChangeFile: UploadProps['onChange'] = ({
     fileList: newFileList,
   }) => {
     setFileList(newFileList);
     form.setFieldsValue({ images: newFileList });
   };
-
-  const [form] = Form.useForm();
 
   const handleProvinceChange = (value: string) => {
     setSelectedProvince(value);
@@ -144,25 +144,8 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
       provinceId: selectedProvince,
       districtId: selectedDistrict,
       wardId: selectedWard,
-      addressDetail: `${rest.address} -- ${ward?.name} -- ${district?.name} -- ${province?.name}`,
+      addressDetail: `${rest.address}, ${ward?.name}, ${district?.name}, ${province?.name}`,
     };
-
-    console.log({
-      id: defaultValues?.id,
-      ...rest,
-      sportFieldImages: [...uploadImages],
-      removeImageIds: removeFile.map((uid) => {
-        if (uid.includes('rc-upload')) {
-          return;
-        } else {
-          return uid;
-        }
-      }),
-      location,
-      startTime,
-      endTime,
-      label,
-    });
 
     const result = await postData(
       {
@@ -187,6 +170,8 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
     if (result.statusCode === 201 || result.statusCode === 200) {
       setLoading(false);
       message.success(result.message);
+      route.push('/owner');
+
       // } else if (result.status === 200) {
       //   message.success(result.message);
     } else {
@@ -225,7 +210,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
             ? defaultValues.location.wardId
             : '',
 
-          address: defaultValues.location.addressDetail.split(' -- ')[0],
+          address: defaultValues.location.addressDetail.split(', ')[0],
         });
         setSelectedProvince(defaultValues.location.provinceId);
         setSelectedDistrict(defaultValues.location.districtId);
