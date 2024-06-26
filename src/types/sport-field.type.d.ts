@@ -18,9 +18,10 @@ type SportField = {
   endTime: string;
   price: number;
   rule: string | '';
-  sportFieldType: SportFieldType;
+  sportFieldTypeId: string;
   ownerId: string;
+  sportFieldType: any;
   sportFieldImages: SportFieldImage[];
   location: LocationType;
-  fields?: Field[];
+  fields?: string[];
 };

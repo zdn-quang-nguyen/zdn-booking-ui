@@ -2,9 +2,9 @@
 import { cookies } from 'next/headers';
 
 export async function getLocation() {
-  let provinces: Province[] = [];
-  let districts: District[] = [];
-  let wards: Ward[] = [];
+  let provinces: BaseResponse;
+  let districts: BaseResponse;
+  let wards: BaseResponse;
   const auth = `Bearer ${cookies().get('access_token')?.value}`;
   try {
     // Fetch provinces
@@ -53,15 +53,15 @@ export async function getLocation() {
     wards = await wardsResponse.json();
 
     return {
-      provinces,
-      districts,
-      wards,
+      provinces: provinces.data,
+      districts: districts.data,
+      wards: wards.data,
     };
   } catch (error: any) {
     return {
-      provinces,
-      districts,
-      wards,
+      provinces: [],
+      districts: [],
+      wards: [],
       error: 'Failed to fetch data',
     };
   } finally {
@@ -73,7 +73,6 @@ export const postData = async (data: any, method: string) => {
 
   switch (method) {
     case 'create':
-      console.log('Data:', data);
       try {
         const response = await fetch('http://localhost:5000/sport-field', {
           method: 'POST',
@@ -87,29 +86,38 @@ export const postData = async (data: any, method: string) => {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        console.log('Data sent successfully:', result);
         return result;
       } catch (error) {
-        console.error('Error sending data:', error);
+        return {
+          statusCode: 500,
+          message: 'Failed to create sport field',
+        };
       }
       break;
-    case 'update':
+    case 'edit':
       try {
-        const response = await fetch('http://localhost:5000/sport-field', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
+        console.log(data);
+        const response = await fetch(
+          `http://localhost:5000/sport-field/${data.id}`,
+          {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              Authorization: auth,
+            },
+            body: JSON.stringify(data),
           },
-          body: JSON.stringify(data),
-        });
+        );
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const result = await response.json();
-        console.log('Data sent successfully:', result);
         return result;
       } catch (error) {
-        console.error('Error sending data:', error);
+        return {
+          statusCode: 500,
+          message: 'Failed to update sport field',
+        };
       }
       break;
     default:
@@ -130,7 +138,6 @@ export const postData = async (data: any, method: string) => {
 //     throw new Error(`HTTP error! status: ${response.status}`);
 //   }
 //   const result = await response.json();
-//   console.log('Data sent successfully:', result);
 //   return result;
 // } catch (error) {
 //   console.error('Error sending data:', error);

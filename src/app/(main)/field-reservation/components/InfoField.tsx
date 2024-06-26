@@ -18,9 +18,7 @@ export default function InfoField() {
       end: '',
     },
   ]);
-  const onChange: DatePickerProps['onChange'] = (date, dateString) => {
-    console.log(date, dateString);
-  };
+  const onChange: DatePickerProps['onChange'] = (date, dateString) => {};
   const options: SelectProps['options'] = [];
   for (let i = 10; i < 36; i++) {
     options.push({
@@ -29,9 +27,7 @@ export default function InfoField() {
     });
   }
 
-  const handleChange = (value: string | string[]) => {
-    console.log(`Selected: ${value}`);
-  };
+  const handleChange = (value: string | string[]) => {};
   function splitTimeRange(startTime: string, endTime: string) {
     const timeSlots = [];
     let [startHour, startMinute] = startTime.split(':').map(Number);

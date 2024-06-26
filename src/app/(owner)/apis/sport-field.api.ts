@@ -1,8 +1,9 @@
+'use server';
+
 import { cookies } from 'next/headers';
 
-const auth = `Bearer ${cookies().get('access_token')?.value}`;
-
 export const getSportFieldTypes = async () => {
+  const auth = `Bearer ${cookies().get('access_token')?.value}`;
   let sportFieldTypes: SportFieldType[] = [];
   try {
     const sportFieldTypeResponse = await fetch(
@@ -26,6 +27,39 @@ export const getSportFieldTypes = async () => {
   } catch (error: any) {
     return {
       sportFieldTypes,
+      error: 'Failed to fetch data',
+    };
+  } finally {
+  }
+};
+
+export const getSportField = async (slug: string) => {
+  let sportField: SportField;
+  const auth = `Bearer ${cookies().get('access_token')?.value}`;
+  try {
+    const sportFieldResponse = await fetch(
+      `http://localhost:5000/sport-field/${slug}`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: auth,
+        },
+      },
+    );
+    if (!sportFieldResponse.ok) {
+      throw new Error('Failed to fetch sport field');
+    }
+    const response: BaseResponse = await sportFieldResponse.json();
+
+    console.log('response', response);
+
+    sportField = response.data;
+
+    return { sportField };
+  } catch (error: any) {
+    return {
+      sportField: null,
       error: 'Failed to fetch data',
     };
   } finally {
