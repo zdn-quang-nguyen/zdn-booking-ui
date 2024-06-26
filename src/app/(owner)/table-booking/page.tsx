@@ -25,9 +25,9 @@ export interface FieldData {
 }
 
 const dummyData: FieldData = {
-  name: 'Field 1',
-  startTime: '13:00:00',
-  endTime: '16:00:00',
+  name: 'Sân 1',
+  startTime: '6:00:00',
+  endTime: '22:00:00',
 };
 
 const dummyBookings: BookingData[] = [

@@ -3,6 +3,12 @@ import { Button, Tooltip } from 'antd';
 import React, { useState } from 'react';
 import styles from './ScheduleTable.module.scss';
 import { useRouter } from 'next/navigation';
+import {
+  ArrowLeftOutlined,
+  LeftOutlined,
+  RightOutlined,
+} from '@ant-design/icons';
+import { cn } from '@/libs/utils';
 
 export interface BookingData {
   id: string;
@@ -223,95 +229,129 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     return false;
   };
 
+  const onCancel = () => {
+    router.back();
+  };
+
   return (
-    <div className={styles.wrapper}>
-      <div className={styles.navigation}>
-        <button className="w-28" onClick={handlePrevWeek}>
-          -
+    <div
+      className={cn(
+        styles.wrapper,
+        'flex w-11/12 flex-col gap-8 overflow-x-hidden rounded-form bg-white p-10',
+      )}
+    >
+      <div className="flex items-center">
+        <button className="hover:opacity-75" key="back" onClick={onCancel}>
+          <ArrowLeftOutlined className="mr-4 text-xl" />
         </button>
-        <button onClick={handleNextWeek}>+</button>
-        <p>{startWeek.toDateString()}</p>
+
+        <h4 className="cursor-pointer font-bold">
+          Quản lý đặt chỗ - {fieldData.name}
+        </h4>
       </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Date/Time</th>
-            {columns.map((column, index) => (
-              <th key={index}>{column.label}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {weekDates.map((date) => (
-            <tr key={date}>
-              <td>{date}</td>
-              {columns.map((column, columnIndex) => {
-                const booking = isTimeSlotBooked(
-                  column.start,
-                  column.end,
-                  date,
-                );
-
-                console.log({ booking });
-
-                return (
-                  <td
-                    key={column.label + startWeek.toDateString()}
-                    className={
-                      isPastSlot(date, column.label.split('-')[1])
-                        ? styles.pastSlot
-                        : status === CheckStatus.UNCHECKED_BOOKING && booking
-                          ? styles.checkedBooking
-                          : status === CheckStatus.CHECKED_BOOKING && !booking
-                            ? styles.uncheckedBooking
-                            : ''
-                    }
-                  >
-                    <Tooltip
-                      title={
-                        booking ? (
-                          <>
-                            <div className="font-bold">Name:</div>
-                            <div>{booking.fullName}</div>
-                            <div className="font-bold">Phone:</div>
-                            <div>{booking.phone.trim()}</div>
-                            <div className="font-bold">Start:</div>
-                            <div>
-                              {new Date(booking.startTime).toLocaleString()}
-                            </div>
-                            <div className="font-bold">End:</div>
-                            <div>
-                              {new Date(booking.endTime).toLocaleString()}
-                            </div>
-                          </>
-                        ) : (
-                          ''
-                        )
-                      }
-                      color={'green'}
-                      key={'green'}
-                    >
-                      <input
-                        data-id={booking?.id}
-                        type="checkbox"
-                        defaultChecked={!!booking}
-                        onChange={(e) => handleCheckboxChange(e)}
-                        disabled={
-                          isPastSlot(date, column.label.split('-')[1]) ||
-                          (status === CheckStatus.UNCHECKED_BOOKING &&
-                            !!booking) ||
-                          (status === CheckStatus.CHECKED_BOOKING && !booking)
-                        }
-                      />
-                    </Tooltip>
+      <div className={cn(styles.navigation, 'self-end')}>
+        <button className="w-28" onClick={handlePrevWeek}>
+          <LeftOutlined />
+        </button>
+        <button onClick={handleNextWeek}>
+          <RightOutlined />
+        </button>
+        {/* <p>{startWeek.toDateString()}</p> */}
+      </div>
+      <div className="relative">
+        <div className="w-full overflow-auto">
+          <table className="overflow-x-scroll">
+            <thead>
+              <tr className="min-h-10">
+                <th className="absolute min-h-10 min-w-24"></th>
+                <th className="min-w-24" style={{ border: 'none' }}></th>
+                {columns.map((column, index) => (
+                  <th className="body-3 min-w-48 font-medium" key={index}>
+                    {column.label}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {weekDates.map((date) => (
+                <tr key={date}>
+                  <td className="body-3 absolute w-24 truncate bg-white font-medium">
+                    {date}
                   </td>
-                );
-              })}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="flex gap-20">
+                  <td
+                    className="min-w-24 border-none"
+                    style={{ border: 'none' }}
+                  ></td>
+                  {columns.map((column) => {
+                    const booking = isTimeSlotBooked(
+                      column.start,
+                      column.end,
+                      date,
+                    );
+                    console.log({ booking });
+                    return (
+                      <td
+                        key={column.label + startWeek.toDateString()}
+                        className={
+                          isPastSlot(date, column.label.split('-')[1])
+                            ? styles.pastSlot
+                            : status === CheckStatus.UNCHECKED_BOOKING &&
+                                booking
+                              ? styles.checkedBooking
+                              : status === CheckStatus.CHECKED_BOOKING &&
+                                  !booking
+                                ? styles.uncheckedBooking
+                                : ''
+                        }
+                      >
+                        <Tooltip
+                          title={
+                            booking ? (
+                              <>
+                                <div className="font-bold">Name:</div>
+                                <div>{booking.fullName}</div>
+                                <div className="font-bold">Phone:</div>
+                                <div>{booking.phone.trim()}</div>
+                                <div className="font-bold">Start:</div>
+                                <div>
+                                  {new Date(booking.startTime).toLocaleString()}
+                                </div>
+                                <div className="font-bold">End:</div>
+                                <div>
+                                  {new Date(booking.endTime).toLocaleString()}
+                                </div>
+                              </>
+                            ) : (
+                              ''
+                            )
+                          }
+                          color={'green'}
+                          key={'green'}
+                        >
+                          <input
+                            data-id={booking?.id}
+                            type="checkbox"
+                            defaultChecked={!!booking}
+                            onChange={(e) => handleCheckboxChange(e)}
+                            disabled={
+                              isPastSlot(date, column.label.split('-')[1]) ||
+                              (status === CheckStatus.UNCHECKED_BOOKING &&
+                                !!booking) ||
+                              (status === CheckStatus.CHECKED_BOOKING &&
+                                !booking)
+                            }
+                          />
+                        </Tooltip>
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div className="flex gap-20 self-end">
         <Button type="primary" htmlType="submit" onClick={handleSubmit}>
           {status === CheckStatus.UNCHECKED_BOOKING
             ? 'Đặt sân'
