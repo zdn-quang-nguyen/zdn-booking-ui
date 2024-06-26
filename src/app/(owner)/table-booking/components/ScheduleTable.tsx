@@ -1,7 +1,7 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './ScheduleTable.module.scss';
-import { set } from 'zod';
+import { Button, Tooltip } from 'antd';
 
 export interface BookingData {
   id: string;
@@ -106,33 +106,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
 
   const weekDates = getCurrentWeekDates(startWeek);
 
-  function handleCheckboxChange(e: React.ChangeEvent<HTMLInputElement>) {
-    // Handle the change, e.g., update state or props
-  }
-
-  // function isTimeSlotBooked(
-  //   columnStart: number,
-  //   columnEnd: number,
-  //   date: string,
-  // ) {
-  //   return bookings.some((booking) => {
-  //     const bookingStart = parseTimeToMinutes(booking.startTime.split('T')[1]);
-  //     const bookingEnd = parseTimeToMinutes(booking.endTime.split('T')[1]);
-  //     const inputDate = parseDateFromString(date);
-  //     const bookingDate = new Date(booking.startTime.split('T')[0]);
-
-  //     if (
-  //       inputDate.toISOString().slice(0, 10) ===
-  //       bookingDate.toISOString().slice(0, 10)
-  //     ) {
-  //       return (
-  //         (columnStart > bookingStart || columnStart == bookingStart) &&
-  //         (columnEnd < bookingEnd || columnEnd == bookingEnd)
-  //       );
-  //     }
-  //     return false;
-  //   });
-  // }
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {};
 
   function isTimeSlotBooked(
     columnStart: number,
@@ -212,18 +186,38 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                         ? styles.pastSlot
                         : ''
                     }
-                    title={
-                      booking
-                        ? `ID: ${booking.id}, Phone: ${booking.phone.trim()}, Name: ${booking.fullName}, Start: ${booking.startTime}, End: ${booking.endTime}`
-                        : ''
-                    }
                   >
-                    <input
-                      type="checkbox"
-                      checked={!!booking}
-                      onChange={handleCheckboxChange}
-                      disabled={isPastSlot(date, column.label.split('-')[1])}
-                    />
+                    <Tooltip
+                      title={
+                        booking ? (
+                          <>
+                            <div className="font-bold">Name:</div>
+                            <div>{booking.fullName}</div>
+                            <div className="font-bold">Phone:</div>
+                            <div>{booking.phone.trim()}</div>
+                            <div className="font-bold">Start:</div>
+                            <div>
+                              {new Date(booking.startTime).toLocaleString()}
+                            </div>
+                            <div className="font-bold">End:</div>
+                            <div>
+                              {new Date(booking.endTime).toLocaleString()}
+                            </div>
+                          </>
+                        ) : (
+                          ''
+                        )
+                      }
+                      color={'green'}
+                      key={'green'}
+                    >
+                      <input
+                        type="checkbox"
+                        defaultChecked={!!booking}
+                        onChange={(e) => console.log('abc')}
+                        disabled={isPastSlot(date, column.label.split('-')[1])}
+                      />
+                    </Tooltip>
                   </td>
                 );
               })}
@@ -231,6 +225,9 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
           ))}
         </tbody>
       </table>
+      <Button type="primary" htmlType="submit">
+        Xác nhận
+      </Button>
     </div>
   );
 };
