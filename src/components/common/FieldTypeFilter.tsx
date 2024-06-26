@@ -3,17 +3,17 @@ import React, { useState } from 'react';
 import AccentButton from './components/AccentButton';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { getValidFilterType } from '@/libs/utils';
+import useSportFieldType from '@/hooks/useSportFieldType';
 
-const tabs = [
-  { label: 'Tất cả', value: 'all' },
-  { label: 'Sân bóng rổ', value: 'basketball' },
-  { label: 'Sân bóng chuyền', value: 'volleyball' },
-  { label: 'Sân cầu lông', value: 'badminton' },
-  { label: 'Sân tennis', value: 'tennis' },
-  { label: 'Sân bóng đá', value: 'football' },
-  { label: 'Sân bóng bàn', value: 'tableTennis' },
-  { label: 'Bi-da', value: 'billiards' },
-];
+export const tabs: { [key: string]: string } = {
+  basketball: 'Bóng rổ',
+  volleyball: 'Bõng chuyền',
+  badminton: 'Cầu lông',
+  tennis: 'Tennis',
+  football: 'Bóng đá',
+  tableTennis: 'Bóng bàn',
+  billiards: 'Bi-da',
+};
 
 interface FieldTypeFilterProps {
   onSelect: (value: string) => void;
@@ -25,26 +25,49 @@ const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({
   name = 'type',
 }) => {
   // const [activeTab, setActiveTab] = useState('all');
+  const { types, isLoading } = useSportFieldType();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const activeTab = getValidFilterType(tabs, searchParams.get(name) as string);
-  const handleClick = (value: string) => {
-    // setActiveTab(value);
+  const currentTab = searchParams.get(name);
+  const handleChangeTab = (value: string) => {
     onSelect(value);
     const params = new URLSearchParams(searchParams);
     params.set(name, value);
 
     router.push(`${pathname}?${params.toString()}`, { scroll: false });
   };
+
+  if (tabs.keys.includes(currentTab + '')) {
+    handleChangeTab('all');
+  }
+
+  const handleClick = (value: string) => {
+    handleChangeTab(value);
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  const allBtn = {
+    value: 'all',
+    label: 'Tất cả',
+  };
   return (
     <div className={`grid grid-cols-2 gap-3 md:grid-cols-4 xl:flex`}>
-      {tabs.map((tab) => (
+      <AccentButton
+        key={allBtn.value}
+        label={allBtn.label}
+        value={allBtn.value}
+        isActive={currentTab === allBtn.value}
+        onClick={handleClick}
+      />
+      {types?.map((type) => (
         <AccentButton
-          key={tab.value}
-          label={tab.label}
-          value={tab.value}
-          isActive={activeTab === tab.value}
+          key={type.id}
+          label={tabs[type.name] ?? type.name}
+          value={type.id}
+          isActive={currentTab === type.id}
           onClick={handleClick}
         />
       ))}

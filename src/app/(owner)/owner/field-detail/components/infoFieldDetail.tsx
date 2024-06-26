@@ -26,7 +26,7 @@ export default function InfoFieldDetail({
   const handleBack = () => {
     route.push('/owner');
   };
-  console.log(sportField);
+
   return (
     <div className="flex h-full w-full justify-center">
       <DeleteFieldBooking isOpen={openModal} onClose={handleCloseModal} />
@@ -79,7 +79,7 @@ export default function InfoFieldDetail({
           <p className="mb-6 text-base font-normal leading-6 text-natural-500">
             Địa chỉ{' '}
             <span className="ml-3 font-bold text-natural-700">
-              {sportField.location.addressDetail}
+              {sportField.location?.addressDetail}
             </span>
           </p>
           <p className="mb-6 text-base font-normal leading-6 text-natural-500">
@@ -123,7 +123,7 @@ export default function InfoFieldDetail({
               Hình ảnh
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              {sportField.sportFieldImages.map((sportFieldImage) => (
+              {sportField.sportFieldImages?.map((sportFieldImage) => (
                 <Image
                   key={sportFieldImage.id}
                   className="rounded-xl"
