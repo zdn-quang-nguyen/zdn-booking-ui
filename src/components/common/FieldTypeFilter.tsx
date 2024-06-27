@@ -6,8 +6,9 @@ import { getValidFilterType } from '@/libs/utils';
 import useSportFieldType from '@/hooks/useSportFieldType';
 
 export const tabs: { [key: string]: string } = {
+  all: 'Tất cả',
   basketball: 'Bóng rổ',
-  volleyball: 'Bõng chuyền',
+  volleyball: 'Bóng chuyền',
   badminton: 'Cầu lông',
   tennis: 'Tennis',
   football: 'Bóng đá',
@@ -16,29 +17,25 @@ export const tabs: { [key: string]: string } = {
 };
 
 interface FieldTypeFilterProps {
-  onSelect: (value: string) => void;
   name?: string;
 }
 
-const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({
-  onSelect,
-  name = 'type',
-}) => {
-  // const [activeTab, setActiveTab] = useState('all');
+const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({ name = 'type' }) => {
   const { types, isLoading } = useSportFieldType();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const currentTab = searchParams.get(name);
   const handleChangeTab = (value: string) => {
-    onSelect(value);
     const params = new URLSearchParams(searchParams);
     params.set(name, value);
 
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    const url = `${pathname}?${params.toString()}`;
+
+    router.replace(url, { scroll: false });
   };
 
-  if (tabs.keys.includes(currentTab + '')) {
+  if (!types.find((type) => type.id === currentTab)) {
     handleChangeTab('all');
   }
 
@@ -68,7 +65,7 @@ const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({
           label={tabs[type.name] ?? type.name}
           value={type.id}
           isActive={currentTab === type.id}
-          onClick={handleClick}
+          onClick={() => handleClick(type.id)}
         />
       ))}
     </div>

@@ -10,7 +10,6 @@ export const getUserSportFields = async (
   sportFieldTypeId: string,
 ): Promise<any> => {
   const accessToken = cookies().get('access_token')?.value as string;
-  console.log(accessToken);
   try {
     const sportFieldTypeParam =
       sportFieldTypeId === 'all' ? '' : `&sportFieldTypeId=${sportFieldTypeId}`;
