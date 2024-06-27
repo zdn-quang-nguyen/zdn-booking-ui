@@ -5,6 +5,7 @@ import Image from 'next/image';
 import styles from './sport-field.module.scss';
 import SportFieldShortInfo from './SportFieldShortInfo';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 type SportFieldInfoCardProps = {
   sportField: SportField;
@@ -12,9 +13,6 @@ type SportFieldInfoCardProps = {
 
 const SportFieldInfoCard = ({ sportField }: SportFieldInfoCardProps) => {
   const router = useRouter();
-  const handleClick = () => {
-    router.push(`/field-reservation/${sportField.id}`);
-  };
   return (
     <section
       className={cn(
@@ -26,19 +24,17 @@ const SportFieldInfoCard = ({ sportField }: SportFieldInfoCardProps) => {
         <p className="body-2 mb-5 truncate font-bold">{sportField.name}</p>
         <SportFieldShortInfo sportField={sportField} />
       </div>
-      <Button
-        type="primary"
-        className="mt-auto flex items-center gap-2"
-        onClick={handleClick}
-      >
-        <Image
-          src="/icons/external-link.svg"
-          alt="location icon"
-          width={20}
-          height={20}
-        />
-        <span className="body-3 font-bold">Đặt chỗ ngay</span>
-      </Button>
+      <Link href={`/field-reservation/${sportField.id}`}>
+        <Button type="primary" className="mt-auto flex items-center gap-2">
+          <Image
+            src="/icons/external-link.svg"
+            alt="location icon"
+            width={20}
+            height={20}
+          />
+          <span className="body-3 font-bold">Đặt chỗ ngay</span>
+        </Button>
+      </Link>
     </section>
   );
 };

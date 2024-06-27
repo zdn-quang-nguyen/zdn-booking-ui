@@ -4,18 +4,20 @@ import { Carousel, Spin } from "antd";
 import styles from "./SportFieldSwiper.module.scss";
 import Image from "next/image";
 
-const SportFieldSwiper: React.FC = () => {
-  const images = useMemo(
-    () => [
-      "https://picsum.photos/360/360",
-      "https://picsum.photos/360/361",
-      "https://picsum.photos/360/362",
-      "https://picsum.photos/360/363",
-      "https://picsum.photos/360/364",
-    ],
-    []
-  );
+export const DEFAULT_IMAGES = [
+  'https://picsum.photos/360/360',
+  'https://picsum.photos/360/361',
+  'https://picsum.photos/360/362',
+  'https://picsum.photos/360/363',
+  'https://picsum.photos/360/364',
+];
 
+type SportFieldSwiperProps = {
+  images: string[];
+};
+const SportFieldSwiper = ({
+  images = DEFAULT_IMAGES,
+}: SportFieldSwiperProps) => {
   const [loading, setLoading] = useState(true);
 
   // UseEffect to handle loading state
@@ -43,12 +45,12 @@ const SportFieldSwiper: React.FC = () => {
   return (
     <div className={styles.sliderContainer}>
       {loading ? (
-        <div className="h-card w-full bg-accent-100 flex justify-center items-center rounded-large">
+        <div className="flex h-card w-full items-center justify-center rounded-large bg-accent-100">
           <Spin size="large" />
         </div>
       ) : (
         <Carousel
-          className="w-full h-card relative"
+          className="relative h-card w-full"
           autoplay
           arrows
           autoplaySpeed={2000}
@@ -56,7 +58,7 @@ const SportFieldSwiper: React.FC = () => {
           effect="scrollx"
         >
           {images.map((image, index) => (
-            <div key={image} className="w-full h-card relative">
+            <div key={image} className="relative h-card w-full">
               <Image src={image} alt={`Slide ${index + 1}`} fill />
             </div>
           ))}
