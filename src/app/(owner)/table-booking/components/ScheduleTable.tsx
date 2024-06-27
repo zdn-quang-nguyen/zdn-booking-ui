@@ -190,8 +190,20 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     date: string,
   ) {
     const matchedBooking = bookings.find((booking) => {
-      const bookingStart = parseTimeToMinutes(booking.startTime.split('T')[1]);
-      const bookingEnd = parseTimeToMinutes(booking.endTime.split('T')[1]);
+      const bookingStart = parseTimeToMinutes(
+        new Date(booking.startTime).toLocaleTimeString('en-US', {
+          hourCycle: 'h24',
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+      );
+      const bookingEnd = parseTimeToMinutes(
+        new Date(booking.endTime).toLocaleTimeString('en-US', {
+          hourCycle: 'h24',
+          hour: '2-digit',
+          minute: '2-digit',
+        }),
+      );
       const inputDate = parseDateFromString(date);
       const bookingDate = new Date(booking.startTime.split('T')[0]);
 
@@ -288,7 +300,6 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                       column.end,
                       date,
                     );
-                    console.log({ booking });
                     return (
                       <td
                         key={column.label + startWeek.toDateString()}

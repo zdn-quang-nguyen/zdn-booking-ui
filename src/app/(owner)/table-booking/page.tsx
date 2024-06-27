@@ -1,5 +1,7 @@
 import type { Metadata } from 'next';
 import ScheduleTable from './components/ScheduleTable';
+import { redirect } from 'next/navigation';
+import { getBookingsByFieldId } from './api/booking';
 
 export const metadata: Metadata = {
   title: 'Zodinet Booking - Owner Home Page',
@@ -63,10 +65,29 @@ const dummyBookings: BookingData[] = [
   },
 ];
 
-const OwnerHomePage = () => {
+type OwnerHomePageProps = {
+  params: { slug: string };
+  searchParams?: { [key: string]: string | undefined };
+};
+
+const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
+  const fieldId = searchParams?.fieldId;
+
+  if (!fieldId) {
+    redirect('/home');
+  }
+
+  const startDate = new Date('2024-06-24');
+  startDate.setHours(6, 0, 0, 0);
+
+  const endDate = new Date('2024-06-30');
+  endDate.setHours(22, 0, 0, 0);
+
+  const bookings = await getBookingsByFieldId(fieldId, startDate, endDate);
+  console.log(bookings);
   return (
     <div className="flex h-full w-full items-end justify-center">
-      <ScheduleTable fieldData={dummyData} bookings={dummyBookings} />
+      <ScheduleTable fieldData={dummyData} bookings={bookings} />
     </div>
   );
 };
