@@ -133,7 +133,7 @@ export default function InfoFieldDetail({
               Hình ảnh
             </p>
             <div className="flex flex-wrap items-center gap-3">
-              {sportField.sportFieldImages.map((sportFieldImage) => (
+              {sportField.sportFieldImages?.map((sportFieldImage) => (
                 <Image
                   key={sportFieldImage.id}
                   className="rounded-xl"
