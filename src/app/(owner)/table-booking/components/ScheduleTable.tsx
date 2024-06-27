@@ -206,7 +206,6 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   };
 
   const handleSubmit = () => {
-    console.log(getCurrentCancelBookingId());
     if (status === CheckStatus.CHECKED_BOOKING && getCurrentCancelBookingId()) {
       setIsOpen(true);
       return;
@@ -286,8 +285,11 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   const onCancel = () => {
     router.back();
   };
-
+  console.log(bookings);
   const getBookingTime = () => {
+    if (!document) {
+      return;
+    }
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
     const bookingTime: any = [];
 
@@ -328,10 +330,17 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
       endTime = new Date(firstBooking.date);
       endTime.setHours(firstBooking.endHour, firstBooking.endMinute);
     }
-    return { startTime, endTime };
+    return {
+      startTime,
+      endTime,
+      amount: bookingTime.length * field.sportField.price,
+    };
   };
 
   const getCurrentCancelBookingId = () => {
+    if (!document) {
+      return;
+    }
     const checkboxes = document.querySelectorAll('input[type="checkbox"]');
 
     for (let i = 0; i < checkboxes.length; i++) {
@@ -343,8 +352,6 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     }
     return '';
   };
-
-  console.log(getCurrentCancelBookingId());
 
   return (
     <div

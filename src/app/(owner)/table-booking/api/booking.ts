@@ -77,19 +77,14 @@ export const createBookingByOwner = async (
   createBookingByOwnerDto: CreateBookingByOwnerDto,
 ) => {
   const accessToken = cookies().get('access_token')?.value;
-  const response = await fetch(`${API_HOST}/booking/owner`, {
-    method: 'POST',
-    body: JSON.stringify(createBookingByOwnerDto),
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
+  const response = await axios.post(
+    `${API_HOST}/booking/owner`,
+    createBookingByOwnerDto,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     },
-  });
-
-  if (!response.ok) {
-    throw new Error('Failed to fetch bookings');
-  }
-
-  const json = await response.json();
-
-  return json.data;
+  );
+  return response.data;
 };
