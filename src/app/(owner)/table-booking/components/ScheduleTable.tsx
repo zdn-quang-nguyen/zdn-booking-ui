@@ -9,6 +9,7 @@ import {
   RightOutlined,
 } from '@ant-design/icons';
 import { cn } from '@/libs/utils';
+import ReservationBooking from './ReservationBooking';
 
 export interface BookingData {
   id: string;
@@ -252,6 +253,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
         'flex w-11/12 flex-col gap-8 overflow-x-hidden rounded-form bg-white p-10',
       )}
     >
+      <ReservationBooking />
       <div className="flex items-center">
         <button className="hover:opacity-75" key="back" onClick={onCancel}>
           <ArrowLeftOutlined className="mr-4 text-xl" />

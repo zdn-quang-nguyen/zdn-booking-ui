@@ -1,3 +1,4 @@
+@import 'src/styles/mixins.scss';
 .wrapper {
   table {
     // width: 100%;
@@ -28,4 +29,19 @@
 .checkedBooking,
 .uncheckedBooking {
   background-color: theme('colors.natural.100');
+}
+
+.modal {
+  :global {
+    .ant-btn-primary {
+      @include accent-btn;
+      padding: 14px 40px;
+      font-size: 16px;
+      height: 52px;
+      &:hover {
+        background-color: none !important;
+        border-color: none !important;
+      }
+    }
+  }
 }
