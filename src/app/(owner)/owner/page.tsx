@@ -21,7 +21,7 @@ const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
   const typeId = searchParams?.type;
 
   if (!typeId) {
-    redirect('/owner');
+    redirect('/owner?type=all');
   }
 
   const res = await getUserSportFields(+page, +size, typeId as string);

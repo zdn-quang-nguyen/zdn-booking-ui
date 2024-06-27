@@ -284,10 +284,11 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     >
       <ReservationBooking
         isOpen={isOpen}
-        setIsOpen={setIsOpen}
+        isClose={() => setIsOpen(false)}
         isDeleteForm={status === CheckStatus.CHECKED_BOOKING}
         bookingId={currentBookingId}
         field={field}
+        bookings={bookings}
       />
       <div className="flex items-center">
         <button className="hover:opacity-75" key="back" onClick={onCancel}>

@@ -27,3 +27,38 @@ export const getBookingsByFieldId = async (
 
   return json.data;
 };
+export const getBookingById = async (id: string) => {
+  console.log(id);
+  const accessToken = cookies().get('access_token')?.value;
+  const response = await fetch(`${API_HOST}/booking/${id}`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch bookings');
+  }
+
+  const json = await response.json();
+
+  return json.data;
+};
+export const removeBookingById = async (id: string) => {
+  console.log(id);
+  const accessToken = cookies().get('access_token')?.value;
+  const response = await fetch(`${API_HOST}/booking/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch bookings');
+  }
+
+  const json = await response.json();
+
+  return json.data;
+};
