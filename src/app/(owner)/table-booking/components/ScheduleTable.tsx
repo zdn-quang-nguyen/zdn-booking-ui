@@ -206,7 +206,19 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   };
 
   const handleSubmit = () => {
-    setIsOpen(true);
+    console.log(getCurrentCancelBookingId());
+    if (status === CheckStatus.CHECKED_BOOKING && getCurrentCancelBookingId()) {
+      setIsOpen(true);
+      return;
+    } else if (status === CheckStatus.UNCHECKED_BOOKING) {
+      const { startTime, endTime } = getBookingTime();
+      if (startTime && endTime) {
+        setIsOpen(true);
+        return;
+      }
+    }
+
+    setIsOpen(false);
   };
 
   function isTimeSlotBooked(
@@ -275,6 +287,65 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     router.back();
   };
 
+  const getBookingTime = () => {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const bookingTime: any = [];
+
+    checkboxes.forEach((el: Element) => {
+      if ((el as HTMLInputElement).checked && !el.getAttribute('data-id')) {
+        const time = el.getAttribute('data-time') as string;
+        const [startTime, endTime] = time.split(' - ');
+        const [startHour, startMinute] = startTime.split(':');
+        const [endHour, endMinute] = endTime.split(':');
+        bookingTime.push({
+          date: parseDateFromString(el.getAttribute('data-date') as string),
+          startHour,
+          startMinute,
+          endTime,
+          endHour,
+          endMinute,
+        });
+      }
+    });
+    let startTime;
+    let endTime;
+
+    if (bookingTime.length >= 2) {
+      const firstBooking = bookingTime[0];
+      const lastBooking = bookingTime[bookingTime.length - 1];
+
+      startTime = new Date(firstBooking.date);
+      startTime.setHours(firstBooking.startHour, firstBooking.startMinute);
+
+      endTime = new Date(lastBooking.date);
+      endTime.setHours(lastBooking.endHour, lastBooking.endMinute);
+    } else if (bookingTime.length === 1) {
+      const firstBooking = bookingTime[0];
+
+      startTime = new Date(firstBooking.date);
+      startTime.setHours(firstBooking.startHour, firstBooking.startMinute);
+
+      endTime = new Date(firstBooking.date);
+      endTime.setHours(firstBooking.endHour, firstBooking.endMinute);
+    }
+    return { startTime, endTime };
+  };
+
+  const getCurrentCancelBookingId = () => {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+    for (let i = 0; i < checkboxes.length; i++) {
+      const id = checkboxes[i].getAttribute('data-id');
+      if (!(checkboxes[i] as HTMLInputElement).checked && id) {
+        console.log(id);
+        return id;
+      }
+    }
+    return '';
+  };
+
+  console.log(getCurrentCancelBookingId());
+
   return (
     <div
       className={cn(
@@ -286,7 +357,8 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
         isOpen={isOpen}
         isClose={() => setIsOpen(false)}
         isDeleteForm={status === CheckStatus.CHECKED_BOOKING}
-        bookingId={currentBookingId}
+        bookingTime={getBookingTime()}
+        bookingId={getCurrentCancelBookingId()}
         field={field}
         bookings={bookings}
       />
@@ -379,6 +451,8 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                         >
                           <input
                             data-id={booking?.id}
+                            data-date={date}
+                            data-time={column.label}
                             type="checkbox"
                             defaultChecked={!!booking}
                             onChange={(e) => handleCheckboxChange(e)}

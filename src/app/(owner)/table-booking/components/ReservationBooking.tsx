@@ -15,6 +15,7 @@ type ReservationBookingProps = {
   isClose: () => void;
   bookingId: string;
   field: FieldResponse;
+  bookingTime?: any;
   bookings: BookingData[];
 };
 type Booking = {
@@ -39,6 +40,7 @@ export default function ReservationBooking({
   isClose,
   bookingId,
   field,
+  bookingTime,
   bookings,
 }: ReservationBookingProps) {
   console.log({ bookingId, field, isDeleteForm });
@@ -176,7 +178,7 @@ export default function ReservationBooking({
             </div>
           </div>
         </div>
-        <QRBooking isClose={isDeleteForm} />
+        <QRBooking isClose={isDeleteForm}/>
       </div>
     </div>
   );
