@@ -23,7 +23,7 @@ const AccentButton: React.FC<AccentButtonProps> = ({
       <Button
         type={isActive ? 'primary' : 'default'}
         onClick={() => onClick(value)}
-        className={`${style} w-full`}
+        className={`${style} w-full xl:w-fit`}
       >
         {label}
       </Button>

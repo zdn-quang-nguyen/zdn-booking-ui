@@ -9,13 +9,21 @@ import styles from './styles/DatePickerComponent.module.scss';
 import Calendar from '@public/icons/calendar.svg';
 import Image from 'next/image';
 
-const DatePickerComponent: React.FC = () => {
+interface DatePickerComponentProps {
+  lable?: string;
+  style?: string;
+}
+
+const DatePickerComponent: React.FC<DatePickerComponentProps> = (props) => {
+  const { lable, style } = props;
   return (
-    <Space direction="vertical" size={12} className={``}>
+    <Space direction="vertical" size={10} className={``}>
       <div
-        className={`${styles.picker} flex flex-row justify-end gap-3 items-center`}
+        className={`${styles.picker} flex flex-row items-center justify-end gap-3`}
       >
-        <label className={`body-3 text-natural-700`}>Ngày</label>
+        {lable && (
+          <p className="body-4 font-medium text-natural-700">{lable}</p>
+        )}
         <DatePicker
           defaultValue={dayjs(dayjs(), 'YYYY-MM-DD')}
           format="DD/MM/YYYY"
@@ -23,7 +31,7 @@ const DatePickerComponent: React.FC = () => {
           suffixIcon={
             <Image src={Calendar} alt="calendar" width={20} height={20} />
           }
-          className={`w-[312px] body-4`}
+          className={`body-4`}
         />
       </div>
     </Space>
