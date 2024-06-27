@@ -4,6 +4,7 @@ import AccentButton from './components/AccentButton';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { getValidFilterType } from '@/libs/utils';
 import useSportFieldType from '@/hooks/useSportFieldType';
+import { Skeleton } from 'antd';
 
 export const tabs: { [key: string]: string } = {
   all: 'Tất cả',
@@ -44,7 +45,8 @@ const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({ name = 'type' }) => {
   };
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    const NUMBER_OF_SKELETON = 6;
+    return <FieldTypeFilterSkeleton size={NUMBER_OF_SKELETON} />;
   }
   const allBtn = {
     value: 'all',
@@ -66,6 +68,19 @@ const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({ name = 'type' }) => {
           value={type.id}
           isActive={currentTab === type.id}
           onClick={() => handleClick(type.id)}
+        />
+      ))}
+    </div>
+  );
+};
+
+export const FieldTypeFilterSkeleton = ({ size }: { size: number }) => {
+  return (
+    <div className="flex gap-4">
+      {Array.from({ length: size }).map(() => (
+        <Skeleton.Button
+          active
+          style={{ width: '80px', height: '32px', borderRadius: '40px' }}
         />
       ))}
     </div>
