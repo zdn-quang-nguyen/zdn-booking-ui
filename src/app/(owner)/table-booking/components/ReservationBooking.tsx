@@ -11,7 +11,7 @@ import {
   getBookingById,
   removeBookingById,
 } from '../api/booking';
-import { BookingData } from './ScheduleTable';
+import { BookingData } from './ScheduleSection';
 import { useRouter } from 'next/navigation';
 
 type ReservationBookingProps = {
@@ -52,7 +52,9 @@ export default function ReservationBooking({
   bookingTime,
   bookings,
 }: ReservationBookingProps) {
+  const [isLoading, setIsLoading] = useState(false);
   console.log({ bookingId, field, isDeleteForm, bookingTime });
+
   // const [booking, setBooking] = useState<Booking>(); // [1
   // const fetchBooking = async () => {
   //   const res = await getBookingById(bookingId);
@@ -66,28 +68,42 @@ export default function ReservationBooking({
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const handleDeleteBooking = async () => {
-    const res = await removeBookingById(bookingId);
-    if (res) {
-      message.error('Xóa thành công');
-      isClose();
-     route.push(`/table-booking?fieldId=${field.id}&id=${id}`);
+    try {
+      setIsLoading(true);
+      const res = await removeBookingById(bookingId);
+      if (res) {
+        message.error('Xóa thành công');
+        isClose();
+        route.push(`/table-booking?fieldId=${field.id}&id=${id}`);
+      }
+    } catch (error) {
+      message.error('Xóa thất bại');
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleAddBooking = async () => {
-    const data: CreateBookingByOwnerDto = {
-      name: fullName,
-      amount: bookingTime.amount,
-      endTime: bookingTime.endTime,
-      startTime: bookingTime.startTime,
-      fieldId: field.id as string,
-      status: 'accepted',
-      phone,
-    };
-    const res = await createBookingByOwner(data);
-    if (res) {
-      message.success('Thêm thành công');
-      isClose();
-      route.push(`/table-booking?fieldId=${field.id}&id=${id}`);
+    try {
+      setIsLoading(true);
+      const data: CreateBookingByOwnerDto = {
+        name: fullName,
+        amount: bookingTime.amount,
+        endTime: bookingTime.endTime,
+        startTime: bookingTime.startTime,
+        fieldId: field.id as string,
+        status: 'accepted',
+        phone,
+      };
+      const res = await createBookingByOwner(data);
+      if (res) {
+        message.success('Thêm thành công');
+        isClose();
+        route.push(`/table-booking?fieldId=${field.id}&id=${id}`);
+      }
+    } catch (error) {
+      message.error('Tạo thất bại');
+    } finally {
+      setIsLoading(false);
     }
   };
   const handleSubmit = async () => {
@@ -191,6 +207,7 @@ export default function ReservationBooking({
               <input
                 type="text"
                 onChange={(e) => setFullName(e.target.value)}
+                disabled={isLoading}
                 name="fullName"
                 value={isDeleteForm ? booking?.fullName : fullName}
                 className="mt-2 w-full rounded-large border border-neutral-200 px-4 py-[10px] focus:outline-primary-400"
@@ -202,6 +219,7 @@ export default function ReservationBooking({
               </p>
               <input
                 type="text"
+                disabled={isLoading}
                 value={isDeleteForm ? booking?.phone : phone}
                 name="phone"
                 onChange={(e) => setPhone(e.target.value)}
@@ -225,6 +243,7 @@ export default function ReservationBooking({
             <div className="submit">
               <Button
                 onClick={handleSubmit}
+                loading={isLoading}
                 type="primary"
                 {...(isDeleteForm ? { danger: true } : {})}
               >

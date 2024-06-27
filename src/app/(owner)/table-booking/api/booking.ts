@@ -6,12 +6,13 @@ import { cookies } from 'next/headers';
 const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
 export const getBookingsByFieldId = async (
   fieldId: string,
-  startTime: Date,
-  endTime: Date,
+  startTime: Date = new Date(),
+  endTime: Date = new Date(),
 ) => {
+  console.log({ fieldId, startTime, endTime });
   const accessToken = cookies().get('access_token')?.value;
   const response = await fetch(
-    `${API_HOST}/booking?fieldId=${fieldId}&startTime=${startTime.toISOString()}&endTime=${endTime.toISOString()}`,
+    `${API_HOST}/booking?fieldId=${fieldId}&startTime=${new Date(startTime).toISOString()}&endTime=${new Date(endTime).toISOString()}`,
     {
       headers: {
         Authorization: `Bearer ${accessToken}`,

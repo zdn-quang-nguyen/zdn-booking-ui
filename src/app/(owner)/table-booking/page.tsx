@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import ScheduleTable from './components/ScheduleTable';
+import ScheduleSection, { FieldData } from './components/ScheduleSection';
 import { redirect } from 'next/navigation';
 import { getBookingsByFieldId } from './api/booking';
 import { getFieldById } from './api/field';
@@ -31,8 +31,8 @@ export type FieldResponse = {
 
 const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
   const fieldId = searchParams?.fieldId;
-  const startDate = new Date(searchParams?.startDate as string);
-  const endDate = new Date(searchParams?.endDate as string);
+  const startDate = new Date(searchParams?.startDate ?? new Date());
+  const endDate = new Date(searchParams?.endDate ?? new Date());
 
   if (!fieldId) {
     redirect('/home');
@@ -66,7 +66,11 @@ const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
 
   return (
     <div className="flex h-full w-full items-end justify-center">
-      <ScheduleTable fieldData={fieldData} bookings={bookings} field={field} />
+      <ScheduleSection
+        fieldData={fieldData}
+        bookings={bookings}
+        field={field}
+      />
     </div>
   );
 };
