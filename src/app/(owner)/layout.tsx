@@ -6,9 +6,9 @@ type OwnerLayoutProps = {
 
 export default function OwnerLayout({ children }: OwnerLayoutProps) {
   return (
-    <main className="relative flex min-h-screen flex-col">
+    <main className="relative flex h-full flex-col">
       <OwnerHeader />
-      <div className="h-1 flex-grow bg-[#f7f7f7]">{children}</div>
+      <div className="flex-grow bg-[#f7f7f7]">{children}</div>
     </main>
   );
 }
