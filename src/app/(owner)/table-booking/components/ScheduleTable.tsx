@@ -1,8 +1,8 @@
 'use client';
 import { Button, Tooltip } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './ScheduleTable.module.scss';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowLeftOutlined,
   LeftOutlined,
@@ -68,6 +68,9 @@ function getCurrentWeekDates(now: Date) {
 }
 
 function parseDateFromString(dateStr: string) {
+  if (!dateStr) {
+    return null;
+  }
   // Split the input string into components
   const parts = dateStr.split(' - '); // E.g., ['T2', '30/6']
   if (parts.length !== 2) {
@@ -106,6 +109,8 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   bookings,
 }) => {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const columns = generateColumns(fieldData.startTime, fieldData.endTime);
   const [startWeek, setStartWeek] = React.useState(new Date());
   const weekDates = getCurrentWeekDates(startWeek);
@@ -121,6 +126,19 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   const handlePrevWeek = () => {
     setStartWeek(new Date(startWeek.setDate(startWeek.getDate() - 7)));
   };
+
+  useEffect(() => {
+    const startDateIndex = 0;
+    const endDateIndex = 6;
+
+    const startDate = parseDateFromString(weekDates[startDateIndex]);
+    const endDate = parseDateFromString(weekDates[endDateIndex]);
+    const params = new URLSearchParams(searchParams);
+    startDate && params.set('startDate', new Date(startDate).toISOString());
+    endDate && params.set('endDate', new Date(endDate).toISOString());
+
+    router.push(`${pathname}?${params.toString()}`);
+  }, [weekDates]);
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const id = e.target.getAttribute('data-id');
@@ -253,7 +271,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
         'flex w-11/12 flex-col gap-8 overflow-x-hidden rounded-form bg-white p-10',
       )}
     >
-      <ReservationBooking />
+      {/* <ReservationBooking /> */}
       <div className="flex items-center">
         <button className="hover:opacity-75" key="back" onClick={onCancel}>
           <ArrowLeftOutlined className="mr-4 text-xl" />
