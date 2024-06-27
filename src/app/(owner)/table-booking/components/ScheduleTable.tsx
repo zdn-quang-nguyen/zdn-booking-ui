@@ -206,7 +206,19 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   };
 
   const handleSubmit = () => {
-    setIsOpen(true);
+    console.log(getCurrentCancelBookingId());
+    if (status === CheckStatus.CHECKED_BOOKING && getCurrentCancelBookingId()) {
+      setIsOpen(true);
+      return;
+    } else if (status === CheckStatus.UNCHECKED_BOOKING) {
+      const { startTime, endTime } = getBookingTime();
+      if (startTime && endTime) {
+        setIsOpen(true);
+        return;
+      }
+    }
+
+    setIsOpen(false);
   };
 
   function isTimeSlotBooked(
@@ -319,6 +331,21 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     return { startTime, endTime };
   };
 
+  const getCurrentCancelBookingId = () => {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+
+    for (let i = 0; i < checkboxes.length; i++) {
+      const id = checkboxes[i].getAttribute('data-id');
+      if (!(checkboxes[i] as HTMLInputElement).checked && id) {
+        console.log(id);
+        return id;
+      }
+    }
+    return '';
+  };
+
+  console.log(getCurrentCancelBookingId());
+
   return (
     <div
       className={cn(
@@ -331,7 +358,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
         setIsOpen={setIsOpen}
         isDeleteForm={status === CheckStatus.CHECKED_BOOKING}
         bookingTime={getBookingTime()}
-        bookingId={currentBookingId}
+        bookingId={getCurrentCancelBookingId()}
         field={field}
       />
       <div className="flex items-center">

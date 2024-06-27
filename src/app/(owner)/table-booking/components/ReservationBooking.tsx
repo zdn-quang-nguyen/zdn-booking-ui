@@ -22,7 +22,17 @@ export default function ReservationBooking({
   field,
   bookingTime,
 }: ReservationBookingProps) {
-  console.log({ bookingTime });
+  console.log({
+    isDeleteForm,
+    isOpen,
+    setIsOpen,
+    bookingId,
+    field,
+    bookingTime,
+  });
+  const handleClose = () => {
+    setIsOpen(false);
+  };
   return (
     <div
       className={cn(
@@ -40,7 +50,10 @@ export default function ReservationBooking({
               Đặt chỗ
             </span>
             {isDeleteForm ? (
-              <CloseOutlined className="cursor-pointer text-xl text-natural-700" />
+              <CloseOutlined
+                className="cursor-pointer text-xl text-natural-700"
+                onClick={handleClose}
+              />
             ) : (
               ' '
             )}
@@ -124,7 +137,7 @@ export default function ReservationBooking({
             </div>
           </div>
         </div>
-        <QRBooking isClose={isDeleteForm} />
+        <QRBooking isClose={isDeleteForm} onClose={handleClose} />
       </div>
     </div>
   );

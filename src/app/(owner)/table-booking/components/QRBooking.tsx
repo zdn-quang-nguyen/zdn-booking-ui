@@ -3,13 +3,22 @@ import qr1 from '../../../../../public/images/QRReservation.png';
 import Image from 'next/image';
 import { CloseOutlined } from '@ant-design/icons';
 import dowload from '../../../../../public/icons/dowload.svg';
-export default function QRBooking({ isClose }: { isClose: boolean }) {
+export default function QRBooking({
+  isClose,
+  onClose: handleClose,
+}: {
+  isClose: boolean;
+  onClose: () => void;
+}) {
   return (
     <div
       className={`${isClose ? 'hidden' : 'block'} z-10 rounded-r-[20px] bg-primary-100 px-[60px] py-8`}
     >
       <div className="flex w-full justify-end">
-        <CloseOutlined className="cursor-pointer justify-end text-xl text-natural-700" />
+        <CloseOutlined
+          className="cursor-pointer justify-end text-xl text-natural-700"
+          onClick={handleClose}
+        />
       </div>
       <div className="mt-14 flex flex-col items-center text-natural-700">
         <span className="text-base font-bold">Nhận mã QR để vào cổng</span>
