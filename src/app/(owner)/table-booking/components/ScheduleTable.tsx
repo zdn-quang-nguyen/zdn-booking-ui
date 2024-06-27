@@ -275,6 +275,50 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     router.back();
   };
 
+  const getBookingTime = () => {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+    const bookingTime: any = [];
+
+    checkboxes.forEach((el: Element) => {
+      if ((el as HTMLInputElement).checked && !el.getAttribute('data-id')) {
+        const time = el.getAttribute('data-time') as string;
+        const [startTime, endTime] = time.split(' - ');
+        const [startHour, startMinute] = startTime.split(':');
+        const [endHour, endMinute] = endTime.split(':');
+        bookingTime.push({
+          date: parseDateFromString(el.getAttribute('data-date') as string),
+          startHour,
+          startMinute,
+          endTime,
+          endHour,
+          endMinute,
+        });
+      }
+    });
+    let startTime;
+    let endTime;
+
+    if (bookingTime.length >= 2) {
+      const firstBooking = bookingTime[0];
+      const lastBooking = bookingTime[bookingTime.length - 1];
+
+      startTime = new Date(firstBooking.date);
+      startTime.setHours(firstBooking.startHour, firstBooking.startMinute);
+
+      endTime = new Date(lastBooking.date);
+      endTime.setHours(lastBooking.endHour, lastBooking.endMinute);
+    } else if (bookingTime.length === 1) {
+      const firstBooking = bookingTime[0];
+
+      startTime = new Date(firstBooking.date);
+      startTime.setHours(firstBooking.startHour, firstBooking.startMinute);
+
+      endTime = new Date(firstBooking.date);
+      endTime.setHours(firstBooking.endHour, firstBooking.endMinute);
+    }
+    return { startTime, endTime };
+  };
+
   return (
     <div
       className={cn(
@@ -286,6 +330,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
         isOpen={isOpen}
         setIsOpen={setIsOpen}
         isDeleteForm={status === CheckStatus.CHECKED_BOOKING}
+        bookingTime={getBookingTime()}
         bookingId={currentBookingId}
         field={field}
       />
@@ -378,6 +423,8 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
                         >
                           <input
                             data-id={booking?.id}
+                            data-date={date}
+                            data-time={column.label}
                             type="checkbox"
                             defaultChecked={!!booking}
                             onChange={(e) => handleCheckboxChange(e)}

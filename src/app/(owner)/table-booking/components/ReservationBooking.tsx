@@ -12,6 +12,7 @@ type ReservationBookingProps = {
   setIsOpen: (isOpen: boolean) => void;
   bookingId?: string;
   field: FieldResponse;
+  bookingTime?: any;
 };
 export default function ReservationBooking({
   isDeleteForm,
@@ -19,8 +20,9 @@ export default function ReservationBooking({
   setIsOpen,
   bookingId,
   field,
+  bookingTime,
 }: ReservationBookingProps) {
-  console.log({ bookingId, field, isDeleteForm });
+  console.log({ bookingTime });
   return (
     <div
       className={cn(
