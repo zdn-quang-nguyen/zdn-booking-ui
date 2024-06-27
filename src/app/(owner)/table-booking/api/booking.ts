@@ -63,7 +63,7 @@ export const removeBookingById = async (id: string) => {
   return json.data;
 };
 
-type CreateBookingByOwnerDto = {
+export type CreateBookingByOwnerDto = {
   fieldId: string;
   startTime: Date;
   endTime: Date;
