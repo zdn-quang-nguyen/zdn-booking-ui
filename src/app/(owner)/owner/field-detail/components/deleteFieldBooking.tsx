@@ -91,8 +91,12 @@ export default function DeleteFieldBooking({
     onClose(); // Call the function to close the modal
   };
   const handleDeleteAllField = () => {
-    console.log(12);
     setFieldBooking([]);
+  };
+  const handleDeleteBookings = () => {
+    if (fieldBooking.length === 0) {
+      onClose();
+    }
   };
   return (
     <div
@@ -146,6 +150,7 @@ export default function DeleteFieldBooking({
             Hủy bỏ
           </button>
           <button
+            onClick={handleDeleteBookings}
             className={`${fieldBooking.length > 0 ? 'bg-natural-300' : 'bg-accent-600 hover:bg-accent-500'} rounded-[40px] px-10 py-4 leading-6 text-natural-100`}
           >
             Xác nhận

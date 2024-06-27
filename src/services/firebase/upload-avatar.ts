@@ -23,5 +23,5 @@ export const uploadImage = async (file: File) => {
   }
   const res = await response.json();
 
-  return res.data[0];
+  return res.data;
 };

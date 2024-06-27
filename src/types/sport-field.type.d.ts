@@ -4,22 +4,24 @@ type SportFieldType = {
 };
 
 type SportFieldImage = {
-    id: string;
-    name: string;
-    url: string;
+  id?: string | '';
+  name: string;
+  url: string;
 };
 
 type SportField = {
-    id: string;
-    name: string;
-    quantity: number;
-    phone: string;
-    startTime: Date;
-    endTime: Date;
-    price: number;
-    rule?: string;
-    sportFieldType: SportFieldType;
-    sportFieldImages: SportFieldImage[];
-    location: LocationType;
-    fields: Field[];
+  id?: string;
+  name: string;
+  quantity: number;
+  phone: string;
+  startTime: string;
+  endTime: string;
+  price: number;
+  rule: string | '';
+  sportFieldTypeId: string;
+  ownerId: string;
+  sportFieldType: any;
+  sportFieldImages: SportFieldImage[];
+  location: LocationType;
+  fields?: string[];
 };

@@ -22,3 +22,12 @@
     }
   }
 }
+
+.buttonCustom {
+  :global {
+    .ant-col-offset-8 {
+      margin-inline-start: 0 !important;
+      margin: 0;
+    }
+  }
+}

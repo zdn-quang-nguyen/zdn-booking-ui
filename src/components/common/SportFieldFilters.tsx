@@ -51,10 +51,7 @@ export const SportFieldFilters: React.FC = () => {
     distanceFilter.options[0].value,
   );
 
-  const handleApplyFilter = () => {
-    console.log('Distance: ', distance);
-    console.log('Price: ', price);
-  };
+  const handleApplyFilter = () => {};
 
   const handleClearFilter = () => {
     setIsNeedReset(true);

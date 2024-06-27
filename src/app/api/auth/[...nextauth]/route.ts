@@ -31,13 +31,14 @@ export async function auth(req: NextApiRequest, res: NextApiResponse) {
         clientId: process.env.KEYCLOAK_CLIENT_ID as string,
         clientSecret: process.env.KEYCLOAK_CLIENT_SECRET as string,
         issuer: process.env.KEYCLOAK_ISSUER,
-        authorization: {
-          params: { role: 'user' || 'owners' },
-        },
       }),
     ],
     callbacks: {
-      async jwt({ token, account }: any) {
+      async jwt({ token, account, user }: any) {
+        if (user) {
+          token.user = user;
+        }
+
         if (account) {
           token.account = account;
           account.access_token &&
@@ -48,6 +49,7 @@ export async function auth(req: NextApiRequest, res: NextApiResponse) {
 
       async session({ session, token }: any) {
         session.token = token?.account?.access_token ?? '';
+        session.user = token.user;
         return session;
       },
     },

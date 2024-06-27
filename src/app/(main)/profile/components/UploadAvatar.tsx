@@ -31,7 +31,6 @@ const UploadAvatar: React.FC = () => {
     }
     if (info.file.status === 'done' || true) {
       uploadImage(info.file.originFileObj as File).then((res) => {
-        console.log(res);
         setLoading(false);
         setImageUrl(`${res}?alt=media`);
       });
