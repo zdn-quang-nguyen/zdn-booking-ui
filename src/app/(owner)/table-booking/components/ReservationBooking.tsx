@@ -4,14 +4,28 @@ import React from 'react';
 import { cn } from '@/libs/utils';
 import { Button } from 'antd';
 import QRBooking from './QRBooking';
+import { FieldResponse } from '../page';
 
-export default function ReservationBooking() {
-  const isDeleteForm = false;
+type ReservationBookingProps = {
+  isDeleteForm: boolean;
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  bookingId?: string;
+  field: FieldResponse;
+};
+export default function ReservationBooking({
+  isDeleteForm,
+  isOpen,
+  setIsOpen,
+  bookingId,
+  field,
+}: ReservationBookingProps) {
+  console.log({ bookingId, field, isDeleteForm });
   return (
     <div
       className={cn(
         styles.modal,
-        `${true ? 'absolute flex' : 'hidden'} z-1 right-0 top-0 h-full w-full items-center justify-center rounded-[20px] transition`,
+        `${isOpen ? 'absolute flex' : 'hidden'} z-1 right-0 top-0 h-full w-full items-center justify-center rounded-[20px] transition`,
       )}
     >
       <div className="absolute inset-0 bg-black opacity-40"></div>

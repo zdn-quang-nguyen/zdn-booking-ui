@@ -71,6 +71,10 @@ type OwnerHomePageProps = {
   searchParams?: { [key: string]: string | undefined };
 };
 
+export type FieldResponse = {
+  sportField: SportField;
+} & Field;
+
 const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
   const fieldId = searchParams?.fieldId;
   const startDate = new Date(searchParams?.startDate as string);
@@ -80,7 +84,7 @@ const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
     redirect('/home');
   }
 
-  const field = await getFieldById(fieldId);
+  const field: FieldResponse = await getFieldById(fieldId);
 
   if (!field) {
     redirect('/home');
@@ -102,7 +106,7 @@ const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
 
   return (
     <div className="flex h-full w-full items-end justify-center">
-      <ScheduleTable fieldData={fieldData} bookings={bookings} />
+      <ScheduleTable fieldData={fieldData} bookings={bookings} field={field} />
     </div>
   );
 };

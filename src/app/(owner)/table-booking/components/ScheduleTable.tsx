@@ -10,6 +10,7 @@ import {
 } from '@ant-design/icons';
 import { cn } from '@/libs/utils';
 import ReservationBooking from './ReservationBooking';
+import { FieldResponse } from '../page';
 
 export interface BookingData {
   id: string;
@@ -97,6 +98,7 @@ function parseDateFromString(dateStr: string) {
 interface ScheduleTableProps {
   fieldData: FieldData;
   bookings: BookingData[];
+  field: FieldResponse;
 }
 
 enum CheckStatus {
@@ -107,6 +109,7 @@ enum CheckStatus {
 const ScheduleTable: React.FC<ScheduleTableProps> = ({
   fieldData,
   bookings,
+  field,
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -116,6 +119,8 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   const weekDates = getCurrentWeekDates(startWeek);
   const [checkedBookings, setCheckedBookings] = useState<string[]>([]);
   const [uncheckedBookings, setUncheckedBookings] = useState<string>();
+  const [isOpen, setIsOpen] = useState(false);
+  const [currentBookingId, setCurrentBookingId] = useState('');
 
   const [status, setStatus] = useState<CheckStatus>(CheckStatus.DEFAULT);
 
@@ -161,6 +166,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
     }
     if (id) {
       setStatus(CheckStatus.CHECKED_BOOKING);
+      setCurrentBookingId(id);
       checkboxes.forEach((el: Element) => {
         if (el.getAttribute('data-id') === id) {
           if (el !== e.target) {
@@ -200,7 +206,7 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
   };
 
   const handleSubmit = () => {
-    console.log(uncheckedBookings);
+    setIsOpen(true);
   };
 
   function isTimeSlotBooked(
@@ -227,8 +233,9 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
       const bookingDate = new Date(booking.startTime.split('T')[0]);
 
       if (
+        inputDate &&
         inputDate.toISOString().slice(0, 10) ===
-        bookingDate.toISOString().slice(0, 10)
+          bookingDate.toISOString().slice(0, 10)
       ) {
         return columnStart >= bookingStart && columnEnd <= bookingEnd;
       }
@@ -240,6 +247,10 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
 
   const isPastSlot = (date: string, time: string) => {
     const inputDate = parseDateFromString(date);
+    if (!inputDate) {
+      return true;
+    }
+
     const currentDate = new Date();
     currentDate.setHours(7, 0, 0, 0);
     const currentTime = new Date();
@@ -271,7 +282,13 @@ const ScheduleTable: React.FC<ScheduleTableProps> = ({
         'flex w-11/12 flex-col gap-8 overflow-x-hidden rounded-form bg-white p-10',
       )}
     >
-      {/* <ReservationBooking /> */}
+      <ReservationBooking
+        isOpen={isOpen}
+        setIsOpen={setIsOpen}
+        isDeleteForm={status === CheckStatus.CHECKED_BOOKING}
+        bookingId={currentBookingId}
+        field={field}
+      />
       <div className="flex items-center">
         <button className="hover:opacity-75" key="back" onClick={onCancel}>
           <ArrowLeftOutlined className="mr-4 text-xl" />
