@@ -12,10 +12,11 @@ import Image from 'next/image';
 interface DatePickerComponentProps {
   lable?: string;
   style?: string;
+  onChange?: (value: any) => void;
 }
 
 const DatePickerComponent: React.FC<DatePickerComponentProps> = (props) => {
-  const { lable, style } = props;
+  const { lable, style, onChange } = props;
   return (
     <Space direction="vertical" size={10} className={``}>
       <div
@@ -31,6 +32,7 @@ const DatePickerComponent: React.FC<DatePickerComponentProps> = (props) => {
           suffixIcon={
             <Image src={Calendar} alt="calendar" width={20} height={20} />
           }
+          onChange={onChange}
           className={`body-4`}
         />
       </div>

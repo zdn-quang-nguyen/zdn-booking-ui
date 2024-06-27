@@ -40,6 +40,10 @@ const timeFilter = {
   options: [],
 };
 
+interface FilterProps {
+  isOpen: boolean;
+}
+
 export const SportFieldFilters: React.FC = () => {
   const [isOpened, setIsOpened] = React.useState<boolean>(true);
   const [price, setPrice] = React.useState<string>(

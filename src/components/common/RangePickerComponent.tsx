@@ -48,6 +48,11 @@ const RangePickerComponent: React.FC<rangePickerProps> = (props) => {
         className={`flex flex-grow items-center justify-start gap-3`}
         onCalendarChange={(_, [start, end]) => {
           setTime([dayjs(start, 'HH:mm'), dayjs(end, 'HH:mm')]);
+          console.log(start, end);
+          if (start || end)
+            onChange && onChange([dayjs(start, 'HH:mm'), dayjs(end, 'HH:mm')]);
+          else onChange && onChange(null);
+            
         }}
         onOk={(e) => {
           onChange && onChange(e);
