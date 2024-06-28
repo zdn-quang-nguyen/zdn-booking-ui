@@ -60,10 +60,10 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
     };
     const res = await callUpdate(data, updateBooking.id);
     if (res.statusCode === 200) {
-      message.success(res.message);
       setIsLoading(false);
       onCancel();
       window.location.reload();
+      message.success(res.message);
     } else {
       message.error(res.message);
       setIsLoading(false);
@@ -79,10 +79,10 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
     };
     const res = await callUpdate(data, updateBooking.id);
     if (res.statusCode === 200) {
-      message.success(res.message);
       setIsLoading(false);
       onCancel();
       window.location.reload();
+      message.success(res.message);
     } else {
       message.error(res.message);
       setIsLoading(false);
