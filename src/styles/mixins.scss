@@ -29,6 +29,12 @@
   padding: 8px 20px;
 }
 
+@mixin primary-btn-1 {
+  @include btn(theme('colors.primary.600'), theme('colors.primary.100'));
+  // padding: 8px 20px;
+  font-weight: 500;
+}
+
 @mixin neutral-btn {
   @include btn(theme('colors.accent.600'), theme('colors.neutral.DEFAULT'));
 }
