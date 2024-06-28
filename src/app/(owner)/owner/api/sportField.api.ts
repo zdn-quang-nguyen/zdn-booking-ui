@@ -2,7 +2,6 @@
 import axios from 'axios';
 
 import { cookies } from 'next/headers';
-import { cache } from 'react';
 
 const API_HOST = process.env.NEXT_PUBLIC_API_HOST || 'http://127.0.0.1:3000';
 export const getUserSportFields = async (
@@ -24,12 +23,12 @@ export const getUserSportFields = async (
       },
     );
 
-      return data.data;
-    } catch (error) {
-      return error;
-    }
-  },
-);
+    return data.data;
+  } catch (error) {
+    return error;
+  }
+};
+
 export const getSportFieldById = async (id: string): Promise<any> => {
   const accessToken = cookies().get('access_token')?.value as string;
 

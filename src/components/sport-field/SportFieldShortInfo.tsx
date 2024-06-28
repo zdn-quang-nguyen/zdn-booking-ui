@@ -1,4 +1,4 @@
-import { formatDateToTime } from '@/libs/utils';
+import { formatCurrency, formatDateToTime } from '@/libs/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import dollar from '@public/icons/dollar.svg';
@@ -19,7 +19,9 @@ const SportFieldShortInfo = ({ sportField }: SportFieldShortInfoProps) => {
             width={20}
             height={20}
           />
-          <p className="body-4 truncate">{sportField.location.addressDetail}</p>
+          <p className="body-4 truncate">
+            {sportField.location?.addressDetail ?? 'Chưa cập nhật'}
+          </p>
         </div>
       </div>
       <div className="flex items-center gap-2">
@@ -35,13 +37,14 @@ const SportFieldShortInfo = ({ sportField }: SportFieldShortInfoProps) => {
           height={20}
         />
         <p className="body-4 truncate">
-          {formatDateToTime(sportField.startTime)} -{' '}
-          {formatDateToTime(sportField.endTime)}
+          {sportField.startTime} - {sportField.endTime}
         </p>
       </div>
       <div className="flex items-center gap-2">
         <Image src={dollar} alt="Dollar Icon" width={20} height={20} />
-        <p className="body-4 truncate">{sportField.price} đ/30 phút</p>
+        <p className="body-4 truncate">
+          {formatCurrency(sportField.price)}/30 phút
+        </p>
       </div>
       <div className="flex items-center gap-2">
         <Image
@@ -51,10 +54,10 @@ const SportFieldShortInfo = ({ sportField }: SportFieldShortInfoProps) => {
           height={20}
         />
         <Link
-          href={`tel:${sportField.phone}`}
+          href={`tel:${sportField.phone ?? ''}`}
           className="body-4 truncate text-alerts-blue underline"
         >
-          {sportField.phone}
+          {sportField.phone ?? 'Chưa cập nhật'}
         </Link>
       </div>
     </div>
