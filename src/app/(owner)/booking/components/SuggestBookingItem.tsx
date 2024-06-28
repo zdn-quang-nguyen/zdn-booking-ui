@@ -7,6 +7,7 @@ import { PlusOutlined } from '@ant-design/icons';
 import { Button, Input } from 'antd';
 
 import styles from './styles/Booking.module.scss';
+import moment from 'moment';
 
 interface SuggestBookingItemProps {
   startTime?: string;
@@ -14,10 +15,12 @@ interface SuggestBookingItemProps {
   fieldId?: string;
   fieldName?: string;
   isFirstChild?: boolean;
+  onClick: (value: any) => void;
 }
 
 const SuggestBookingItem: React.FC<SuggestBookingItemProps> = (props) => {
-  const { startTime, endTime, fieldId, fieldName, isFirstChild } = props;
+  const { startTime, endTime, fieldId, fieldName, isFirstChild, onClick } =
+    props;
 
   const handleClick = (value: any) => {
     console.log('click');
@@ -35,7 +38,7 @@ const SuggestBookingItem: React.FC<SuggestBookingItemProps> = (props) => {
         </span>
         <Input
           readOnly
-          value={8}
+          value={fieldName ? fieldName : ''}
           type="text"
           className="body-4 text-natural-700"
         />
@@ -47,7 +50,9 @@ const SuggestBookingItem: React.FC<SuggestBookingItemProps> = (props) => {
           Ngày
         </span>
         <DatePickerComponent
-          defaultValue={startTime ? startTime : undefined}
+          defaultValue={
+            startTime ? moment(startTime).utc().format('DD/MM/YYYY') : undefined
+          }
           disabled={true}
         />
       </div>
@@ -58,19 +63,33 @@ const SuggestBookingItem: React.FC<SuggestBookingItemProps> = (props) => {
           Khung giờ
         </span>
         <RangePickerComponent
-          defaultValue={startTime && endTime ? [startTime, endTime] : undefined}
+          defaultValue={
+            startTime
+              ? [
+                  moment(startTime).utc().format('HH:mm'),
+                  moment(endTime).utc().format('HH:mm'),
+                ]
+              : undefined
+          }
           disabled={true}
         />
       </div>
 
-      <AccentButton
-        disabled={false}
-        key={1}
-        label={<PlusOutlined style={{ fontSize: '20px', padding: '10px' }} />}
-        value={fieldId ? fieldId : ''}
-        isActive={false}
-        onClick={handleClick}
-      />
+      <div className="flex flex-col gap-3">
+        <span
+          className={`body-4 font-medium text-white ${isFirstChild ? '' : 'hidden'}`}
+        >
+          Action
+        </span>
+        <AccentButton
+          disabled={false}
+          key={1}
+          label={<PlusOutlined style={{ fontSize: '20px', padding: '10px' }} />}
+          value={fieldId ? fieldId : ''}
+          isActive={false}
+          onClick={() => onClick([fieldId, fieldName])}
+        />
+      </div>
     </div>
   );
 };

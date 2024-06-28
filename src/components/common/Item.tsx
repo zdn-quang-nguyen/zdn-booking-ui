@@ -1,7 +1,10 @@
 //
 import React from 'react';
 import Link from 'next/link';
+import { CATEGORY_MAPPING } from '@/constants/constant';
 // import { sportField } from '@/mocks/sport-fields';
+import dayjs from 'dayjs';
+import moment from 'moment';
 
 interface ItemProps {
   data: any;
@@ -66,19 +69,16 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
         <div>
           {(label == 'transaction' || label == 'booking') && (
             <div className={`flex flex-row items-center gap-2`}>
-              <Link
-                href={mockData.url}
-                className={`body-4 text-natural-700} font-medium`}
-              >
-                {mockData.data.fullName}
+              <Link href="/" className={`body-4 text-natural-700} font-medium`}>
+                {data.fullName}
               </Link>
             </div>
           )}
           {label == 'notification' && (
             <div className={`flex flex-row items-center gap-2`}>
               <Link
-                href={mockData.url}
-                className={`body-4 font-bold ${textColor(mockData.status)}`}
+                href="/"
+                className={`body-4 font-bold ${textColor(data.status)}`}
               >
                 {mockData.title}
               </Link>
@@ -94,13 +94,20 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
             <div
               className={`body-5 flex flex-row items-center gap-2 text-natural-500`}
             >
-              <p>{mockData.data.sportField.sportFieldType}</p>
-              <DotFrame />
               <p>
-                {mockData.data.start} - {mockData.data.end}
+                {
+                  CATEGORY_MAPPING[
+                    data?.field?.sportField?.sportFieldType?.name
+                  ]
+                }
               </p>
               <DotFrame />
-              <p>{mockData.data.field}</p>
+              <p>
+                {moment(data.startTime).utc().format('HH:mm')}-{' '}
+                {moment(data.endTime).utc().format('HH:mm')}
+              </p>
+              <DotFrame />
+              <p>{data?.field?.name}</p>
             </div>
           )}
         </div>
@@ -109,12 +116,13 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
         {(label == 'transaction' || label == 'booking') && (
           <div className="flex flex-col gap-1">
             <span className="body-4 flex flex-row justify-end font-medium text-natural-700">
-              {mockData.data.price.toLocaleString('en').replaceAll(',', '.')}
+              {/* {data.amount.toLocaleString('en').replaceAll(',', '.')} */}
+              {data.amount}
               <p>đ</p>
             </span>
             {label == 'transaction' && (
               <span
-                className={`body-4 font-bold ${textColor(mockData.data.status)} text-right`}
+                className={`body-4 font-bold ${textColor(data.status)} text-right`}
               >
                 {'Đặt chỗ thành công'}
               </span>

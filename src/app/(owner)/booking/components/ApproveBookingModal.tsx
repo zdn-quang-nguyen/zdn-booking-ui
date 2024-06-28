@@ -1,21 +1,23 @@
 //
+'use client';
 
 import DatePickerComponent from '@/components/common/DatePickerComponent';
 import RangePickerComponent from '@/components/common/RangePickerComponent';
 import AccentButton from '@/components/common/components/AccentButton';
 import { CloseOutlined } from '@ant-design/icons';
-import { Input } from 'antd';
+import { Input, message } from 'antd';
 import styles from './styles/ApproveBookingModal.module.scss';
 import { useState } from 'react';
 import SuggestBooking from './SuggestBooking';
-
+import moment from 'moment';
+import { updateBooking as callUpdate } from '../../apis/booking.api';
 interface Props {
   booking: any;
   onCancel: () => void;
 }
 
 function formatPhoneNumber(phone: string): string {
-  const digits = phone.replace(/\D/g, '');
+  const digits = phone.replace(/\D/g, '').slice(1);
 
   const countryCode = '84';
   const mainNumber = digits;
@@ -26,7 +28,67 @@ function formatPhoneNumber(phone: string): string {
 }
 
 const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
-  const [isWarning, setIsWarning] = useState<boolean>(true);
+  const [updateBooking, setUpdateBooking] = useState(booking);
+  const [isWarning, setIsWarning] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const handleClick = (value: any) => {
+    setUpdateBooking((prevState: any) => {
+      return {
+        ...prevState,
+        fieldId: value[0],
+      };
+    });
+
+    setUpdateBooking((prevState: any) => ({
+      ...prevState,
+      field: {
+        ...prevState.field,
+        name: value[1],
+      },
+    }));
+
+    setIsWarning(false);
+  };
+
+  const acceptBooking = async () => {
+    setIsLoading(true);
+    console.log('acc cl');
+    const data = {
+      fieldId: updateBooking.fieldId,
+      status: 'accepted',
+    };
+    const res = await callUpdate(data, updateBooking.id);
+    if (res.statusCode === 200) {
+      message.success(res.message);
+      setIsLoading(false);
+      onCancel();
+      window.location.reload();
+    } else {
+      message.error(res.message);
+      setIsLoading(false);
+      onCancel();
+    }
+  };
+
+  const rejectBooking = async () => {
+    setIsLoading(true);
+    console.log('rej cl');
+    const data = {
+      status: 'rejected',
+    };
+    const res = await callUpdate(data, updateBooking.id);
+    if (res.statusCode === 200) {
+      message.success(res.message);
+      setIsLoading(false);
+      onCancel();
+      window.location.reload();
+    } else {
+      message.error(res.message);
+      setIsLoading(false);
+      onCancel();
+    }
+  };
 
   return (
     <div className={`${styles.modalContainer}`}>
@@ -36,13 +98,15 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
           <CloseOutlined style={{ fontSize: '24px' }} className="hover-spin" />
         </button>
       </div>
-      <div className="mt-3 flex flex-col gap-8">
+      <div className="mb-10 mt-3 flex flex-col gap-8">
         <div className="gap flex flex-col gap-2">
           <span className="body-3 font-bold text-natural-700">
-            Sân bóng Vạn Phúc
+            {updateBooking?.field?.sportField?.name}
           </span>
           <p className="body-5 text-natural-500">
-            12 Nguyễn Thị Nhung, Hiệp Bình Phước, Thủ Đức, Tp. Hồ Chí Minh
+            {updateBooking?.field?.sportField?.location?.addressDetail
+              ? updateBooking?.field?.sportField?.location?.addressDetail
+              : 'Chưa cập nhật'}
           </p>
         </div>
         <div className="flex flex-col gap-2">
@@ -53,7 +117,7 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
               <span className="body-4 font-medium text-natural-700">Sân</span>
               <Input
                 readOnly
-                value={8}
+                value={updateBooking?.field?.name}
                 type="text"
                 className="body-4 text-natural-700"
               />
@@ -61,7 +125,11 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
             <div className="flex flex-col gap-3">
               <span className="body-4 font-medium text-natural-700">Ngày</span>
               <DatePickerComponent
-                defaultValue={booking.startTime ? booking.startTime : null}
+                defaultValue={
+                  updateBooking.startTime
+                    ? moment(updateBooking.startTime).utc().format('DD/MM/YYYY')
+                    : undefined
+                }
                 disabled={true}
               />
             </div>
@@ -71,8 +139,11 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
               </span>
               <RangePickerComponent
                 defaultValue={
-                  booking.startTime
-                    ? [booking.startTime, booking.endTime]
+                  updateBooking.startTime
+                    ? [
+                        moment(booking.startTime).utc().format('HH:mm'),
+                        moment(booking.endTime).utc().format('HH:mm'),
+                      ]
                     : undefined
                 }
                 disabled={true}
@@ -85,39 +156,43 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
             </p>
           )}
         </div>
-        {isWarning && <SuggestBooking booking={booking} />}
+        {isWarning && (
+          <SuggestBooking booking={updateBooking} onClick={handleClick} />
+        )}
       </div>
       <div className="flex flex-row items-center justify-between py-6">
         <div>
           <div className="flex flex-row gap-2">
             <span className="body-4 font-medium text-natural-700">Đặt sân</span>
             <p className="body-3 font-bold text-natural-700">
-              {booking.fullName ? booking.fullName : 'Nguyễn Văn Quang'}
+              {updateBooking.fullName
+                ? updateBooking.fullName
+                : 'Nguyễn Văn Quang'}
             </p>
           </div>
           <span className="body-3 font-bold text-accent-600">
-            {booking.phone
-              ? formatPhoneNumber(booking.phone)
+            {updateBooking.phone
+              ? formatPhoneNumber(updateBooking.phone)
               : '(+84) 965 724 322'}
           </span>
         </div>
         <div className={`flex flex-row gap-3 ${styles.customBtn}`}>
           <AccentButton
-            // disabled={isWarning}
+            disabled={isLoading}
             key={0}
             label={'Hủy đặt chỗ'}
             value={'rejected'}
             isActive={false}
-            onClick={onCancel}
+            onClick={rejectBooking}
           />
 
           <AccentButton
-            disabled={isWarning}
+            disabled={isWarning || isLoading}
             key={1}
             label={'Xác nhận'}
             value={'accepted'}
             isActive={true}
-            onClick={onCancel}
+            onClick={acceptBooking}
           />
         </div>
       </div>
