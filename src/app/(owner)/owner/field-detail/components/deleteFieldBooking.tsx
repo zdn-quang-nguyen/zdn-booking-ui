@@ -8,7 +8,7 @@ import {
   removeSportField,
 } from '../../api/sportField.api';
 import { redirect, useRouter } from 'next/navigation';
-import Router from 'next/router';
+import { revalidatePath } from 'next/cache';
 
 type DeleteFieldBookingProps = {
   isOpen: boolean;
@@ -39,6 +39,7 @@ export default function DeleteFieldBooking({
   sportField,
 }: DeleteFieldBookingProps) {
   const route = useRouter();
+
   const [fieldBooking, setFieldBooking] = useState<DataType[]>();
   const [api, contextHolder] = notification.useNotification();
   const columns: TableProps<DataType>['columns'] = [
@@ -101,6 +102,7 @@ export default function DeleteFieldBooking({
       await removeSportField(sportField.id);
       message.success('Xóa sân thành công');
       onClose();
+      route.refresh();
       route.push('/owner?type=all');
     }
   };

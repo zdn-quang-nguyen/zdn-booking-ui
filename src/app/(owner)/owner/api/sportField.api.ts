@@ -1,6 +1,6 @@
 'use server';
 import axios from 'axios';
-
+import { unstable_cache, unstable_noStore } from 'next/cache';
 import { cookies } from 'next/headers';
 
 const API_HOST = process.env.NEXT_PUBLIC_API_HOST || 'http://127.0.0.1:3000';
@@ -10,6 +10,7 @@ export const getUserSportFields = async (
   size: number,
   sportFieldTypeId: string,
 ): Promise<any> => {
+  unstable_noStore();
   const accessToken = cookies().get('access_token')?.value as string;
   try {
     const sportFieldTypeParam =
@@ -20,6 +21,7 @@ export const getUserSportFields = async (
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${accessToken}`,
+          'Cache-Control': 'no-store',
         },
       },
     );
@@ -29,7 +31,7 @@ export const getUserSportFields = async (
     return error;
   }
 };
-
+ 
 export const getSportFieldById = async (id: string): Promise<any> => {
   const accessToken = cookies().get('access_token')?.value as string;
 
