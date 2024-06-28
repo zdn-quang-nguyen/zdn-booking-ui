@@ -20,6 +20,7 @@ import { FieldResponse } from '../page';
 import { useWeekNavigation } from '@/hooks/useWeekNavigation';
 import ScheduleTable from './ScheduleTable';
 import useDocumentLoaded from '@/hooks/useDocumentLoaded';
+import { sportField } from '@/mocks/sport-fields';
 
 export interface BookingData {
   id: string;
@@ -114,7 +115,7 @@ const ScheduleSection: React.FC<ScheduleTableProps> = ({
   };
 
   const onCancel = () => {
-    router.back();
+    router.replace(`/owner/field-map/${field.sportField.id}`);
   };
 
   const getBookingTime = () => {
@@ -229,7 +230,7 @@ const ScheduleSection: React.FC<ScheduleTableProps> = ({
     <div
       className={cn(
         styles.wrapper,
-        'flex w-11/12 flex-col gap-8 overflow-x-hidden rounded-form bg-white p-10',
+        'rounded-form flex min-h-[800px] w-11/12 flex-col gap-8 overflow-x-hidden bg-white p-10',
       )}
     >
       {isDocumentLoaded && (

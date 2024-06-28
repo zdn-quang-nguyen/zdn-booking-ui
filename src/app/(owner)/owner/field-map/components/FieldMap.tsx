@@ -4,28 +4,21 @@ import { Button } from 'antd';
 import { FaArrowLeft } from 'react-icons/fa6';
 import { cn } from '@/libs/utils';
 import styles from './fieldMap.module.scss';
+import { useRouter } from 'next/navigation';
 
-const FieldMap = () => {
-  const fieldNames = [
-    '1',
-    '2',
-    '3',
-    '4',
-    '5',
-    '6',
-    '7',
-    '8',
-    '9',
-    '10',
-    '11',
-    '12',
-    '13',
-    '14',
-    '15',
-  ];
+const FieldMap = ({ sportField }: { sportField: SportField }) => {
+  const fieldNames = sportField.fields || [];
+  const router = useRouter();
+
+  console.log(fieldNames, 'fieldNames');
 
   const handleButtonClick = (index: number) => {
-    console.log(`Đã chọn sân ${fieldNames[index]}`);
+    console.log(`Đã chọn sân ${fieldNames[index].id}`);
+    router.push(`/table-booking?fieldId=${fieldNames[index].id}`);
+  };
+
+  const onCancel = () => {
+    router.back();
   };
 
   return (
@@ -36,7 +29,7 @@ const FieldMap = () => {
       )}
     >
       <div className="flex items-center">
-        <button className="hover:opacity-75" key="back">
+        <button className="hover:opacity-75" key="back" onClick={onCancel}>
           <FaArrowLeft className="mr-4 text-xl" />
         </button>
 
@@ -52,7 +45,7 @@ const FieldMap = () => {
               key={index}
               onClick={() => handleButtonClick(index)}
             >
-              {`Sân ${fieldName}`}
+              {`Sân ${fieldName.name}`}
             </Button>
           ))}
         </div>

@@ -1,8 +1,8 @@
-import { cn } from "@/libs/utils";
-import { Button, Input } from "antd";
-import s from "./profile.module.scss";
-import UploadAvatar from "./UploadAvatar";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import { cn } from '@/libs/utils';
+import { Button, Input } from 'antd';
+import s from './profile.module.scss';
+import UploadAvatar from './UploadAvatar';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 type EditProfileProps = {
   onCancel: () => void;
@@ -21,7 +21,6 @@ export default function EditProfile({ onCancel }: EditProfileProps) {
           <ArrowLeftOutlined className="mr-4 text-xl" />
         </button>
 
-        <span className="cursor-pointer text-[28px] font-bold leading-7">
         <span className="cursor-pointer text-[28px] font-bold leading-7">
           Edit profile
         </span>

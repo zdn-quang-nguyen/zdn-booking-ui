@@ -1,7 +1,7 @@
 import { parseDateFromString, parseTimeToMinutes } from '@/libs/utils';
-import styles from './ScheduleTable.module.scss';
-import { CheckStatus } from './ScheduleSection';
 import { Tooltip } from 'antd';
+import { CheckStatus } from './ScheduleSection';
+import styles from './ScheduleTable.module.scss';
 
 const ScheduleTable = ({
   columns,
@@ -125,7 +125,7 @@ const ScheduleTable = ({
                           <div className="font-bold">Name:</div>
                           <div>{booking.fullName}</div>
                           <div className="font-bold">Phone:</div>
-                          <div>{booking.phone.trim()}</div>
+                          <div>{booking.phone}</div>
                           <div className="font-bold">Start:</div>
                           <div>
                             {new Date(booking.startTime).toLocaleString()}
