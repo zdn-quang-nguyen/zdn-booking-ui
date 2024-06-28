@@ -20,6 +20,7 @@ export interface BookingData {
   amount: number;
   status: string;
 }
+
 type OwnerHomePageProps = {
   params: { slug: string };
   searchParams?: { [key: string]: string | undefined };
@@ -38,15 +39,12 @@ const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
     redirect('/home');
   }
 
-  console.log('a');
-
   const field: FieldResponse = await getFieldById(fieldId);
-  console.log(field);
 
   if (!field) {
     redirect('/home');
   }
-  console.log('b');
+
   const [startHour, startMinute] =
     field.sportField?.startTime?.split(':') ?? [];
   const [endHour, endMinute] = field.sportField?.endTime?.split(':') ?? [];
@@ -54,7 +52,7 @@ const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
   if (!startHour || !startMinute || !endHour || !endMinute) {
     redirect('/home');
   }
-console.log('c');
+
   startDate.setHours(Number(startHour), Number(startMinute));
   endDate.setHours(Number(endHour), Number(endMinute));
 

@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import {
   ArrowLeftOutlined,
   LeftOutlined,
+  ReloadOutlined,
   RightOutlined,
 } from '@ant-design/icons';
 import {
@@ -92,8 +93,6 @@ const ScheduleSection: React.FC<ScheduleTableProps> = ({
       } else {
         (el as HTMLInputElement).checked = true;
       }
-
-      // (el as HTMLInputElement).checked = false;
     });
     setStatus(CheckStatus.DEFAULT);
     setUncheckedBookings('');
@@ -195,8 +194,13 @@ const ScheduleSection: React.FC<ScheduleTableProps> = ({
           'input',
         )[0];
 
-      if (!nextSibling?.checked && !previousSibling?.checked) {
+      if (
+        (!nextSibling?.checked || nextSibling.getAttribute('date-id')) &&
+        (!previousSibling?.checked || previousSibling.getAttribute('date-id'))
+      ) {
         e.target.checked = false;
+      } else if (nextSibling?.checked && previousSibling?.checked) {
+        e.target.checked = true;
       }
 
       return;
@@ -253,8 +257,8 @@ const ScheduleSection: React.FC<ScheduleTableProps> = ({
           Quản lý đặt chỗ - {fieldData.name}
         </h4>
       </div>
-      <div className={cn(styles.navigation, 'self-end')}>
-        <button className="w-28" onClick={handlePrevWeek}>
+      <div className={cn(styles.navigation, 'flex gap-10 self-end')}>
+        <button className="" onClick={handlePrevWeek}>
           <LeftOutlined />
         </button>
         <button onClick={handleNextWeek}>
@@ -275,18 +279,23 @@ const ScheduleSection: React.FC<ScheduleTableProps> = ({
         </div>
       </div>
       <div className="flex gap-20 self-end">
-        <Button type="primary" htmlType="submit" onClick={handleSubmit}>
+        {status !== CheckStatus.DEFAULT && (
+          <Button type="default" htmlType="reset" onClick={handleReset}>
+            <ReloadOutlined />
+          </Button>
+        )}
+        <Button
+          type="primary"
+          htmlType="submit"
+          onClick={handleSubmit}
+          {...(status === CheckStatus.CHECKED_BOOKING ? { danger: true } : {})}
+        >
           {status === CheckStatus.UNCHECKED_BOOKING
             ? 'Đặt sân'
             : status === CheckStatus.CHECKED_BOOKING
               ? 'Hủy'
               : 'Xác nhận'}
         </Button>
-        {status !== CheckStatus.DEFAULT && (
-          <Button type="primary" htmlType="reset" onClick={handleReset}>
-            Đặt lại
-          </Button>
-        )}
       </div>
     </div>
   );

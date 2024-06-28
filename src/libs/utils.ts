@@ -96,6 +96,5 @@ export function parseDateFromString(dateStr: string) {
   if (date.getUTCDate() !== day || date.getUTCMonth() + 1 !== month) {
     throw new Error('Invalid day or month in date string');
   }
-
   return date;
 }

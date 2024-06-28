@@ -32,14 +32,15 @@ const ScheduleTable = ({
         }),
       );
       const inputDate = parseDateFromString(date);
-      const bookingDate = new Date(booking.startTime.split('T')[0]);
+      const bookingDate = new Date(booking.startTime);
 
       if (
         inputDate &&
-        inputDate.toISOString().slice(0, 10) ===
-          bookingDate.toISOString().slice(0, 10)
+        new Date(inputDate).toLocaleDateString() ===
+          new Date(bookingDate).toLocaleDateString()
       ) {
-        return columnStart >= bookingStart && columnEnd <= bookingEnd;
+        if (columnStart >= bookingStart && columnEnd <= bookingEnd)
+          return columnStart >= bookingStart && columnEnd <= bookingEnd;
       }
       return false;
     });
