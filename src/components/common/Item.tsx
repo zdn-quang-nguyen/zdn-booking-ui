@@ -6,6 +6,7 @@ import Link from 'next/link';
 interface ItemProps {
   data: any;
   label: string;
+  onClick?: (value: any) => void;
 }
 
 const mockData = {
@@ -35,8 +36,12 @@ const DotFrame: React.FC = () => {
   return <span className={`block h-1 w-1 rounded-lg bg-natural-300`}></span>;
 };
 
-const Item: React.FC<ItemProps> = (props) => {
-  const { data, label } = props;
+const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
+  const handleClick = () => {
+    console.log('clicked');
+    onClick && onClick(data);
+  };
+
   const textColor = (status: string) => {
     switch (status) {
       case 'booking':
@@ -116,6 +121,7 @@ const Item: React.FC<ItemProps> = (props) => {
             )}
             {label == 'booking' && (
               <button
+                onClick={handleClick}
                 className={`body-4 text-right font-bold text-accent-600 underline`}
               >
                 {'Duyệt đặt chỗ'}

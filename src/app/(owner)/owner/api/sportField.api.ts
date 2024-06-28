@@ -24,12 +24,11 @@ export const getUserSportFields = async (
       },
     );
 
-      return data.data;
-    } catch (error) {
-      return error;
-    }
-  },
-);
+    return data.data;
+  } catch (error) {
+    return error;
+  }
+};
 export const getSportFieldById = async (id: string): Promise<any> => {
   const accessToken = cookies().get('access_token')?.value as string;
 

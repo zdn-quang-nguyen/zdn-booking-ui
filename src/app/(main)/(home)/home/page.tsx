@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   description: 'Zodinet Booking - Home: Find Your Sport Field with Ease',
 };
 const HomePage = async () => {
-  const test = await axiosAuth.get('/location');
-  console.log(test);
+  // const test = await axiosAuth.get('/location');
+  // console.log(test);
   const sportFields = Array(12).fill(sportField);
   return (
     <div>

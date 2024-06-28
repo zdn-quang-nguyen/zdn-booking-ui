@@ -12,11 +12,13 @@ import Image from 'next/image';
 interface DatePickerComponentProps {
   lable?: string;
   style?: string;
+  defaultValue?: string;
   onChange?: (value: any) => void;
+  disabled?: boolean;
 }
 
 const DatePickerComponent: React.FC<DatePickerComponentProps> = (props) => {
-  const { lable, style, onChange } = props;
+  const { lable, style, onChange, defaultValue, disabled } = props;
   return (
     <Space direction="vertical" size={10} className={``}>
       <div
@@ -26,7 +28,12 @@ const DatePickerComponent: React.FC<DatePickerComponentProps> = (props) => {
           <p className="body-4 font-medium text-natural-700">{lable}</p>
         )}
         <DatePicker
-          defaultValue={dayjs(dayjs(), 'YYYY-MM-DD')}
+          disabled={disabled && disabled}
+          defaultValue={
+            defaultValue
+              ? dayjs(defaultValue, 'DD/MM/YYYY')
+              : dayjs(dayjs(), 'DD/MM/YYYY')
+          }
           format="DD/MM/YYYY"
           locale={locale}
           suffixIcon={

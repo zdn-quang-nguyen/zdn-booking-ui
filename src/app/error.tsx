@@ -5,18 +5,18 @@ import Link from 'next/link';
 import { useEffect } from 'react';
 
 const Error = ({ error }: { error: any; reset: () => void }) => {
-  const isUnauthorized = error.message === 'Unauthorized';
+  // const isUnauthorized = error.message === 'Unauthorized';
 
-  useEffect(() => {
-    console.log('err', error);
-    if (isUnauthorized) {
-      signOut();
-    }
-  }, []);
+  // useEffect(() => {
+  //   console.log('err', error);
+  //   if (isUnauthorized) {
+  //     signOut();
+  //   }
+  // }, []);
 
-  if (isUnauthorized) {
-    return null;
-  }
+  // if (isUnauthorized) {
+  //   return null;
+  // }
 
   return (
     <section className="bg-white">
