@@ -1,8 +1,8 @@
-import { cn } from '@/libs/utils';
-import { Button, Input } from 'antd';
-import s from './profile.module.scss';
-import UploadAvatar from './UploadAvatar';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { cn } from "@/libs/utils";
+import { Button, Input } from "antd";
+import s from "./profile.module.scss";
+import UploadAvatar from "./UploadAvatar";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 type EditProfileProps = {
   onCancel: () => void;

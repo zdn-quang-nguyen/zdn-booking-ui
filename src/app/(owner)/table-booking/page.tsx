@@ -20,7 +20,6 @@ export interface BookingData {
   amount: number;
   status: string;
 }
-
 type OwnerHomePageProps = {
   params: { slug: string };
   searchParams?: { [key: string]: string | undefined };
@@ -40,6 +39,7 @@ const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
   }
 
   const field: FieldResponse = await getFieldById(fieldId);
+  console.log(field);
 
   if (!field) {
     redirect('/home');

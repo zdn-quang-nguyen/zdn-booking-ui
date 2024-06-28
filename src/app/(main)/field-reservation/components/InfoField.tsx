@@ -5,6 +5,7 @@ import { Button, Checkbox, DatePicker, Select } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
 import { cn } from '@/libs/utils';
 import s from '@/app/(main)/field-reservation/infoField.module.scss';
+import BookingModal from './BookingModal';
 
 type TimeRange = {
   start: string;
@@ -73,6 +74,7 @@ export default function InfoField() {
 
   return (
     <div>
+      <BookingModal />
       <div className="flex items-center">
         <p className="mr-3 cursor-pointer text-sm font-medium text-natural-400">
           Trang chủ
