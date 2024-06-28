@@ -129,10 +129,10 @@ export default function DeleteFieldBooking({
     <>
       {contextHolder}
       <div
-        className={`${isOpen ? 'absolute flex' : 'hidden'} z-1 right-0 top-0 h-full w-full items-center justify-center rounded-[20px] transition`}
+        className={`${isOpen ? 'absolute flex' : 'hidden'} right-0 top-0 z-[999] h-full w-full items-center justify-center rounded-[20px] transition`}
       >
         <div
-          className="absolute inset-0 bg-black opacity-40"
+          className="z-9 absolute inset-0 h-full bg-black opacity-40"
           onClick={handleBackgroundClick}
         ></div>
         <div className="py relative z-10 w-[740px] rounded-2xl bg-white px-10 py-6 shadow-lg">
