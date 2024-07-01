@@ -3,32 +3,70 @@ import React, { useEffect, useState } from 'react';
 import type { DatePickerProps, SelectProps } from 'antd';
 import { Button, Checkbox, DatePicker, Select } from 'antd';
 import { RightOutlined } from '@ant-design/icons';
-import { cn } from '@/libs/utils';
+import { cn, formatCurrency, getTime } from '@/libs/utils';
 import s from '@/app/(main)/field-reservation/infoField.module.scss';
-import BookingModal from './BookingModal';
+import SportFieldShortInfo from '@/components/sport-field/SportFieldShortInfo';
+import SportFieldRule from '@/components/common/sport-field-rule/SportFieldRule';
+import dayjs from 'dayjs';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import useBooking from '@/hooks/useBooking';
+import { CheckboxChangeEvent } from 'antd/es/checkbox';
+import BookingModal, { ModalData } from './BookingModal';
 
 type TimeRange = {
   start: string;
   end: string;
 };
 
-export default function InfoField() {
-  const [times, setTimes] = useState<TimeRange[]>([
-    {
-      start: '',
-      end: '',
-    },
-  ]);
-  const onChange: DatePickerProps['onChange'] = (date, dateString) => {};
-  const options: SelectProps['options'] = [];
-  for (let i = 10; i < 36; i++) {
-    options.push({
-      value: i.toString(36) + i,
-      label: i.toString(36) + i,
-    });
-  }
+type InfoFieldProps = {
+  sportField: SportField;
+};
 
-  const handleChange = (value: string | string[]) => {};
+export default function InfoField({ sportField }: InfoFieldProps) {
+  const [data, setData] = useState<ModalData>();
+  const [isOpen, setIsOpen] = useState(false);
+  const [timesChosen, setTimesChosen] = useState<number[]>([]);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [times, setTimes] = useState<TimeRange[]>(
+    splitTimeRange(sportField.startTime, sportField.endTime),
+  );
+  useEffect(() => {
+    const date = searchParams.get('date');
+    const field = searchParams.get('field');
+    if (!sportField.fields?.length) {
+      return;
+    }
+    if (!date || !field) {
+      router.replace(
+        `${pathname}?date=${dayjs(new Date()).format('DD/MM/YYYY')}&field=${sportField.fields?.[0].id}`,
+        { scroll: false },
+      );
+    }
+  }, []);
+
+  const handleDateChange: DatePickerProps['onChange'] = (
+    date,
+    dateString: string,
+  ) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('date', dateString);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
+  const options: SelectProps['options'] = [];
+  sportField.fields?.forEach((field) => {
+    options.push({
+      value: field.id,
+      label: field.name,
+    });
+  });
+
+  const handleSelect = (value: string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set('field', value);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  };
   function splitTimeRange(startTime: string, endTime: string) {
     const timeSlots = [];
     let [startHour, startMinute] = startTime.split(':').map(Number);
@@ -67,15 +105,144 @@ export default function InfoField() {
     return timeSlots;
   }
 
-  useEffect(() => {
-    const time = splitTimeRange('9:00', '18:00');
-    setTimes(time);
-  }, []);
+  const date = searchParams.get('date');
+  const fieldId = searchParams.get('field');
+
+  const startTime = getTime(date, sportField.startTime);
+
+  const endTime = getTime(date, sportField.endTime);
+
+  const { bookings, isLoading } = useBooking(
+    fieldId,
+    startTime,
+    endTime,
+    'accepted',
+  );
+  const bookingTimes = bookings.map((booking) => ({
+    start: booking.startTime,
+    end: booking.endTime,
+  }));
+
+  const timesWithBooking = times.map((time) => {
+    const isBooked = bookingTimes.some((bookingTime) => {
+      const start = dayjs(bookingTime.start);
+      const end = dayjs(bookingTime.end);
+      const timeStart = dayjs(time.start, 'HH:mm');
+      const timeEnd = dayjs(time.end, 'HH:mm');
+
+      timeStart.set('date', start.get('date'));
+      timeEnd.set('date', start.get('date'));
+
+      if (timeStart.isBefore(dayjs()) || timeEnd.isBefore(dayjs())) {
+        return true;
+      }
+
+      return (
+        (timeStart.isAfter(start) || timeStart.isSame(start)) &&
+        (timeEnd.isBefore(end) || timeEnd.isSame(end))
+      );
+    });
+    return {
+      ...time,
+      isBooked,
+    };
+  });
+
+  const getReservedTime = () => {
+    let startTimeResult;
+    let endTimeResult;
+
+    let startTime;
+    let endTime;
+    if (timesChosen.length === 1) {
+      startTime = timesWithBooking[timesChosen[0]].start;
+      endTime = timesWithBooking[timesChosen[0]].end;
+    }
+    if (timesChosen.length >= 2) {
+      startTime = timesWithBooking[timesChosen[0]].start;
+      endTime = timesWithBooking[timesChosen[timesChosen.length - 1]].end;
+    }
+
+    startTimeResult = dayjs(startTime, 'HH:mm');
+    startTimeResult.set('date', dayjs(date, 'DD/MM/YYYY').get('date'));
+
+    endTimeResult = dayjs(endTime, 'HH:mm');
+    endTimeResult.set('date', dayjs(date, 'DD/MM/YYYY').get('date'));
+
+    return {
+      startTimeISO: startTimeResult.toISOString(),
+      endTimeISO: endTimeResult.toISOString(),
+      startTime: startTimeResult,
+      endTime: endTimeResult,
+      sportField,
+      fieldId: fieldId as string,
+      amount: timesChosen.length * sportField.price,
+    };
+  };
+
+  const handleSubmit = () => {
+    const reversedData = getReservedTime();
+    setData(reversedData);
+    setIsOpen(true);
+  };
+  const handleCheck = (e: CheckboxChangeEvent) => {
+    const { checked, value } = e.target;
+    const lastValue = timesChosen[timesChosen.length - 1];
+    const firstValue = timesChosen[0];
+    if (checked) {
+      timesChosen.sort((a, b) => a - b);
+      const newValue = Number(value);
+      if (value > lastValue) {
+        const newTimes = Array.from(
+          { length: newValue - lastValue },
+          (_, index) => lastValue + index + 1,
+        );
+        setTimesChosen([...timesChosen, ...newTimes]);
+      }
+
+      if (value < firstValue) {
+        const newTimes = Array.from(
+          { length: firstValue - newValue },
+          (_, index) => firstValue - index - 1,
+        );
+        setTimesChosen([...newTimes, ...timesChosen]);
+      }
+
+      if (timesChosen.length === 0) {
+        setTimesChosen([Number(value)]);
+      }
+      // setTimesChosen([...timesChosen, Number(value)]);
+    } else {
+      if (timesChosen.length === 1) {
+        setTimesChosen([]);
+        return;
+      }
+
+      setTimesChosen(timesChosen.filter((time) => time < Number(value)));
+
+      // setTimesChosen(timesChosen.filter((time) => time !== Number(value)));
+    }
+  };
+
+  const handleReset = () => {
+    setTimesChosen([]);
+    document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
+      if (!(checkbox as HTMLInputElement).disabled) {
+        (checkbox as HTMLInputElement).checked = false;
+      }
+    });
+  };
 
   return (
     <div>
-      <BookingModal />
-      <div className="flex items-center">
+      {data && (
+        <BookingModal
+          data={data}
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+        />
+      )}
+      <div className="mb-6 flex items-center">
         <p className="mr-3 cursor-pointer text-sm font-medium text-natural-400">
           Trang chủ
         </p>
@@ -86,62 +253,99 @@ export default function InfoField() {
       </div>
 
       <div className={cn(s.main)}>
-        <div className="flex flex-wrap">
-          <div className="mr-4 flex flex-col">
-            <span className="mb-3 text-base font-bold text-natural-700">
-              Ngày
-            </span>
-            <DatePicker
-              name="date-res"
-              format={{
-                format: 'DD/MM/YYYY',
-                type: 'mask',
-              }}
-              onChange={onChange}
-            />
-          </div>
-          <div className="flex flex-col">
-            <span className="mb-3 text-base font-bold text-natural-700">
-              Sân
-            </span>
-            <Select options={options} />
-          </div>
-        </div>
-        <div className="gap-x-18 mt-8 grid grid-cols-1 gap-y-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
-          {/* {Array.from({ length: 24 }).map(() => (
-            <div className="flex items-center flex-wrap ">
-              <span className="font-normal text-base text-natural-700 mr-9">
-                5:00 - 5:30
+        <h1 className="mb-5">{sportField.name}</h1>
+        <div className="space-y-8">
+          <SportFieldShortInfo sportField={sportField} />
+          <SportFieldRule rulesString={sportField.rule ?? 'Chưa cập nhật'} />
+          <div className="flex flex-wrap">
+            <div className="mr-4 flex flex-col">
+              <span className="mb-3 text-base font-bold text-natural-700">
+                Ngày
               </span>
-              <Checkbox value="A"></Checkbox>
+              <DatePicker
+                name="date-res"
+                format={{
+                  format: 'DD/MM/YYYY',
+                  type: 'mask',
+                }}
+                defaultValue={
+                  searchParams.get('date')
+                    ? dayjs(searchParams.get('date'), 'DD/MM/YYYY')
+                    : dayjs(new Date())
+                }
+                minDate={dayjs(new Date())}
+                onChange={handleDateChange}
+              />
             </div>
-          ))} */}
-          {times.map((slot, index) => (
-            <div className="flex flex-wrap items-center" key={index}>
-              <span className="mr-9 text-base font-normal text-natural-700">
-                {slot.start}-{slot.end}
+            <div className="flex flex-col">
+              <span className="mb-3 text-base font-bold text-natural-700">
+                Sân
               </span>
-              <Checkbox value={`Slot-${index}`} />
+              {options.length > 0 && (
+                <Select
+                  options={options}
+                  onSelect={handleSelect}
+                  defaultValue={options[0].value as string}
+                />
+              )}
             </div>
-          ))}
-        </div>
-        <div className="mt-8 flex flex-wrap justify-between">
-          <div>
-            <p className="text-base font-normal text-natural-700">
-              Bạn đang chọn <span className="ml-2 font-bold">5 tiếng/ngày</span>
-            </p>
-            <p className="mt-3 text-base font-normal">
-              Tổng tiền{' '}
-              <span className="ml-2 font-bold text-primary-600">
-                1.400.000đ
-              </span>
-            </p>
           </div>
-          <div className="mt-2">
-            <Button type="primary" className="mr-3">
-              Đặt lại
-            </Button>
-            <Button>Xác nhận</Button>
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : (
+            <div className="gap-x-18 mt-8 grid grid-cols-1 gap-y-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
+              {timesWithBooking.map((slot, index) => (
+                <div
+                  className={cn(
+                    'flex flex-wrap items-center',
+                    slot.isBooked && 'cursor-not-allowed opacity-50',
+                  )}
+                  key={slot.start}
+                >
+                  <label
+                    htmlFor={slot.start}
+                    className="mr-9 text-base font-normal text-natural-700"
+                  >
+                    {slot.start}-{slot.end}
+                  </label>
+                  <Checkbox
+                    id={slot.start}
+                    value={index}
+                    disabled={slot.isBooked}
+                    checked={timesChosen.includes(index)}
+                    // defaultChecked={slot.isBooked}
+                    onChange={handleCheck}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+          <div className="mt-8 flex flex-wrap justify-between">
+            <div>
+              <p className="text-base font-normal text-natural-700">
+                Bạn đang chọn{' '}
+                <span className="ml-2 font-bold">
+                  {timesChosen.length / 2} tiếng/ngày
+                </span>
+              </p>
+              <p className="mt-3 text-base font-normal">
+                Tổng tiền{' '}
+                <span className="ml-2 font-bold text-primary-600">
+                  {formatCurrency(timesChosen.length * sportField.price)}
+                </span>
+              </p>
+            </div>
+            <div className="mt-2">
+              <Button type="primary" className="mr-3" onClick={handleReset}>
+                Đặt lại
+              </Button>
+              <Button
+                disabled={timesChosen.length === 0}
+                onClick={handleSubmit}
+              >
+                Xác nhận
+              </Button>
+            </div>
           </div>
         </div>
       </div>

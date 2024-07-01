@@ -27,15 +27,13 @@ export default async function FieldReservationPage({
 
   const sportField = sportFieldRes.data;
 
-  // const date = new Date(
-  //   (searchParams?.date as string) ?? new Date().toISOString(),
-  // );
+  if (!sportField) {
+    return null;
+  }
 
-  // const fieldId = searchParams?.fieldId as string;
-  console.log(sportField);
   return (
     <div className="px-30 py-12">
-      <InfoField />
+      <InfoField sportField={sportField} />
     </div>
   );
 }
