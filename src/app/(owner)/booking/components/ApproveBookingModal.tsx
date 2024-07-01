@@ -53,7 +53,6 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
 
   const acceptBooking = async () => {
     setIsLoading(true);
-    console.log('acc cl');
     const data = {
       fieldId: updateBooking.fieldId,
       status: 'accepted',
@@ -73,7 +72,6 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
 
   const rejectBooking = async () => {
     setIsLoading(true);
-    console.log('rej cl');
     const data = {
       status: 'rejected',
     };
