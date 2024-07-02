@@ -41,9 +41,7 @@ const SportFieldShortInfo = ({
           height={20}
         />
         <p className="body-4 truncate">
-          {/* {sportField.startTime} - {sportField.endTime} */}
-          {new Date(sportField.startTime).toLocaleTimeString()}-
-          {new Date(sportField.endTime).toLocaleTimeString()}
+          {sportField.startTime} - {sportField.endTime}
         </p>
       </div>
       <div className="flex items-center gap-2">
