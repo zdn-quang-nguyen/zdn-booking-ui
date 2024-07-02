@@ -6,25 +6,31 @@ import { cookies } from 'next/headers';
 type GetSportFieldParams = {
   page?: number;
   size?: number;
+  typeId?: string;
 };
 
 const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
 export const getSportFields = async ({
   page = 0,
   size = 12,
+  typeId = 'all',
 }: GetSportFieldParams) => {
   'use server';
   const accessToken = cookies().get('access_token')?.value;
-
-  const res = await axios.get(`${API_HOST}/sport-field`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
+  const sportFieldTypeParam =
+    typeId === 'all' ? '' : `&sportFieldTypeId=${typeId}`;
+  const res = await axios.get(
+    `${API_HOST}/sport-field?${sportFieldTypeParam}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+      params: {
+        page,
+        size,
+      },
     },
-    params: {
-      page,
-      size,
-    },
-  });
+  );
 
   return res.data;
 };
