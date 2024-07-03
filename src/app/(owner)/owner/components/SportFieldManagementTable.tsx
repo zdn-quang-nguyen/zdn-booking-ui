@@ -5,13 +5,16 @@ import { ColumnsType } from 'antd/es/table';
 import { MoreOutlined } from '@ant-design/icons';
 import styles from './sportFieldManagement.module.scss';
 import { useRouter } from 'next/navigation';
+import { CATEGORY_MAPPING } from '@/constants/constant';
 
 interface SportFieldManagementTableProps {
   sportFields: SportField[];
+  isLoading: boolean;
 }
 
 const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
   sportFields,
+  isLoading,
 }) => {
   type DataType = {
     key: React.Key;
@@ -97,7 +100,7 @@ const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
       width: 200,
       render: (category: string) => (
         <p style={{ color: '#5D5E5B' }} key={category}>
-          {category}
+          {CATEGORY_MAPPING[category]}
         </p>
       ),
     },
@@ -152,6 +155,7 @@ const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
         bordered={false}
         pagination={{ position: ['bottomCenter'], pageSize: 10 }}
         tableLayout="fixed"
+        loading={isLoading}
       />
     </div>
   );

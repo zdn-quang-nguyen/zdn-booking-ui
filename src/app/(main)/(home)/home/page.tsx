@@ -13,38 +13,19 @@ export const metadata: Metadata = {
   title: 'Zodinet Booking - Home Page',
   description: 'Zodinet Booking - Home: Find Your Sport Field with Ease',
 };
+type HomePageProps = {
+  params: { slug: string };
+  searchParams?: { [key: string]: string | string[] | undefined };
+};
 
-const HomePage = async () => {
-  // const test = await axiosAuth.get('/location');
-  // console.log(test);
-  const sportFields = Array(12).fill(sportField);
-  const popularSportFields = await getPopularSportFields();
+const HomePage = async ({ searchParams }: HomePageProps) => {
   return (
     <div>
       <Banner />
-      <PopularPlaces sportFields={popularSportFields} />
-      <NearestFields sportFields={sportFields} />
+      <PopularPlaces />
+      <NearestFields />
       {/* <SportFieldsByTime sportFields={sportFields} /> */}
     </div>
   );
 };
 export default HomePage;
-
-const getSportFieldData = (sportFieldRes: any) => {
-  if (!sportFieldRes) {
-    return null;
-  }
-
-  const sportFields: SportField[] = sportFieldRes.data;
-
-  if (!sportFields) {
-    return null;
-  }
-
-  return sportFields;
-};
-
-const getPopularSportFields = async () => {
-  const sportFieldRes = await getSportFields({ size: 4 });
-  return getSportFieldData(sportFieldRes);
-};

@@ -1,34 +1,45 @@
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
 
 type PaginationProps = {
   currentPage: number;
   totalPages: number;
-  onPageChange: (newPage: number) => void; // Add onPageChange prop here
+  scrollId?: string;
+  name?: string;
 };
 
 const Pagination = ({
   currentPage,
   totalPages,
-  onPageChange,
+  scrollId,
+  name = 'page',
 }: PaginationProps) => {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const scrollToId = scrollId ? `#${scrollId}` : '';
+
+  if (isNaN(currentPage) || isNaN(totalPages)) {
+    currentPage = 1;
+    totalPages = 1;
+  }
 
   const handleArrowRight = () => {
     const nextPage = currentPage + 1;
     if (nextPage <= totalPages) {
-      onPageChange(nextPage); // Call onPageChange prop to update page
-      router.push(`${pathname}?page=${nextPage}` as any, { scroll: false });
+      const params = new URLSearchParams(searchParams);
+      params.set(name, nextPage.toString());
+      router.push(`${pathname}?${params.toString()}${scrollToId}` as any);
     }
   };
 
   const handleArrowLeft = () => {
     const prevPage = currentPage - 1;
     if (prevPage >= 1) {
-      onPageChange(prevPage); // Call onPageChange prop to update page
-      router.push(`${pathname}?page=${prevPage}` as any, { scroll: false });
+      const params = new URLSearchParams(searchParams);
+      params.set(name, prevPage.toString());
+      router.push(`${pathname}?${params.toString()}${scrollToId}` as any);
     }
   };
 

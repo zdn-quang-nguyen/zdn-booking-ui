@@ -1,18 +1,18 @@
-import QRBooking from '@/app/(owner)/table-booking/components/QRBooking';
 import { cn } from '@/libs/utils';
 import { CloseOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from './../booking.module.scss';
-import { Dayjs } from 'dayjs';
 
+import { Dayjs } from 'dayjs';
+import BookingQRModal from './BookingQRModal';
 export type ModalData = {
   startTimeISO: string;
   endTimeISO: string;
   startTime: Dayjs;
   endTime: Dayjs;
   sportField: SportField;
-  fieldId: string;
+  field?: Field;
   amount: number;
 };
 type BookingProps = {
@@ -21,9 +21,18 @@ type BookingProps = {
   // bookingId: string;
   data: ModalData;
 };
+
 export default function BookingModal({ isOpen, data, onClose }: BookingProps) {
-  const startTime = new Date(data.startTimeISO);
-  const endTime = new Date(data.endTimeISO);
+  const field = data.field; 
+
+  const [isOpenQR, setIsOpenQR] = useState(false);
+  const handleOpenQR = () => {
+    setIsOpenQR(true);
+  };
+  useEffect(() => {
+    setIsOpenQR(false);
+  }, [isOpen]);
+  if (!field) return null;
   return (
     <div
       className={cn(
@@ -32,7 +41,7 @@ export default function BookingModal({ isOpen, data, onClose }: BookingProps) {
       )}
     >
       <div className="absolute inset-0 bg-black opacity-40"></div>
-      <div className="flex flex-wrap">
+      <div className={`${isOpenQR ? 'hidden' : 'flex'} flex-wrap`}>
         <div className={`z-10 rounded-[40px] bg-white px-10 py-6 md:w-[740px]`}>
           <div className="flex items-center justify-between">
             <span className="text-xl font-bold leading-5 text-natural-700">
@@ -44,15 +53,16 @@ export default function BookingModal({ isOpen, data, onClose }: BookingProps) {
               onClick={onClose}
             />
           </div>
-          <div className="mt-6 flex flex-col gap-y-6">
+          <div className="mt-6 flex flex-col">
             <div>
-              <div className="space-y-1">
+              <div className="space-y-3">
                 <p className="text-sm font-bold leading-5 text-neutral-500">
-                  {startTime.toLocaleDateString()}
+                  Khung thời gian đã chọn [{data.startTime.format('DD/MM/YYYY')}
+                  ]
                 </p>
                 <div className="flex w-fit items-center rounded-[40px] bg-neutral-100 px-4 py-2 text-xs font-normal leading-4 text-neutral-700">
-                  {startTime.toLocaleTimeString()} -{' '}
-                  {endTime.toLocaleTimeString()}
+                  {data.startTime.format('HH:mm')} -{' '}
+                  {data.endTime.format('HH:mm')}
                   {/* <CloseCircleOutlined className="ml-2 text-base" /> */}
                 </div>
               </div>
@@ -62,7 +72,7 @@ export default function BookingModal({ isOpen, data, onClose }: BookingProps) {
               <div className="mr-8 font-bold leading-5">
                 <span>Sân đã chọn</span>
                 <div className="mt-4 flex w-fit items-center rounded-[40px] bg-neutral-100 px-4 py-2 text-xs font-normal leading-4 text-neutral-700">
-                  A1
+                  {field.name}
                 </div>
               </div>
             </div>
@@ -81,24 +91,21 @@ export default function BookingModal({ isOpen, data, onClose }: BookingProps) {
                 type="default"
                 className="mr-3"
                 onClick={onClose}
-                // {...(isDeleteForm ? { danger: true } : {})}
               >
                 Hủy bỏ
               </Button>
               <Button
-                // onClick={handleSubmit}
+                onClick={handleOpenQR}
                 // loading={isLoading}
                 type="primary"
-
-                // {...(isDeleteForm ? { danger: true } : {})}
               >
                 Đặt chỗ
               </Button>
             </div>
           </div>
         </div>
-        <QRBooking isClose={true} />
       </div>
+      <BookingQRModal data={data} isOpen={isOpenQR} onClose={onClose} />
     </div>
   );
 }

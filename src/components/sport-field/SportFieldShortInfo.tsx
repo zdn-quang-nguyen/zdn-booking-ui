@@ -1,4 +1,4 @@
-import { formatCurrency, formatDateToTime } from '@/libs/utils';
+import { cn, formatCurrency, formatDateToTime } from '@/libs/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import dollar from '@public/icons/dollar.svg';
@@ -6,11 +6,15 @@ import bike from '@public/icons/bike.svg';
 
 type SportFieldShortInfoProps = {
   sportField: SportField;
+  className?: string;
 };
 
-const SportFieldShortInfo = ({ sportField }: SportFieldShortInfoProps) => {
+const SportFieldShortInfo = ({
+  sportField,
+  className,
+}: SportFieldShortInfoProps) => {
   return (
-    <div className="flex flex-col gap-3">
+    <div className={cn('flex flex-col gap-3', className)}>
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <Image
@@ -27,7 +31,7 @@ const SportFieldShortInfo = ({ sportField }: SportFieldShortInfoProps) => {
       <div className="flex items-center gap-2">
         <Image src={bike} alt="Bike Icon" width={20} height={20} />
 
-        <p className="body-4 truncate">2.7 km</p>
+        <p className="body-4 truncate">{`2.7 km`}</p>
       </div>
       <div className="flex items-center gap-2">
         <Image
