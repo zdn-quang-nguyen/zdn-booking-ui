@@ -8,18 +8,13 @@ type PaginationProps = {
   onPageChange: (newPage: number) => void; // Add onPageChange prop here
 };
 
-const Pagination = ({
-  currentPage,
-  totalPages,
-  onPageChange,
-}: PaginationProps) => {
+const Pagination = ({ currentPage, totalPages }: PaginationProps) => {
   const router = useRouter();
   const pathname = usePathname();
 
   const handleArrowRight = () => {
     const nextPage = currentPage + 1;
     if (nextPage <= totalPages) {
-      onPageChange(nextPage); // Call onPageChange prop to update page
       router.push(`${pathname}?page=${nextPage}` as any, { scroll: false });
     }
   };
@@ -27,7 +22,6 @@ const Pagination = ({
   const handleArrowLeft = () => {
     const prevPage = currentPage - 1;
     if (prevPage >= 1) {
-      onPageChange(prevPage); // Call onPageChange prop to update page
       router.push(`${pathname}?page=${prevPage}` as any, { scroll: false });
     }
   };

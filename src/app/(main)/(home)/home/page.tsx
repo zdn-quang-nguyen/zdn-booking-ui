@@ -29,7 +29,7 @@ const HomePage = async ({ searchParams }: HomePageProps) => {
       <Banner />
       <PopularPlaces sportFields={popularSportFields} />
       <NearestFields sportFields={sportFields} />
-      <SportFieldsByTime sportFields={sportFields} />
+      <SportFieldsByTime />
     </div>
   );
 };
