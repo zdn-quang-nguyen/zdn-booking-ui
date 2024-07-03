@@ -1,6 +1,5 @@
-import DatePickerComponent from '@/components/common/DatePickerComponent';
-import RangePickerComponent from '@/components/common/RangePickerComponent';
-import { Input } from 'antd';
+'use client';
+
 import SuggestBookingItem from './SuggestBookingItem';
 
 //

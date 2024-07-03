@@ -1,4 +1,5 @@
 //
+'use client';
 
 import DatePickerComponent from '@/components/common/DatePickerComponent';
 import RangePickerComponent from '@/components/common/RangePickerComponent';
@@ -22,8 +23,7 @@ const SuggestBookingItem: React.FC<SuggestBookingItemProps> = (props) => {
   const { startTime, endTime, fieldId, fieldName, isFirstChild, onClick } =
     props;
 
-  const handleClick = (value: any) => {
-  };
+  const handleClick = (value: any) => {};
 
   return (
     <div

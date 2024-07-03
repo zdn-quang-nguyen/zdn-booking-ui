@@ -6,7 +6,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 const API_URL = 'http://localhost:5000';
 
-export const getOwnerBookings = async () => {
+export const getOwnerBookings = async (page: number) => {
   // const auth = `Bearer ${cookies().get('access_token')?.value}`;
   const auth = `Bearer ${Cookies.get('access_token')}`;
 
@@ -14,6 +14,9 @@ export const getOwnerBookings = async () => {
     const res = await axios.get(`http://localhost:5000/booking/owner`, {
       headers: {
         Authorization: auth,
+      },
+      params: {
+        page: page,
       },
     });
     // const response = await fetch(`http://localhost:5000/booking/owner`, {

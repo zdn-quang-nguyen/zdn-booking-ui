@@ -22,10 +22,9 @@ interface Props {
 function formatPhoneNumber(phone: string): string {
   const digits = phone.replace(/\D/g, '').slice(1);
 
-  const countryCode = '84';
   const mainNumber = digits;
 
-  const formattedNumber = `(+${countryCode}) ${mainNumber.slice(0, 3)} ${mainNumber.slice(3, 6)} ${mainNumber.slice(6)}`;
+  const formattedNumber = `+${0} ${mainNumber.slice(0, 3)} ${mainNumber.slice(3, 6)} ${mainNumber.slice(6)}`;
 
   return formattedNumber;
 }
