@@ -40,7 +40,7 @@ export default function InfoField({ sportField }: InfoFieldProps) {
     }
     if (!date || !field) {
       router.replace(
-        `${pathname}?date=${dayjs(new Date()).format('DD/MM/YYYY')}&field=${sportField.fields?.[0].id}`,
+        `${pathname}?date=${dayjs(new Date()).format('DD/MM/YYYY')}&field=${sportField.fields?.[0].id}` as any,
         { scroll: false },
       );
     }
@@ -52,7 +52,7 @@ export default function InfoField({ sportField }: InfoFieldProps) {
   ) => {
     const params = new URLSearchParams(searchParams);
     params.set('date', dateString);
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    router.push(`${pathname}?${params.toString()}` as any, { scroll: false });
   };
   const options: SelectProps['options'] = [];
   sportField.fields?.forEach((field) => {
