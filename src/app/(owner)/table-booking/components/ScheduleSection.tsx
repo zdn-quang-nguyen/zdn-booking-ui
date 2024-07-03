@@ -81,7 +81,7 @@ const ScheduleSection: React.FC<ScheduleTableProps> = ({
     startDate && params.set('startDate', new Date(startDate).toISOString());
     endDate && params.set('endDate', new Date(endDate).toISOString());
 
-    router.push(`${pathname}?${params.toString()}`);
+    router.push(`/${pathname}?${params.toString()}` as any);
   }, [weekDates]);
 
   // clear all state
@@ -103,7 +103,12 @@ const ScheduleSection: React.FC<ScheduleTableProps> = ({
       setIsOpen(true);
       return;
     } else if (status === CheckStatus.UNCHECKED_BOOKING) {
-      const { startTime, endTime } = getBookingTime();
+      const bookingTime = getBookingTime();
+
+      if (!bookingTime) {
+        return;
+      }
+      const { startTime, endTime } = bookingTime;
       if (startTime && endTime) {
         setIsOpen(true);
         return;

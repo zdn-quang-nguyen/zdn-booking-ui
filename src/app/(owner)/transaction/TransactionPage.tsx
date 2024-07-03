@@ -53,7 +53,7 @@ function TransactionPage() {
   };
 
   const onChange: PaginationProps['onChange'] = (pageNumber: number) => {
-    router.push(`${pathname}?page=${pageNumber}` as any, { scroll: false });
+    router.push(`/${pathname}?page=${pageNumber}` as any, { scroll: false });
     console.log('Page: ', pageNumber);
   };
 

@@ -35,11 +35,7 @@ console.log(paginatedSportFields);
           <SportFieldInfoCard key={sportField.id} sportField={sportField} />
         ))}
       </div>
-      <Pagination
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+      <Pagination currentPage={currentPage} totalPages={totalPages} />
     </div>
   );
 };

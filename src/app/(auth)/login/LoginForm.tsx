@@ -26,7 +26,7 @@ export default function LoginForm() {
     const updateSearchParams = () => {
       if (!VALID_ROLES.includes(role as string)) {
         const params = getValidRole(role as string);
-        router.push(`login?role=${params.toString()}`);
+        router.push(`/login?role=${params.toString()}`);
       }
     };
 
