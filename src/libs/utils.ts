@@ -74,6 +74,19 @@ export function getCurrentWeekDates(now: Date) {
   });
 }
 
+export function generateRows(startDateSchedule: Date) {
+  return Array.from({ length: 7 }, (_, i) => {
+    const day = new Date(
+      new Date(startDateSchedule).setDate(startDateSchedule.getDate() + i),
+    );
+    const weekdayShort = day
+      .toLocaleDateString('vi', { weekday: 'short' })
+      .replace('.', '');
+    const formattedWeekday = weekdayShort.replace('Th ', 'T'); // Remove space after 'Th'
+    return `${formattedWeekday} - ${day.getDate()}/${day.getMonth() + 1}`;
+  });
+}
+
 export function parseDateFromString(dateStr: string) {
   if (!dateStr) {
     return null;

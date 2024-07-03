@@ -1,4 +1,9 @@
-type BookingStatus = 'disabled' | 'rejected' | 'available' | 'accepted' | 'booking';
+type BookingStatus =
+  | 'disabled'
+  | 'rejected'
+  | 'available'
+  | 'accepted'
+  | 'booking';
 
 type Booking = {
   id?: string;
@@ -9,3 +14,7 @@ type Booking = {
   amount?: number;
   status?: BookingStatus;
 };
+
+type BookingResponse = {
+  field: Field;
+} & Booking;
