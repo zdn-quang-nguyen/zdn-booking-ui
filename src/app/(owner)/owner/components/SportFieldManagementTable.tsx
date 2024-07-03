@@ -34,17 +34,17 @@ const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
   ];
   const handleView = (id: string) => {
     console.log(id);
-    router.push(`owner/field-detail/${id}`);
+    router.push(`owner/field-detail/${id}` as any);
   };
 
   const handleEdit = (id: string) => {
     console.log(id);
-    router.push(`edit-sport-field/${id}`);
+    router.push(`edit-sport-field/${id}` as any);
   };
 
   const handleFieldMap = (id: string) => {
     console.log(id);
-    router.push(`owner/field-map/${id}`);
+    router.push(`owner/field-map/${id}` as any);
   };
 
   const dataSource = sportFields?.map((sportField, index) => ({
@@ -148,7 +148,7 @@ const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
     <div className={styles.tableContainer}>
       <Table
         dataSource={dataSource}
-        columns={columns}
+        columns={columns as any}
         bordered={false}
         pagination={{ position: ['bottomCenter'], pageSize: 10 }}
         tableLayout="fixed"

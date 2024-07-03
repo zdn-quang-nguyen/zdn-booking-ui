@@ -50,7 +50,9 @@ const SuggestBookingItem: React.FC<SuggestBookingItemProps> = (props) => {
         </span>
         <DatePickerComponent
           defaultValue={
-            startTime ? moment(startTime).utc().format('DD/MM/YYYY') : undefined
+            startTime
+              ? moment(startTime).local().format('DD/MM/YYYY')
+              : undefined
           }
           disabled={true}
         />
@@ -65,8 +67,8 @@ const SuggestBookingItem: React.FC<SuggestBookingItemProps> = (props) => {
           defaultValue={
             startTime
               ? [
-                  moment(startTime).utc().format('HH:mm'),
-                  moment(endTime).utc().format('HH:mm'),
+                  moment(startTime).local().format('HH:mm'),
+                  moment(endTime).local().format('HH:mm'),
                 ]
               : undefined
           }

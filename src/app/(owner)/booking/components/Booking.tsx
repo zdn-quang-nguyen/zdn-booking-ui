@@ -41,21 +41,22 @@ const OwnerBooking: React.FC<BookingProps> = ({ filter, bookings }) => {
   return (
     <div className={`${styles.bookingContainer}`}>
       <div className="flex flex-col gap-8">
-        {Object.entries(groupBookings).map(([date, bookings]) => (
-          <div key={date} className="flex flex-col gap-5">
-            <span className="body-2 font-bold text-natural-700">{date}</span>
-            <div className="flex flex-col gap-3">
-              {(bookings as any[]).map((booking: any, index: number) => (
-                <Item
-                  key={index}
-                  data={booking}
-                  label="booking"
-                  onClick={handleClick}
-                />
-              ))}
+        {groupBookings &&
+          Object.entries(groupBookings).map(([date, bookings]) => (
+            <div key={date} className="flex flex-col gap-5">
+              <span className="body-2 font-bold text-natural-700">{date}</span>
+              <div className="flex flex-col gap-3">
+                {(bookings as any[]).map((booking: any, index: number) => (
+                  <Item
+                    key={index}
+                    data={booking}
+                    label="booking"
+                    onClick={handleClick}
+                  />
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
       <div className="lg:w-3/4 xl:w-2/3">
         {isOpenModal && (

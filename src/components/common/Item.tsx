@@ -1,7 +1,7 @@
 //
 import React from 'react';
 import Link from 'next/link';
-import { CATEGORY_MAPPING } from '@/constants/constant';
+import { BOOKING_STATUS_MAPPING, CATEGORY_MAPPING } from '@/constants/constant';
 // import { sportField } from '@/mocks/sport-fields';
 import dayjs from 'dayjs';
 import moment from 'moment';
@@ -69,7 +69,7 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
         <div>
           {(label == 'transaction' || label == 'booking') && (
             <div className={`flex flex-row items-center gap-2`}>
-              <Link href="/" className={`body-4 text-natural-700} font-medium`}>
+              <Link href="#" className={`body-4 text-natural-700} font-medium`}>
                 {data.fullName}
               </Link>
             </div>
@@ -124,7 +124,7 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
               <span
                 className={`body-4 font-bold ${textColor(data.status)} text-right`}
               >
-                {'Đặt chỗ thành công'}
+                {BOOKING_STATUS_MAPPING[data.status]}
               </span>
             )}
             {label == 'booking' && (

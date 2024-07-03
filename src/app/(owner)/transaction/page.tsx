@@ -2,34 +2,83 @@
 
 import Transaction from './components/Transaction';
 import FieldTypeFilter from '@/components/common/FieldTypeFilter';
-import { Button, Form, Select } from 'antd';
+import { Select, Input, Pagination, PaginationProps } from 'antd';
 import { BOOKING_STATUS, BOOKING_STATUS_MAPPING } from '@/constants/constant';
 import styles from './page.module.scss';
 import RangePickerComponent from '@/components/common/RangePickerComponent';
 import DatePickerComponent from '@/components/common/DatePickerComponent';
-import { Input } from 'antd';
 import { CaretDownFilled, FilterFilled } from '@ant-design/icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
+import { getTransactions } from '../apis/transaction.api';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { set } from 'zod';
+// import Pagination from '@/components/pagination/Pagination';
 
 const { Search } = Input;
 
 function Page() {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [bookings, setBookings] = useState<any[]>([]);
   const [status, setStatus] = useState<string>(BOOKING_STATUS[0]);
-  const [date, setDate] = useState<Dayjs>(dayjs());
+  const [date, setDate] = useState<Dayjs>();
   const [time, setTime] = useState<[Dayjs, Dayjs]>();
   const [input, setInput] = useState<string>('');
-  const onFilter = () => {
-    console.log('input', input);
-    console.log('status', status);
-    if (date) {
-      console.log('date', date.format('DD/MM/YYYY'));
-    } else console.log('date', date);
-    if (time) {
-      console.log('time', time[0].format('HH:mm'), time[1].format('HH:mm'));
-      console.log('time', time);
-    } else console.log('time', time);
+  const [total, setTotal] = useState<number>(0);
+
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const page = searchParams.get('page');
+  const type = searchParams.get('type');
+
+  const fetchBookings = async () => {
+    const fetchedBookings = await getTransactions({
+      status,
+      date: date ? date.format('YYYY-MM-DD') : undefined,
+      startTime: time?.[0] ? time?.[0].format('HH:mm') : undefined,
+      endTime: time?.[1] ? time?.[1].format('HH:mm') : undefined,
+      name: input ? input : undefined,
+      type: type ? type : undefined,
+      page: page ? Number(page) : 1,
+    }).then((res) => res.data);
+    setBookings(fetchedBookings.data);
+    setTotal(fetchedBookings.total);
+    setIsLoading(false);
   };
+
+  const onSearch = async () => {
+    console.log('search');
+    setIsLoading(true);
+    fetchBookings();
+  };
+
+  const onChange: PaginationProps['onChange'] = (pageNumber: number) => {
+    router.push(`${pathname}?page=${pageNumber}` as any, { scroll: false });
+    console.log('Page: ', pageNumber);
+  };
+
+  useEffect(() => {
+    console.log('loading');
+    setIsLoading(true);
+
+    fetchBookings();
+  }, [status, date, time, type, page]);
+
+  // useEffect(() => {
+  //   const fetchBookings = async () => {
+  //     const fetchedBookings = await getTransactions({
+  //       status,
+  //       page: page ? Number(page) : 1,
+  //     }).then((res) => res.data);
+  //     setBookings(fetchedBookings.data);
+  //     setTotal(fetchedBookings.total);
+  //     setIsLoading(false);
+  //   };
+  //   // setType(searchParams.get('type') as string);
+  //   fetchBookings();
+  // }, []);
 
   return (
     <div
@@ -42,14 +91,17 @@ function Page() {
         </div>
         <div className="flex flex-row items-center gap-5">
           <Search
+            value={input}
             placeholder="Tìm kiếm giao dịch"
             className="body-3 text-natural-400"
             onChange={(event) => setInput(event.target.value)}
+            onClick={() => setInput('')}
+            onSearch={onSearch}
           />
-          <Button className="" onClick={onFilter}>
+          {/* <Button className="" onClick={onFilter}>
             <FilterFilled style={{ color: '#C7C7C7', fontSize: '24px' }} />
             <p className="body-3 w-[30px] font-bold text-natural-700">Lọc</p>
-          </Button>
+          </Button> */}
         </div>
         <div className={`${styles.select} flex flex-row items-center gap-3`}>
           <p className="body-4 font-medium text-natural-700">
@@ -74,7 +126,27 @@ function Page() {
           <RangePickerComponent onChange={setTime} />
         </div>
       </div>
-      <Transaction />
+      {isLoading ? (
+        <div>Vui lòng chờ ...</div>
+      ) : (
+        <>
+          <Transaction bookings={bookings} />
+          <div className="flex items-center justify-center">
+            {/* <Pagination
+              currentPage={page ? Number(page) : 1}
+              totalPages={5}
+              onPageChange={(value) => console.log(value)}
+            /> */}
+            <Pagination
+              defaultCurrent={page ? Number(page) : 1}
+              total={total}
+              showSizeChanger={false}
+              pageSize={15}
+              onChange={onChange}
+            />
+          </div>
+        </>
+      )}
     </div>
   );
 }

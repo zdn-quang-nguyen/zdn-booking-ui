@@ -75,7 +75,6 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
   const [selectedWard, setSelectedWard] = useState<string | undefined>(
     undefined,
   );
-  console.log(defaultValues);
 
   const [fileList, setFileList] = useState<UploadFile[]>(
     defaultValues?.sportFieldImages.map((img) => {
@@ -153,7 +152,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
       {
         id: defaultValues?.id,
         ...rest,
-        phone: `0${phone}`,
+        phone: phone,
         sportFieldImages: [...uploadImages],
         removeImageIds: removeFile.map((uid) => {
           if (uid.includes('rc-upload')) {
@@ -191,7 +190,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
       form.setFieldsValue({
         name: defaultValues.name,
         sportFieldTypeId: defaultValues.sportFieldTypeId,
-        phone: defaultValues.phone.slice(1),
+        phone: defaultValues.phone,
         // address: defaultValues.location ? defaultValues.location.address : '',
         price: defaultValues.price,
         rule: defaultValues.rule,
@@ -223,7 +222,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
         quantity: 1,
       });
     }
-  }, [defaultValues]);
+  }, []);
 
   const onCancel = () => {
     router.back();
@@ -233,7 +232,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
     <div
       className={cn(
         styles.createSportFileContainer,
-        '3xl:w-1/2 rounded-form mx-auto mt-12 flex w-1/2 flex-col gap-8 bg-neutral p-10 md:w-11/12 lg:w-4/5 xl:w-3/4 2xl:w-2/3',
+        '3xl:w-1/2 mx-auto mt-12 flex w-1/2 flex-col gap-8 rounded-form bg-neutral p-10 md:w-11/12 lg:w-4/5 xl:w-3/4 2xl:w-2/3',
       )}
     >
       <div className="flex items-center">
@@ -404,15 +403,12 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
               { required: true, message: 'Vui lòng nhập Số điện thoại' },
               {
                 type: 'string',
-                len: 9,
-                message: 'Số điện thoại không vượt quá 9 số',
+                len: 10,
+                message: 'Số điện thoại 10 số',
               },
             ]}
           >
-            <Input
-              prefix="(+84) "
-              style={{ width: '100%', borderRadius: '40px' }}
-            />
+            <Input prefix=" " style={{ width: '100%', borderRadius: '40px' }} />
           </Form.Item>
           <Form.Item
             label="Thời gian mở cửa"

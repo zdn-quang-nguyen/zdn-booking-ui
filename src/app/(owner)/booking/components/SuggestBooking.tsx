@@ -16,16 +16,7 @@ interface SuggestBookingProps {
 
 const SuggestBooking: React.FC<SuggestBookingProps> = ({
   booking,
-  fields = [
-    {
-      id: 1,
-      name: 'san1',
-    },
-    {
-      id: 2,
-      name: 'san2',
-    },
-  ],
+  fields = [],
   startTime,
   endTime,
   onClick,
