@@ -18,7 +18,7 @@ const useFieldSelection = (sportField: SportField) => {
   const handleSelect = (value: string) => {
     const params = new URLSearchParams(searchParams);
     params.set('field', value);
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    router.push(`/${pathname}?${params.toString()}` as any, { scroll: false });
   };
 
   const handleDateChange: DatePickerProps['onChange'] = (
@@ -27,7 +27,7 @@ const useFieldSelection = (sportField: SportField) => {
   ) => {
     const params = new URLSearchParams(searchParams);
     params.set('date', dateString);
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    router.push(`/${pathname}?${params.toString()}` as any, { scroll: false });
   };
 
   function splitTimeRange(startTime: string, endTime: string) {
