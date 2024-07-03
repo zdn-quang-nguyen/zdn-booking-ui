@@ -32,7 +32,8 @@ const DatePickerComponent: React.FC<DatePickerComponentProps> = (props) => {
           defaultValue={
             defaultValue
               ? dayjs(defaultValue, 'DD/MM/YYYY')
-              : dayjs(dayjs(), 'DD/MM/YYYY')
+              : // : dayjs(dayjs(), 'DD/MM/YYYY')
+                undefined
           }
           format="DD/MM/YYYY"
           locale={locale}

@@ -1,30 +1,52 @@
-import { usePathname, useRouter } from 'next/navigation';
+'use client';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { FaArrowRight, FaArrowLeft } from 'react-icons/fa';
 import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
+import { useEffect } from 'react';
 
 type PaginationProps = {
   currentPage: number;
   totalPages: number;
-  onPageChange: (newPage: number) => void; // Add onPageChange prop here
+  scrollId?: string;
+  name?: string;
 };
 
-const Pagination = ({ currentPage, totalPages }: PaginationProps) => {
+const Pagination = ({
+  currentPage,
+  totalPages,
+  scrollId,
+  name = 'page',
+}: PaginationProps) => {
   const router = useRouter();
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const scrollToId = scrollId ? `#${scrollId}` : '';
+  if (isNaN(currentPage) || isNaN(totalPages)) {
+    currentPage = 1;
+    totalPages = 1;
+  }
 
   const handleArrowRight = () => {
     const nextPage = currentPage + 1;
     if (nextPage <= totalPages) {
-      router.push(`${pathname}?page=${nextPage}` as any, { scroll: false });
+      const params = new URLSearchParams(searchParams);
+      params.set(name, nextPage.toString());
+      router.push(`${pathname}?${params.toString()}${scrollToId}` as any);
     }
   };
 
   const handleArrowLeft = () => {
     const prevPage = currentPage - 1;
     if (prevPage >= 1) {
-      router.push(`${pathname}?page=${prevPage}` as any, { scroll: false });
+      const params = new URLSearchParams(searchParams);
+      params.set(name, prevPage.toString());
+      router.push(`${pathname}?${params.toString()}${scrollToId}` as any);
     }
   };
+
+  if (!totalPages) {
+    return null;
+  }
 
   return (
     <div className="flex items-center">
@@ -34,7 +56,7 @@ const Pagination = ({ currentPage, totalPages }: PaginationProps) => {
           className={`cursor-pointer text-2xl ${currentPage === 1 ? 'text-neutral-200' : 'text-primary-500'}`}
         />
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center justify-center">
         {Array.from({ length: totalPages }).map((_, index) => (
           <span
             key={index}

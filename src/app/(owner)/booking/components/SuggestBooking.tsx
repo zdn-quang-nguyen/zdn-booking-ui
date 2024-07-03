@@ -1,6 +1,5 @@
-import DatePickerComponent from '@/components/common/DatePickerComponent';
-import RangePickerComponent from '@/components/common/RangePickerComponent';
-import { Input } from 'antd';
+'use client';
+
 import SuggestBookingItem from './SuggestBookingItem';
 
 //
@@ -16,16 +15,7 @@ interface SuggestBookingProps {
 
 const SuggestBooking: React.FC<SuggestBookingProps> = ({
   booking,
-  fields = [
-    {
-      id: 1,
-      name: 'san1',
-    },
-    {
-      id: 2,
-      name: 'san2',
-    },
-  ],
+  fields = [],
   startTime,
   endTime,
   onClick,
