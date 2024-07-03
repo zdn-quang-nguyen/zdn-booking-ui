@@ -4,7 +4,7 @@ import SportFieldInfoCard from '@/components/sport-field/SportFieldInfoCard';
 import React, { use, useEffect, useState } from 'react';
 import TimeFilter from './TimeFilter';
 import { useRouter, useSearchParams } from 'next/navigation'; // Import NextRouter
-import { getSportFieldByTime } from '@/libs/api/sport-field.api';
+import { getSportFieldByTime } from '@/libs/api/sport-field-server.api';
 
 type SportFieldsByTimeProps = {
   sportFields: SportField[];
@@ -20,7 +20,7 @@ const SportFieldsByTime = () => {
   const totalPages = Math.ceil(sportFields.length / 4);
   const router = useRouter(); // Update the type of 'router' to NextRouter
   const searchParams = useSearchParams();
-  const page = searchParams.get('page');
+  const page = searchParams.get('time-page');
   const typeId = searchParams.get('time');
   const currentPage = Number(page) || 1; // Current page from query or default to 1
 
@@ -57,16 +57,27 @@ const SportFieldsByTime = () => {
     fetchSportFieldsByTime(time.start, time.end);
   }, [page, typeId]);
   return (
-    <div className="container mx-auto flex flex-col justify-center px-8 py-16">
+    <div
+      className="container mx-auto flex flex-col justify-center px-8 py-16"
+      id="time-sport-fields"
+    >
       <h4 className="py-5 font-bold">Đặt chỗ theo giờ</h4>
       <TimeFilter onsubmit={onsubmit} />
       <div className="mb-6 mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {sportFields.length > 0 &&
+        {sportFields.length > 0 ? (
           sportFields.map((sportField) => (
             <SportFieldInfoCard key={sportField.id} sportField={sportField} />
-          ))}
+          ))
+        ) : (
+          <div className="font-bold">Không có dữ liệu</div>
+        )}
       </div>
-      {/* <Pagination currentPage={currentPage} totalPages={totalPage} /> */}
+      <Pagination
+        currentPage={currentPage}
+        scrollId="time-sport-fields"
+        totalPages={totalPage}
+        name="time-page"
+      />
     </div>
   );
 };
