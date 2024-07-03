@@ -7,7 +7,7 @@ import { ClockCircleOutlined } from '@ant-design/icons';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 import Image from 'next/image';
 import moment from 'moment';
-import { useRouter } from 'next/navigation'; // Changed import to 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 import styles from './styles/FilterItem.module.scss';
 import Arrow from '@public/icons/ArrowNarrowRight.svg';
@@ -30,26 +30,12 @@ const CustomRangePicker: React.FC<RangePickerProps> = (props) => {
       : [dayjs('00:00', 'HH:mm'), dayjs('00:00', 'HH:mm')],
   );
 
-  const router = useRouter();
-
-  const updateQueryParams = (start: string, end: string) => {
-    // router.push({
-    //   pathname: router.pathname,
-    //   query: {
-    //     ...router.query,
-    //     startTime: start || undefined,
-    //     endTime: end || undefined,
-    //   },
-    // });
-  };
-
-  const handleRangePickerChange = (_, [start, end]) => {
+  const handleRangePickerChange = (_, [start, end]: [string, string]) => {
     const newTime: [dayjs.Dayjs, dayjs.Dayjs] = [
       dayjs(start, 'HH:mm'),
       dayjs(end, 'HH:mm'),
     ];
     setTime(newTime);
-    updateQueryParams(start, end);
 
     if (start || end) {
       onChange && onChange(newTime);
@@ -78,7 +64,9 @@ const CustomRangePicker: React.FC<RangePickerProps> = (props) => {
         separator={<Image src={Arrow} alt="arrow" />}
         className={`flex flex-grow items-center justify-start gap-3`}
         onCalendarChange={handleRangePickerChange}
-        onOk={handleRangePickerChange}
+        onOk={(e) => {
+          onChange && onChange(e);
+        }}
       />
     </div>
   );

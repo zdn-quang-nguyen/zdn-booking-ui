@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Banner from './components/Banner/Banner';
 import NearestFields from './components/nearest/NearestFields';
 import PopularPlaces from './components/popular/PopularPlaces';
+import SportFieldsByTime from './components/fields-by-time/SportFieldsByTime';
 
 export const metadata: Metadata = {
   title: 'Zodinet Booking - Home Page',
@@ -13,7 +14,7 @@ const HomePage = async () => {
       <Banner />
       <PopularPlaces />
       <NearestFields />
-      {/* <SportFieldsByTime sportFields={sportFields} /> */}
+      <SportFieldsByTime />
     </div>
   );
 };
