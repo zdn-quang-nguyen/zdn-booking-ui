@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 'use client';
 import { sportField } from '@/mocks/sport-fields';
 import NearestCard from './NearestCard';
@@ -6,11 +5,6 @@ import NearestImage from './NearestImage';
 import { getSportFields } from '@/libs/api/sport-field.api';
 import useGetLocation from '@/hooks/useGetLocation';
 import useSearchSportFields from '@/hooks/useSearchSportFields';
-=======
-import { getSportFields } from '@/libs/api/sport-field-server.api';
-import NearestCard from './NearestCard';
-import NearestImage from './NearestImage';
->>>>>>> da1954dcf3ecdf9d5970ef0f55aa153de86f0f17
 
 const NearestFields = () => {
   const query = {

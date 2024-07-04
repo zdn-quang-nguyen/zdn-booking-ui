@@ -1,7 +1,7 @@
+'use server';
 import axios from 'axios';
 import axiosInstance from '../axios';
 import { cookies } from 'next/headers';
-import axiosInstance from '../axios';
 
 type GetSportFieldParams = {
   page?: number;

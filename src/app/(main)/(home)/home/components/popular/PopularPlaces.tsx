@@ -6,7 +6,6 @@ import useSearchSportFields from '@/hooks/useSearchSportFields';
 import { Skeleton } from 'antd';
 
 const PopularPlaces = () => {
-<<<<<<< HEAD
   const router = useRouter(); // Update the type of 'router' to NextRouter
   const searchParams = useSearchParams();
   const page = searchParams.get('popular-page') ?? 1;
@@ -26,8 +25,6 @@ const PopularPlaces = () => {
     return null;
   }
 
-=======
->>>>>>> da1954dcf3ecdf9d5970ef0f55aa153de86f0f17
   return (
     <div
       className="container mx-auto flex flex-col justify-center px-8 py-16"
@@ -41,7 +38,6 @@ const PopularPlaces = () => {
 };
 
 export default PopularPlaces;
-<<<<<<< HEAD
 
 export const PopularPlacesSkeleton = () => {
   return (
@@ -60,5 +56,3 @@ export const PopularPlacesSkeleton = () => {
     </div>
   );
 };
-=======
->>>>>>> da1954dcf3ecdf9d5970ef0f55aa153de86f0f17
