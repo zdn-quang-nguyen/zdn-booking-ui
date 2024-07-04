@@ -1,77 +1,54 @@
-import type { Metadata } from 'next';
-import ScheduleSection, { FieldData } from './components/ScheduleSection';
-import { redirect } from 'next/navigation';
-import { getBookingsByFieldId } from './api/booking';
-import { getFieldById } from './api/field';
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Zodinet Booking - Owner Home Page',
-  description:
-    'Zodinet Booking - Owner Home: Manage Your Sport Fields with Ease',
-};
+import { fetcher } from '@/libs/utils';
+import useSWR from 'swr';
+import TableSection from './components/TableSection';
+import { FieldResponse } from '../test/page';
 
-export interface BookingData {
-  id: string;
-  phone: string;
-  fullName: string;
-  fieldId: string;
-  startTime: string;
-  endTime: string;
-  amount: number;
-  status: string;
-}
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
+
 type OwnerHomePageProps = {
   params: { slug: string };
   searchParams?: { [key: string]: string | undefined };
 };
 
-export type FieldResponse = {
-  sportField: SportField;
-} & Field;
-
-const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
+const OwnerHomePage = ({ searchParams }: OwnerHomePageProps) => {
   const fieldId = searchParams?.fieldId;
-  const startDate = new Date(searchParams?.startDate ?? new Date());
-  const endDate = new Date(searchParams?.endDate ?? new Date());
 
-  if (!fieldId) {
-    redirect('/home');
+  const {
+    data: sportFieldData,
+    error: sportFieldError,
+    isLoading: sportFieldLoading,
+  } = useSWR(`${API_HOST}/field/${fieldId}`, (url: string) => fetcher(url), {
+    revalidateIfStale: false,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+  });
+
+  if (!sportFieldData || sportFieldLoading) {
+    return <div>Loading...</div>;
   }
 
-  const field: FieldResponse = await getFieldById(fieldId);
-  console.log(field);
+  const { startTime: startTimeSportField, endTime: endTimeSportField } =
+    sportFieldData.data.sportField;
 
-  if (!field) {
-    redirect('/home');
-  }
+  const nameSportField = sportFieldData.data.name;
 
-  const [startHour, startMinute] =
-    field.sportField?.startTime?.split(':') ?? [];
-  const [endHour, endMinute] = field.sportField?.endTime?.split(':') ?? [];
-
-  if (!startHour || !startMinute || !endHour || !endMinute) {
-    redirect('/home');
-  }
-
-  startDate.setHours(Number(startHour), Number(startMinute));
-  endDate.setHours(Number(endHour), Number(endMinute));
-
-  const fieldData: FieldData = {
-    name: field.name,
-    startTime: field.sportField.startTime,
-    endTime: field.sportField.endTime,
-  };
-
-  const bookings = await getBookingsByFieldId(fieldId, startDate, endDate);
+  console.log('sportFieldData', sportFieldData);
+  const field: FieldResponse = sportFieldData.data;
 
   return (
-    <div className="flex h-full w-full items-end justify-center">
-      <ScheduleSection
-        fieldData={fieldData}
-        bookings={bookings}
+    <div className="container mx-auto">
+      <TableSection
+        SportFieldTimeProps={{
+          startTimeSportField: startTimeSportField,
+          endTimeSportField: endTimeSportField,
+          nameSportField: nameSportField,
+        }}
         field={field}
       />
     </div>
   );
 };
+
 export default OwnerHomePage;

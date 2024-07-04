@@ -1,51 +1,108 @@
-import { parseDateFromString, parseTimeToMinutes } from '@/libs/utils';
-import { Tooltip } from 'antd';
-import { CheckStatus } from './ScheduleSection';
+import { cn, fetcher, parseDateFromString } from '@/libs/utils';
+import { Button, Tooltip } from 'antd';
+import { useSearchParams } from 'next/navigation';
+import React, { useState } from 'react';
+import useSWR from 'swr';
 import styles from './ScheduleTable.module.scss';
+import ReservationBooking from './ReservationBooking';
 
-const ScheduleTable = ({
-  columns,
-  weekDates,
-  bookings,
-  status,
-  startWeek,
-  handleCheckboxChange,
-}) => {
+interface ScheduleTableProps {
+  labelColumns: {
+    label: string;
+    start: number;
+    end: number;
+  }[];
+  labelRows: string[];
+  startDateSchedule: Date;
+  endDateSchedule: Date;
+  handleCheckboxChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  field: FieldResponse;
+}
+
+type BookingTime = {
+  startTime: string;
+  endTime: string;
+  amount: number;
+};
+
+const ScheduleTable = (props: ScheduleTableProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [bookingId, setBookingId] = useState('');
+  const [bookingTime, setBookingTime] = useState<BookingTime>();
+
+  const {
+    labelColumns,
+    labelRows,
+    startDateSchedule,
+    endDateSchedule,
+    handleCheckboxChange,
+    field,
+  } = props;
+  const searchParams = useSearchParams();
+  const fieldId = searchParams.get('fieldId') || '';
+  const statusQuery = 'accepted';
+
+  const params = new URLSearchParams({
+    fieldId: fieldId || '',
+    startTime: startDateSchedule.toISOString(),
+    endTime: endDateSchedule.toISOString(),
+    ...(statusQuery && { statusQuery }),
+  });
+
+  const {
+    data: bookingData,
+    error: bookingError,
+    isLoading: bookingLoading,
+  } = useSWR(
+    `/booking/user?${params.toString()}`,
+    (url: string) => fetcher(url),
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
+
+  if (!bookingData || bookingLoading) {
+    return <div>Loading...</div>;
+  }
+
+  const bookingResponse = bookingData.data;
+
+  const bookingMap = bookingResponse.reduce((acc: any, booking: any) => {
+    const bookingDate = `${new Date(booking.startTime).toISOString()}`;
+    const slot = Math.floor(
+      (new Date(booking.endTime).getTime() -
+        new Date(booking.startTime).getTime()) /
+        (30 * 60 * 1000),
+    );
+
+    const newBooking = JSON.parse(JSON.stringify(booking));
+
+    newBooking.slot = slot;
+    acc[bookingDate] = newBooking;
+
+    for (let i = 1; i < slot; i++) {
+      const bookingSlot = new Date(booking.startTime);
+      const newBooking = JSON.parse(JSON.stringify(booking));
+
+      newBooking.slot = 0;
+      bookingSlot.setMinutes(bookingSlot.getMinutes() + i * 30);
+      acc[bookingSlot.toISOString()] = newBooking;
+    }
+
+    return acc;
+  }, {});
+
   function isTimeSlotBooked(
     columnStart: number,
     columnEnd: number,
     date: string,
   ) {
-    const matchedBooking = bookings.find((booking) => {
-      const bookingStart = parseTimeToMinutes(
-        new Date(booking.startTime).toLocaleTimeString('en-US', {
-          hourCycle: 'h24',
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-      );
-      const bookingEnd = parseTimeToMinutes(
-        new Date(booking.endTime).toLocaleTimeString('en-US', {
-          hourCycle: 'h24',
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-      );
-      const inputDate = parseDateFromString(date);
-      const bookingDate = new Date(booking.startTime);
+    const inputDate = parseDateFromString(date);
+    inputDate.setHours(Math.floor(columnStart / 60), columnStart % 60);
 
-      if (
-        inputDate &&
-        new Date(inputDate).toLocaleDateString() ===
-          new Date(bookingDate).toLocaleDateString()
-      ) {
-        if (columnStart >= bookingStart && columnEnd <= bookingEnd)
-          return columnStart >= bookingStart && columnEnd <= bookingEnd;
-      }
-      return false;
-    });
-
-    return matchedBooking;
+    return bookingMap[inputDate.toISOString()];
   }
 
   const isPastSlot = (date: string, time: string) => {
@@ -61,7 +118,7 @@ const ScheduleTable = ({
     inputTime.setHours(Number(time.split(':')[0]), Number(time.split(':')[1]));
 
     // return inputDate < currentDate && inputTime < currentTime;
-    if (startWeek.getFullYear() < inputDate.getFullYear()) {
+    if (startDateSchedule.getFullYear() < inputDate.getFullYear()) {
       return true;
     }
     if (inputDate.getTime() < currentDate.getTime()) {
@@ -75,96 +132,154 @@ const ScheduleTable = ({
   };
 
   return (
-    <table className="overflow-x-scroll">
-      <thead>
-        <tr className="min-h-10">
-          <th className="absolute min-h-10 min-w-24"></th>
-          <th
-            className="min-w-24"
-            style={{
-              border: 'none',
-            }}
-          ></th>
-          {columns.map((column) => (
-            <th className="body-3 min-w-48 font-medium" key={column.label}>
-              {column.label}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {weekDates.map((date) => (
-          <tr key={date}>
-            <td className="body-3 absolute w-24 truncate bg-white font-medium">
-              {date}
-            </td>
-            <td
-              className="min-w-24 border-none"
+    <div>
+      <table className="overflow-x-scroll">
+        <thead>
+          <tr className="min-h-10">
+            <th className="absolute min-h-10 min-w-24"></th>
+            <th
+              className="min-w-24"
               style={{
                 border: 'none',
               }}
-            ></td>
-            {columns.map((column) => {
-              const booking = isTimeSlotBooked(column.start, column.end, date);
-              return (
-                <td
-                  key={column.label + startWeek.toDateString()}
-                  className={
-                    isPastSlot(date, column.label.split('-')[1])
-                      ? styles.pastSlot
-                      : status === CheckStatus.UNCHECKED_BOOKING && booking
-                        ? styles.checkedBooking
-                        : status === CheckStatus.CHECKED_BOOKING && !booking
-                          ? styles.uncheckedBooking
-                          : ''
-                  }
-                >
-                  <Tooltip
-                    title={
-                      booking ? (
-                        <>
-                          <div className="font-bold">Name:</div>
-                          <div>{booking.fullName}</div>
-                          <div className="font-bold">Phone:</div>
-                          <div>{booking.phone}</div>
-                          <div className="font-bold">Start:</div>
-                          <div>
-                            {new Date(booking.startTime).toLocaleString()}
-                          </div>
-                          <div className="font-bold">End:</div>
-                          <div>
-                            {new Date(booking.endTime).toLocaleString()}
-                          </div>
-                        </>
-                      ) : (
-                        ''
-                      )
-                    }
-                    color={'green'}
-                    key={'green'}
-                  >
-                    <input
-                      data-id={booking?.id}
-                      data-date={date}
-                      data-time={column.label}
-                      type="checkbox"
-                      defaultChecked={!!booking}
-                      onChange={(e) => handleCheckboxChange(e)}
-                      disabled={
-                        isPastSlot(date, column.label.split('-')[1]) ||
-                        (status === CheckStatus.UNCHECKED_BOOKING &&
-                          !!booking) ||
-                        (status === CheckStatus.CHECKED_BOOKING && !booking)
-                      }
-                    />
-                  </Tooltip>
-                </td>
-              );
-            })}
+            ></th>
+            {labelColumns.map((labelColumn) => (
+              <th
+                className="body-3 min-w-48 font-medium"
+                key={labelColumn.label}
+              >
+                {labelColumn.label}
+              </th>
+            ))}
           </tr>
-        ))}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {labelRows.map((labelRow) => (
+            <tr key={labelRow} className="min-h-10">
+              <td className="body-3 absolute z-[99] w-24 truncate bg-white font-medium">
+                {labelRow}
+              </td>
+              <td
+                className="min-w-24 border-none"
+                style={{
+                  border: 'none',
+                }}
+              ></td>
+              {labelColumns.map((labelColumn) => {
+                const booking = isTimeSlotBooked(
+                  labelColumn.start,
+                  labelColumn.end,
+                  labelRow,
+                );
+                const countSlot = booking?.slot ?? 1;
+
+                if (countSlot === 0) {
+                  return null;
+                }
+
+                return (
+                  <td
+                    colSpan={countSlot}
+                    key={labelColumn.label + startDateSchedule.toDateString()}
+                    className={cn(
+                      'h-1 min-h-10',
+                      isPastSlot(labelRow, labelColumn.label.split('-')[1]) &&
+                        styles.pastSlot,
+                    )}
+                  >
+                    {booking ? (
+                      <Tooltip
+                        title={
+                          booking ? (
+                            <>
+                              <div className="font-bold">Name:</div>
+                              <div>{booking.fullName}</div>
+                              <div className="font-bold">Phone:</div>
+                              <div>{booking.phone}</div>
+                              <div className="font-bold">Start:</div>
+                              <div>
+                                {new Date(booking.startTime).toLocaleString()}
+                              </div>
+                              <div className="font-bold">End:</div>
+                              <div>
+                                {new Date(booking.endTime).toLocaleString()}
+                              </div>
+                            </>
+                          ) : (
+                            ''
+                          )
+                        }
+                        color={'green'}
+                        key={'green'}
+                      >
+                        <Button
+                          type="text"
+                          className="h-full w-full bg-accent-600"
+                          onClick={() => {
+                            setBookingId(booking.id);
+                            setIsOpen(true);
+                          }}
+                        ></Button>
+                      </Tooltip>
+                    ) : isPastSlot(
+                        labelRow,
+                        labelColumn.label.split('-')[1],
+                      ) ? (
+                      <Tooltip title={'Sân cũ'} color={'green'} key={'green'}>
+                        <button></button>
+                      </Tooltip>
+                    ) : (
+                      <Tooltip
+                        title={'Sân trống'}
+                        color={'geekblue-inverse'}
+                        key={'green'}
+                      >
+                        <button
+                          className="h-full w-full"
+                          onClick={() => {
+                            const startDate = parseDateFromString(labelRow);
+                            const startBooking = new Date(startDate);
+                            startBooking.setHours(
+                              Math.floor(labelColumn.start / 60),
+                              labelColumn.start % 60,
+                            );
+                            const endBooking = new Date(startDate);
+                            endBooking.setHours(
+                              Math.floor(labelColumn.end / 60),
+                              labelColumn.end % 60,
+                            );
+
+                            setBookingTime({
+                              startTime: startBooking.toISOString(),
+                              endTime: endBooking.toISOString(),
+                              amount: field.sportField?.price ?? 0,
+                            });
+                            setBookingId('');
+                            setIsOpen(true);
+                          }}
+                        ></button>
+                      </Tooltip>
+                    )}
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {isOpen && (
+        <ReservationBooking
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          isDeleteForm={!!bookingId}
+          bookingId={bookingId}
+          bookings={bookingResponse}
+          field={props.field}
+          bookingTime={bookingTime}
+        />
+      )}
+    </div>
   );
 };
+
 export default ScheduleTable;

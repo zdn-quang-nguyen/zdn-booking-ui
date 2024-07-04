@@ -7,7 +7,7 @@
 
     th,
     td {
-      padding: 8px;
+      padding: 4px;
       text-align: center;
       border: 1px solid #ccc;
       color: theme('colors.natural.700');
@@ -17,6 +17,7 @@
     td:first-child,
     tr {
       border: none;
+      padding: 9px;
     }
     th {
       background-color: white;
@@ -40,6 +41,17 @@
       padding: 8px 20px;
       font-size: 16px;
       height: 52px;
+      &:hover {
+        background-color: none !important;
+        border-color: none !important;
+      }
+    }
+
+    .ant-btn-text {
+      @include primary-btn-4;
+      padding: 8px 20px;
+      font-size: 16px;
+      height: 32px;
       &:hover {
         background-color: none !important;
         border-color: none !important;

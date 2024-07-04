@@ -4,3 +4,7 @@ type Field = {
   sportFieldId?: string;
   bookings?: Booking[];
 };
+
+type FieldResponse = {
+  sportField: SportField;
+} & Field;

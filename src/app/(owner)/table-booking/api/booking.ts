@@ -66,8 +66,8 @@ export const removeBookingById = async (id: string) => {
 
 export type CreateBookingByOwnerDto = {
   fieldId: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   phone: string;
   name: string;
   amount: number;
