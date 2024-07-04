@@ -71,6 +71,8 @@ const ScheduleSection: React.FC<ScheduleTableProps> = ({
 
   const [status, setStatus] = useState<CheckStatus>(CheckStatus.DEFAULT);
 
+  console.log('startWeek', startWeek);
+
   useEffect(() => {
     const startDateIndex = 0;
     const endDateIndex = 6;

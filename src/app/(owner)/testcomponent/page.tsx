@@ -104,6 +104,8 @@ const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
   const { startTime: startTimeSportField, endTime: endTimeSportField } =
     sportFieldData.data.sportField;
 
+  const nameSportField = sportFieldData.data.sportField.name;
+
   return (
     <div>
       <TableSection
@@ -111,6 +113,7 @@ const OwnerHomePage = async ({ searchParams }: OwnerHomePageProps) => {
         SportFieldTimeProps={{
           startTimeSportField: startTimeSportField,
           endTimeSportField: endTimeSportField,
+          nameSportField: nameSportField,
         }}
         startDateSchedule={startDateSchedule}
         endDateSchedule={endDateSchedule}
