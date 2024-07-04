@@ -1,10 +1,20 @@
-import { getSportFields } from '@/libs/api/sport-field-server.api';
+'use client';
+import { sportField } from '@/mocks/sport-fields';
 import NearestCard from './NearestCard';
 import NearestImage from './NearestImage';
+import { getSportFields } from '@/libs/api/sport-field.api';
+import useGetLocation from '@/hooks/useGetLocation';
+import useSearchSportFields from '@/hooks/useSearchSportFields';
 
-const NearestFields = async () => {
-  const res = await getSportFields({ page: 1, size: 7 });
-  const sportFields: SportField[] = res.data;
+const NearestFields = () => {
+  const query = {
+    distanceOrder: 'ASC',
+  };
+  const { sportFields } = useSearchSportFields({
+    page: 1,
+    size: 7,
+    query: JSON.stringify(query),
+  });
 
   return (
     <div className="bg-primary-100 px-8">

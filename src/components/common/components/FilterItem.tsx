@@ -56,22 +56,21 @@ export const FilterItem: React.FC<FilterItemProps> = ({
   }, [isNeedReset]);
 
   return (
-    <div className={`flex flex-col gap-5 w-full`}>
+    <div className={`flex w-full flex-col gap-5`}>
       <div className={`flex flex-row justify-between`}>
-        <span className={`body-3 font-bold text-natural-700 w-full`}>
+        <span className={`body-3 w-full font-bold text-natural-700`}>
           {filter.title}
         </span>
         <CaretDownFilled onClick={() => setOpen(!open)} />
       </div>
       {open &&
         (filter.name === 'time' ? (
-          <div className={`flex flex-col gap-3 w-full`}>
-            <DatePickerComponent></DatePickerComponent>
+          <div className={`flex w-full flex-col gap-3`}>
+            <DatePickerComponent lable="Ngày"></DatePickerComponent>
             <RangePickerComponent label="Thời gian"></RangePickerComponent>
-
           </div>
         ) : (
-          <div className={`flex flex-col gap-3 w-full`}>
+          <div className={`flex w-full flex-col gap-3`}>
             {filter.options.map((option, index) => (
               <RadioBtn
                 key={option.value}

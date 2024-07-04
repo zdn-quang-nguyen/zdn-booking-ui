@@ -445,6 +445,7 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
           >
             <InputNumber
               suffix="VND/giờ"
+              maxLength={10}
               style={{ width: '120%', borderRadius: '40px' }}
             />
           </Form.Item>

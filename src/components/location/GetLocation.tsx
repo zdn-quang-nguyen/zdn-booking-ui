@@ -1,7 +1,6 @@
 // components/GetLocation.tsx
 'use client';
 import { useEffect, useState } from 'react';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 
 interface Coordinates {
   lat: number | null;
@@ -41,7 +40,7 @@ const GetLocation: React.FC = () => {
   }, []);
 
   return (
-    <div>
+    <div className="hidden">
       {location.lat !== null && location.long !== null ? (
         <p>
           Latitude: {location.lat}, Longitude: {location.long}
