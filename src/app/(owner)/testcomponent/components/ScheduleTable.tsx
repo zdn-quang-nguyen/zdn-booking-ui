@@ -142,48 +142,58 @@ const ScheduleTable = (props: ScheduleTableProps) => {
                             : ''
                     }
                   >
-                    <Tooltip
-                      title={
-                        booking ? (
-                          <>
-                            <div className="font-bold">Name:</div>
-                            <div>{booking.fullName}</div>
-                            <div className="font-bold">Phone:</div>
-                            <div>{booking.phone}</div>
-                            <div className="font-bold">Start:</div>
-                            <div>
-                              {new Date(booking.startTime).toLocaleString()}
-                            </div>
-                            <div className="font-bold">End:</div>
-                            <div>
-                              {new Date(booking.endTime).toLocaleString()}
-                            </div>
-                          </>
-                        ) : (
-                          ''
-                        )
-                      }
-                      color={'green'}
-                      key={'green'}
-                    >
-                      <input
-                        data-id={booking?.id}
-                        data-date={labelRow}
-                        data-time={labelColumn.label}
-                        type="checkbox"
-                        defaultChecked={!!booking}
-                        onChange={(e) => handleCheckboxChange(e)}
-                        disabled={
-                          isPastSlot(
-                            labelRow,
-                            labelColumn.label.split('-')[1],
-                          ) ||
-                          (status === CheckStatus.UNCHECKED_BOOKING &&
-                            !!booking) ||
-                          (status === CheckStatus.CHECKED_BOOKING && !booking)
+                    {booking ? (
+                      <Tooltip
+                        title={
+                          booking ? (
+                            <>
+                              <div className="font-bold">Name:</div>
+                              <div>{booking.fullName}</div>
+                              <div className="font-bold">Phone:</div>
+                              <div>{booking.phone}</div>
+                              <div className="font-bold">Start:</div>
+                              <div>
+                                {new Date(booking.startTime).toLocaleString()}
+                              </div>
+                              <div className="font-bold">End:</div>
+                              <div>
+                                {new Date(booking.endTime).toLocaleString()}
+                              </div>
+                            </>
+                          ) : (
+                            ''
+                          )
                         }
-                      />
-                    </Tooltip>
+                        color={'green'}
+                        key={'green'}
+                      >
+                        <input
+                          data-id={booking?.id}
+                          data-date={labelRow}
+                          data-time={labelColumn.label}
+                          type="checkbox"
+                          defaultChecked={!!booking}
+                          onChange={(e) => handleCheckboxChange(e)}
+                          disabled={
+                            isPastSlot(
+                              labelRow,
+                              labelColumn.label.split('-')[1],
+                            ) ||
+                            (status === CheckStatus.UNCHECKED_BOOKING &&
+                              !!booking) ||
+                            (status === CheckStatus.CHECKED_BOOKING && !booking)
+                          }
+                        />
+                      </Tooltip>
+                    ) : (
+                      <Tooltip
+                        title={'Sân trống'}
+                        color={'green'}
+                        key={'green'}
+                      >
+                        <p>Trống</p>
+                      </Tooltip>
+                    )}
                   </td>
                 );
               })}
