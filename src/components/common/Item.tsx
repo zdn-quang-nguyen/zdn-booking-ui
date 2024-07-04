@@ -1,10 +1,11 @@
 //
 import React from 'react';
 import Link from 'next/link';
-import { CATEGORY_MAPPING } from '@/constants/constant';
+import { BOOKING_STATUS_MAPPING, CATEGORY_MAPPING } from '@/constants/constant';
 // import { sportField } from '@/mocks/sport-fields';
 import dayjs from 'dayjs';
 import moment from 'moment';
+import { formatCurrency } from '@/libs/utils';
 
 interface ItemProps {
   data: any;
@@ -69,7 +70,7 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
         <div>
           {(label == 'transaction' || label == 'booking') && (
             <div className={`flex flex-row items-center gap-2`}>
-              <Link href="/" className={`body-4 text-natural-700} font-medium`}>
+              <Link href="#" className={`body-4 text-natural-700} font-medium`}>
                 {data.fullName}
               </Link>
             </div>
@@ -103,8 +104,8 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
               </p>
               <DotFrame />
               <p>
-                {moment(data.startTime).utc().format('HH:mm')}-{' '}
-                {moment(data.endTime).utc().format('HH:mm')}
+                {moment(data.startTime).local().format('HH:mm')}-{' '}
+                {moment(data.endTime).local().format('HH:mm')}
               </p>
               <DotFrame />
               <p>{data?.field?.name}</p>
@@ -116,15 +117,13 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
         {(label == 'transaction' || label == 'booking') && (
           <div className="flex flex-col gap-1">
             <span className="body-4 flex flex-row justify-end font-medium text-natural-700">
-              {/* {data.amount.toLocaleString('en').replaceAll(',', '.')} */}
-              {data.amount}
-              <p>đ</p>
+              {formatCurrency(data.amount)}
             </span>
             {label == 'transaction' && (
               <span
                 className={`body-4 font-bold ${textColor(data.status)} text-right`}
               >
-                {'Đặt chỗ thành công'}
+                {BOOKING_STATUS_MAPPING[data.status]}
               </span>
             )}
             {label == 'booking' && (

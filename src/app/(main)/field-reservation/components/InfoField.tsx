@@ -12,12 +12,12 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import useBooking from '@/hooks/useBooking';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 import BookingModal, { ModalData } from './BookingModal';
+import useFieldSelection from '@/hooks/useFieldSelection';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import SportFieldSwiper from '@/components/common/SportFieldSwiper';
+import Link from 'next/link';
 
-type TimeRange = {
-  start: string;
-  end: string;
-};
-
+dayjs.extend(customParseFormat);
 type InfoFieldProps = {
   sportField: SportField;
 };
@@ -29,9 +29,9 @@ export default function InfoField({ sportField }: InfoFieldProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [times, setTimes] = useState<TimeRange[]>(
-    splitTimeRange(sportField.startTime, sportField.endTime),
-  );
+  const { times, handleDateChange, handleSelect } =
+    useFieldSelection(sportField);
+
   useEffect(() => {
     const date = searchParams.get('date');
     const field = searchParams.get('field');
@@ -40,20 +40,12 @@ export default function InfoField({ sportField }: InfoFieldProps) {
     }
     if (!date || !field) {
       router.replace(
-        `${pathname}?date=${dayjs(new Date()).format('DD/MM/YYYY')}&field=${sportField.fields?.[0].id}`,
+        `${pathname}?date=${dayjs(new Date()).format('DD/MM/YYYY')}&field=${sportField.fields?.[0].id}` as any,
         { scroll: false },
       );
     }
   }, []);
 
-  const handleDateChange: DatePickerProps['onChange'] = (
-    date,
-    dateString: string,
-  ) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('date', dateString);
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  };
   const options: SelectProps['options'] = [];
   sportField.fields?.forEach((field) => {
     options.push({
@@ -62,52 +54,13 @@ export default function InfoField({ sportField }: InfoFieldProps) {
     });
   });
 
-  const handleSelect = (value: string) => {
-    const params = new URLSearchParams(searchParams);
-    params.set('field', value);
-    router.push(`${pathname}?${params.toString()}`, { scroll: false });
-  };
-  function splitTimeRange(startTime: string, endTime: string) {
-    const timeSlots = [];
-    let [startHour, startMinute] = startTime.split(':').map(Number);
-    let [endHour, endMinute] = endTime.split(':').map(Number);
-
-    const formatTime = (hour: number, minute: number) => {
-      const h = hour.toString().padStart(2, '0');
-      const m = minute.toString().padStart(2, '0');
-      return `${h}:${m}`;
-    };
-
-    while (
-      startHour < endHour ||
-      (startHour === endHour && startMinute < endMinute)
-    ) {
-      const currentTime = formatTime(startHour, startMinute);
-
-      startMinute += 30;
-      if (startMinute >= 60) {
-        startMinute -= 60;
-        startHour += 1;
-      }
-
-      const nextTime = formatTime(startHour, startMinute);
-      if (
-        startHour < endHour ||
-        (startHour === endHour && startMinute <= endMinute)
-      ) {
-        timeSlots.push({
-          start: currentTime,
-          end: nextTime,
-        });
-      }
-    }
-
-    return timeSlots;
-  }
+  const imageUrls = sportField.sportFieldImages?.map((image) => image.url);
 
   const date = searchParams.get('date');
   const fieldId = searchParams.get('field');
-
+  useEffect(() => {
+    setTimesChosen([]);
+  }, [date]);
   const startTime = getTime(date, sportField.startTime);
 
   const endTime = getTime(date, sportField.endTime);
@@ -121,27 +74,24 @@ export default function InfoField({ sportField }: InfoFieldProps) {
   const bookingTimes = bookings.map((booking) => ({
     start: booking.startTime,
     end: booking.endTime,
+    status: booking.status,
   }));
 
   const timesWithBooking = times.map((time) => {
-    const isBooked = bookingTimes.some((bookingTime) => {
-      const start = dayjs(bookingTime.start);
-      const end = dayjs(bookingTime.end);
-      const timeStart = dayjs(time.start, 'HH:mm');
-      const timeEnd = dayjs(time.end, 'HH:mm');
-
-      timeStart.set('date', start.get('date'));
-      timeEnd.set('date', start.get('date'));
-
-      if (timeStart.isBefore(dayjs()) || timeEnd.isBefore(dayjs())) {
-        return true;
-      }
-
-      return (
-        (timeStart.isAfter(start) || timeStart.isSame(start)) &&
-        (timeEnd.isBefore(end) || timeEnd.isSame(end))
-      );
-    });
+    const timeStart = dayjs(`${date} ${time.start}`, 'DD/MM/YYYY HH:mm');
+    const timeEnd = dayjs(`${date} ${time.end}`, 'DD/MM/YYYY HH:mm');
+    const isBooked =
+      bookingTimes.some((bookingTime) => {
+        const start = dayjs(bookingTime.start);
+        const end = dayjs(bookingTime.end);
+        return (
+          (timeStart.isAfter(start) || timeStart.isSame(start)) &&
+          (timeEnd.isBefore(end) || timeEnd.isSame(end)) &&
+          bookingTime.status === 'accepted'
+        );
+      }) ||
+      timeStart.isBefore(dayjs()) ||
+      timeEnd.isBefore(dayjs());
     return {
       ...time,
       isBooked,
@@ -163,11 +113,11 @@ export default function InfoField({ sportField }: InfoFieldProps) {
       endTime = timesWithBooking[timesChosen[timesChosen.length - 1]].end;
     }
 
-    startTimeResult = dayjs(startTime, 'HH:mm');
-    startTimeResult.set('date', dayjs(date, 'DD/MM/YYYY').get('date'));
+    console.log(startTime);
+    console.log(endTime);
 
-    endTimeResult = dayjs(endTime, 'HH:mm');
-    endTimeResult.set('date', dayjs(date, 'DD/MM/YYYY').get('date'));
+    startTimeResult = dayjs(`${date} ${startTime}`, 'DD/MM/YYYY HH:mm');
+    endTimeResult = dayjs(`${date} ${endTime}`, 'DD/MM/YYYY HH:mm');
 
     return {
       startTimeISO: startTimeResult.toISOString(),
@@ -175,7 +125,7 @@ export default function InfoField({ sportField }: InfoFieldProps) {
       startTime: startTimeResult,
       endTime: endTimeResult,
       sportField,
-      fieldId: fieldId as string,
+      field: sportField.fields?.find((field) => field.id === fieldId),
       amount: timesChosen.length * sportField.price,
     };
   };
@@ -190,7 +140,6 @@ export default function InfoField({ sportField }: InfoFieldProps) {
     const lastValue = timesChosen[timesChosen.length - 1];
     const firstValue = timesChosen[0];
     if (checked) {
-      timesChosen.sort((a, b) => a - b);
       const newValue = Number(value);
       if (value > lastValue) {
         const newTimes = Array.from(
@@ -211,7 +160,6 @@ export default function InfoField({ sportField }: InfoFieldProps) {
       if (timesChosen.length === 0) {
         setTimesChosen([Number(value)]);
       }
-      // setTimesChosen([...timesChosen, Number(value)]);
     } else {
       if (timesChosen.length === 1) {
         setTimesChosen([]);
@@ -219,11 +167,12 @@ export default function InfoField({ sportField }: InfoFieldProps) {
       }
 
       setTimesChosen(timesChosen.filter((time) => time < Number(value)));
-
-      // setTimesChosen(timesChosen.filter((time) => time !== Number(value)));
     }
+    setTimesChosen((prevTimesChosen) => prevTimesChosen.sort((a, b) => a - b));
   };
-
+  const handleClose = () => {
+    setIsOpen(false);
+  };
   const handleReset = () => {
     setTimesChosen([]);
     document.querySelectorAll('input[type="checkbox"]').forEach((checkbox) => {
@@ -243,9 +192,12 @@ export default function InfoField({ sportField }: InfoFieldProps) {
         />
       )}
       <div className="mb-6 flex items-center">
-        <p className="mr-3 cursor-pointer text-sm font-medium text-natural-400">
+        <Link
+          href="/home"
+          className="mr-3 cursor-pointer text-sm font-medium text-natural-400"
+        >
           Trang chủ
-        </p>
+        </Link>
         <RightOutlined className="mr-3 h-4 w-4 text-natural-400" />
         <p className="cursor-pointer text-sm font-medium text-primary-600">
           Đặt chỗ ngay
@@ -253,10 +205,26 @@ export default function InfoField({ sportField }: InfoFieldProps) {
       </div>
 
       <div className={cn(s.main)}>
-        <h1 className="mb-5">{sportField.name}</h1>
         <div className="space-y-8">
-          <SportFieldShortInfo sportField={sportField} />
-          <SportFieldRule rulesString={sportField.rule ?? 'Chưa cập nhật'} />
+          <div className="grid grid-cols-1 items-center gap-3 lg:grid-cols-2">
+            <div>
+              <h1 className="mb-5">{sportField.name}</h1>
+
+              <SportFieldShortInfo sportField={sportField} />
+              <div className="mt-4">
+                <SportFieldRule
+                  rulesString={sportField.rule ?? 'Chưa cập nhật'}
+                />
+              </div>
+            </div>
+            {imageUrls && imageUrls.length > 0 ? (
+              <SportFieldSwiper images={imageUrls} />
+            ) : (
+              <div className="font-bold text-primary-600">
+                Chưa cập nhật ảnh
+              </div>
+            )}
+          </div>
           <div className="flex flex-wrap">
             <div className="mr-4 flex flex-col">
               <span className="mb-3 text-base font-bold text-natural-700">
@@ -300,11 +268,11 @@ export default function InfoField({ sportField }: InfoFieldProps) {
                     'flex flex-wrap items-center',
                     slot.isBooked && 'cursor-not-allowed opacity-50',
                   )}
-                  key={slot.start}
+                  key={date + slot.start}
                 >
                   <label
                     htmlFor={slot.start}
-                    className="mr-9 text-base font-normal text-natural-700"
+                    className="mr-9 w-[108px] text-base font-normal text-natural-700"
                   >
                     {slot.start}-{slot.end}
                   </label>

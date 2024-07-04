@@ -44,13 +44,15 @@
         border-color: none !important;
       }
     }
+
     .ant-btn-primary {
       @include accent-btn-6;
       padding: 14px 40px;
       font-size: 16px;
       height: 52px;
       &:hover {
-        background-color: none !important;
+        background-color: theme('colors.accent.600') !important;
+        color: theme('colors.white') !important;
         border-color: none !important;
       }
     }

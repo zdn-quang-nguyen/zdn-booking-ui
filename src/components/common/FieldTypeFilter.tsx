@@ -19,17 +19,22 @@ export const tabs: { [key: string]: string } = {
 
 interface FieldTypeFilterProps {
   name?: string;
+  pageName?: string;
 }
 
-const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({ name = 'type' }) => {
+const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({
+  name = 'type',
+  pageName = 'page',
+}) => {
   const { types, isLoading } = useSportFieldType();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const currentTab = searchParams.get(name);
+  let currentTab = searchParams.get(name);
   const handleChangeTab = (value: string) => {
     const params = new URLSearchParams(searchParams);
     params.set(name, value);
+    params.set(pageName, '1');
 
     const url = `${pathname}?${params.toString()}` as any;
 
@@ -37,7 +42,7 @@ const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({ name = 'type' }) => {
   };
 
   if (!types.find((type) => type.id === currentTab)) {
-    handleChangeTab('all');
+    currentTab = 'all';
   }
 
   const handleClick = (value: string) => {
@@ -79,8 +84,9 @@ const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({ name = 'type' }) => {
 export const FieldTypeFilterSkeleton = ({ size }: { size: number }) => {
   return (
     <div className="flex gap-4">
-      {Array.from({ length: size }).map(() => (
+      {Array.from({ length: size }).map((_, index) => (
         <Skeleton.Button
+          key={index}
           active
           style={{ width: '80px', height: '32px', borderRadius: '40px' }}
         />

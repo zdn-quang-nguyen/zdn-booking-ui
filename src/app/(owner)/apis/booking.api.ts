@@ -1,36 +1,49 @@
 //
-'use server';
+// ('use server');
+'use client';
 import axios from 'axios';
-import { cookies } from 'next/headers';
+// import { cookies } from 'next/headers';
+import Cookies from 'js-cookie';
+const API_URL = 'http://localhost:5000';
 
-export const getOwnerBookings = async () => {
-  const auth = `Bearer ${cookies().get('access_token')?.value}`;
+export const getOwnerBookings = async (page: number) => {
+  // const auth = `Bearer ${cookies().get('access_token')?.value}`;
+  const auth = `Bearer ${Cookies.get('access_token')}`;
 
   try {
-    const response = await fetch(`http://localhost:5000/booking/owner`, {
-      method: 'GET',
+    const res = await axios.get(`http://localhost:5000/booking/owner`, {
       headers: {
         Authorization: auth,
       },
+      params: {
+        page: page,
+      },
     });
+    // const response = await fetch(`http://localhost:5000/booking/owner`, {
+    //   method: 'GET',
+    //   headers: {
+    //     Authorization: auth,
+    //   },
+    // });
 
-    if (!response.ok) {
-      throw new Error('Failed to fetch bookings');
-    }
-    const res = await response.json();
-
+    // if (!response.ok) {
+    //   throw new Error('Failed to fetch bookings');
+    // }
+    // const res = await response.json();
+    // console.log('res', res.data);
     return res.data;
   } catch (error: any) {
     return {
-      error: 'Failed to fetch bookings',
+      statusCode: 400,
+      error: error,
+      message: error,
     };
   }
 };
 
 export const updateBooking = async (updateData: any, id: string) => {
-  const auth = `Bearer ${cookies().get('access_token')?.value}`;
-
-  console.log('data?', updateData);
+  // const auth = `Bearer ${cookies().get('access_token')?.value}`;
+  const auth = `Bearer ${Cookies.get('access_token')}`;
 
   try {
     // const response = await fetch(
@@ -57,11 +70,34 @@ export const updateBooking = async (updateData: any, id: string) => {
         },
       },
     );
-
     // const res = await response.json();
+    return res.data;
+  } catch (error: any) {
+    return {
+      statusCode: 400,
+      error: error,
+      message: error,
+    };
+  }
+};
 
-    console.log('res', res);
+export const getAvailableField = async (
+  sportFieldId: string,
+  start: Date,
+  end: Date,
+) => {
+  // const auth = `Bearer ${cookies().get('access_token')?.value}`;
+  const auth = `Bearer ${Cookies.get('access_token')}`;
 
+  try {
+    const res = await axios.get(
+      `http://localhost:5000/field/avalable-field?sportFieldId=${sportFieldId}&startTime=${start}&endTime=${end}`,
+      {
+        headers: {
+          Authorization: auth,
+        },
+      },
+    );
     return res.data;
   } catch (error: any) {
     return {

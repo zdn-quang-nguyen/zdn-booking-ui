@@ -5,31 +5,31 @@ import { CloseOutlined } from '@ant-design/icons';
 import AccentButton from './components/AccentButton';
 
 const distanceFilter = {
-  title: 'Khoang cach',
-  name: 'distance',
+  title: 'Khoảng cách',
+  name: 'distanceOrder',
   options: [
     {
       label: 'Gan nhat',
-      value: 'near',
+      value: 'ASC',
     },
     {
       label: 'Xa nhat',
-      value: 'far',
+      value: 'DESC',
     },
   ],
 };
 
 const priceFilter = {
   title: 'Gia ca',
-  name: 'price',
+  name: 'priceOrder',
   options: [
     {
       label: 'Thap nhat',
-      value: 'low',
+      value: 'ASC',
     },
     {
       label: 'Cao nhat',
-      value: 'high',
+      value: 'DESC',
     },
   ],
 };
@@ -55,7 +55,9 @@ export const SportFieldFilters: React.FC = () => {
     distanceFilter.options[0].value,
   );
 
-  const handleApplyFilter = () => {};
+  const handleApplyFilter = () => {
+    console.log('Apply filter', distance, price);
+  };
 
   const handleClearFilter = () => {
     setIsNeedReset(true);

@@ -7,10 +7,13 @@ import AccentButton from '@/components/common/components/AccentButton';
 import { CloseOutlined } from '@ant-design/icons';
 import { Input, message } from 'antd';
 import styles from './styles/ApproveBookingModal.module.scss';
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import SuggestBooking from './SuggestBooking';
 import moment from 'moment';
-import { updateBooking as callUpdate } from '../../apis/booking.api';
+import {
+  updateBooking as callUpdate,
+  getAvailableField,
+} from '../../apis/booking.api';
 interface Props {
   booking: any;
   onCancel: () => void;
@@ -19,19 +22,18 @@ interface Props {
 function formatPhoneNumber(phone: string): string {
   const digits = phone.replace(/\D/g, '').slice(1);
 
-  const countryCode = '84';
   const mainNumber = digits;
 
-  const formattedNumber = `(+${countryCode}) ${mainNumber.slice(0, 3)} ${mainNumber.slice(3, 6)} ${mainNumber.slice(6)}`;
+  const formattedNumber = `+${0} ${mainNumber.slice(0, 3)} ${mainNumber.slice(3, 6)} ${mainNumber.slice(6)}`;
 
   return formattedNumber;
 }
 
 const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
-  console.log(booking);
   const [updateBooking, setUpdateBooking] = useState(booking);
   const [isWarning, setIsWarning] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [fields, setFields] = useState<any[]>([]);
 
   const handleClick = (value: any) => {
     setUpdateBooking((prevState: any) => {
@@ -54,7 +56,6 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
 
   const acceptBooking = async () => {
     setIsLoading(true);
-    console.log('acc cl');
     const data = {
       fieldId: updateBooking.fieldId,
       status: 'accepted',
@@ -74,7 +75,6 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
 
   const rejectBooking = async () => {
     setIsLoading(true);
-    console.log('rej cl');
     const data = {
       status: 'rejected',
     };
@@ -90,6 +90,33 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
       onCancel();
     }
   };
+
+  useEffect(() => {
+    const fetchFields = async () => {
+      const res = await getAvailableField(
+        booking.field.sportField.id,
+        booking.startTime,
+        booking.endTime,
+      ).then((res) => res.data);
+      let flag: boolean = false;
+
+      res.forEach((field: any) => {
+        if (field.id === booking.fieldId) {
+          flag = true;
+        }
+      });
+      if (flag) {
+        setIsWarning(false);
+        setIsLoading(false);
+      } else {
+        setIsWarning(true);
+        setIsLoading(false);
+        setFields(res);
+      }
+    };
+
+    fetchFields();
+  }, []);
 
   return (
     <div className={`${styles.modalContainer}`}>
@@ -128,7 +155,9 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
               <DatePickerComponent
                 defaultValue={
                   updateBooking.startTime
-                    ? moment(updateBooking.startTime).utc().format('DD/MM/YYYY')
+                    ? moment(updateBooking.startTime)
+                        .local()
+                        .format('DD/MM/YYYY')
                     : undefined
                 }
                 disabled={true}
@@ -142,8 +171,8 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
                 defaultValue={
                   updateBooking.startTime
                     ? [
-                        moment(booking.startTime).utc().format('HH:mm'),
-                        moment(booking.endTime).utc().format('HH:mm'),
+                        moment(booking.startTime).local().format('HH:mm'),
+                        moment(booking.endTime).local().format('HH:mm'),
                       ]
                     : undefined
                 }
@@ -158,7 +187,13 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
           )}
         </div>
         {isWarning && (
-          <SuggestBooking booking={updateBooking} onClick={handleClick} />
+          <SuggestBooking
+            booking={updateBooking}
+            fields={fields}
+            startTime={updateBooking.startTime}
+            endTime={updateBooking.endTime}
+            onClick={handleClick}
+          />
         )}
       </div>
       <div className="flex flex-row items-center justify-between py-6">
