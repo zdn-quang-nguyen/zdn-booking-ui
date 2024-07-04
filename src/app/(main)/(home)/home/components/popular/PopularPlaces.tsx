@@ -1,5 +1,9 @@
+'use client';
+import { useRouter, useSearchParams } from 'next/navigation';
 import PopularFilter from './PopularFilter';
 import PopularList from './PopularList';
+import useSearchSportFields from '@/hooks/useSearchSportFields';
+import { Skeleton } from 'antd';
 
 const PopularPlaces = () => {
 <<<<<<< HEAD
