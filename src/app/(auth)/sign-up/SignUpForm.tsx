@@ -47,7 +47,7 @@ export default function SignUpForm() {
       const newParams = params.toString();
       if (!VALID_ROLES.includes(role)) {
         params.set('role', 'user');
-        router.push(`sign-up?${newParams}`);
+        router.push(`/sign-up?${newParams}`);
       }
     };
 

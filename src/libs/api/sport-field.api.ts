@@ -1,7 +1,4 @@
-'use server';
-
-import axios from 'axios';
-import { cookies } from 'next/headers';
+import axiosInstance from '../axios';
 
 type GetSportFieldParams = {
   page?: number;
@@ -12,6 +9,7 @@ type GetSportFieldParams = {
 };
 
 const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
+<<<<<<< HEAD
 // export const getSportFields = async ({
 //   page = 1,
 //   size = 12,
@@ -39,20 +37,37 @@ const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
 
 //   return res.data;
 // };
+=======
+export const getSportFields = async ({
+  page = 1,
+  size = 12,
+  query = '',
+  typeId = 'all',
+}: GetSportFieldParams) => {
+  if (isNaN(page) || isNaN(size)) {
+    page = 1;
+  }
+
+  // const accessToken = cookies().get('access_token')?.value;
+  const sportFieldTypeParam =
+    typeId === 'all' ? '' : `&sportFieldTypeId=${typeId}`;
+  const res = await axiosInstance.get(
+    `/sport-field?page=${page - 1}&size=${size}&filter=name:${query}${sportFieldTypeParam}`,
+  );
+
+  return res.data;
+};
+>>>>>>> da1954dcf3ecdf9d5970ef0f55aa153de86f0f17
 
 export const getSportFieldById = async (id: string) => {
-  'use server';
-  const accessToken = cookies().get('access_token')?.value;
+  // const accessToken = cookies().get('access_token')?.value;
 
-  const res = await axios.get(`${API_HOST}/sport-field/${id}`, {
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
-  });
+  const res = await axiosInstance.get(`${API_HOST}/sport-field/${id}`);
 
   return res.data;
 };
 
+<<<<<<< HEAD
 export const getSportFields = async ({
   page = 1,
   size = 12,
@@ -86,3 +101,6 @@ export const getSportFields = async ({
     };
   }
 };
+=======
+
+>>>>>>> da1954dcf3ecdf9d5970ef0f55aa153de86f0f17

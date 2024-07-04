@@ -1,12 +1,8 @@
-'use client';
-import Pagination from '@/components/pagination/Pagination';
 import PopularFilter from './PopularFilter';
-import PopularItem from './PopularItem';
-import { useRouter, useSearchParams } from 'next/navigation';
-import useSearchSportFields from '@/hooks/useSearchSportFields';
-import { Skeleton } from 'antd';
+import PopularList from './PopularList';
 
 const PopularPlaces = () => {
+<<<<<<< HEAD
   const router = useRouter(); // Update the type of 'router' to NextRouter
   const searchParams = useSearchParams();
   const page = searchParams.get('popular-page') ?? 1;
@@ -26,6 +22,8 @@ const PopularPlaces = () => {
     return null;
   }
 
+=======
+>>>>>>> da1954dcf3ecdf9d5970ef0f55aa153de86f0f17
   return (
     <div
       className="container mx-auto flex flex-col justify-center px-8 py-16"
@@ -33,22 +31,13 @@ const PopularPlaces = () => {
     >
       <h4 className="py-5 font-bold">Địa điểm nổi bật</h4>
       <PopularFilter />
-      <div className="mb-6 mt-8 flex flex-col gap-6 divide-y xl:divide-y-0">
-        {sportFields.map((sportField) => (
-          <PopularItem key={sportField.id} sportField={sportField} />
-        ))}
-      </div>
-      <Pagination
-        currentPage={+page}
-        totalPages={totalPage}
-        name="popular-page"
-        scrollId="popular-places"
-      />
+      <PopularList />
     </div>
   );
 };
 
 export default PopularPlaces;
+<<<<<<< HEAD
 
 export const PopularPlacesSkeleton = () => {
   return (
@@ -67,3 +56,5 @@ export const PopularPlacesSkeleton = () => {
     </div>
   );
 };
+=======
+>>>>>>> da1954dcf3ecdf9d5970ef0f55aa153de86f0f17

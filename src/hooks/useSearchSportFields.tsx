@@ -24,6 +24,7 @@ const useSearchSportFields = ({
       try {
         const location = localStorage.getItem('location');
         setIsLoading(true);
+<<<<<<< HEAD
         console.log('🚀 ~ fetchSportField ~ location', location);
         const response = await getSportFields({
           page,
@@ -33,6 +34,10 @@ const useSearchSportFields = ({
           location: location ? location : '',
         });
         console.log('🚀 ~ fetchSportFieldTypes ~ response:', response);
+=======
+
+        const response = await getSportFields({ page, size, query, typeId });
+>>>>>>> da1954dcf3ecdf9d5970ef0f55aa153de86f0f17
         setTotalPage(response.totalPage);
         setSportFields(response.data);
       } catch (error: any) {
