@@ -18,3 +18,13 @@ type Booking = {
 type BookingResponse = {
   field: Field;
 } & Booking;
+ interface BookingData {
+  id: string;
+  phone: string;
+  fullName: string;
+  fieldId: string;
+  startTime: string;
+  endTime: string;
+  amount: number;
+  status: string;
+}

@@ -22,6 +22,7 @@ interface TableProps {
     endTimeSportField: string;
     nameSportField: string;
   };
+  field: FieldResponse;
 }
 
 export enum CheckStatus {
@@ -109,7 +110,7 @@ const TableSection = (props: TableProps) => {
     <div
       className={cn(
         styles.wrapper,
-        'flex min-h-[800px] w-11/12 flex-col gap-8 overflow-x-hidden rounded-form bg-white p-10',
+        'mx-auto flex min-h-[800px] w-11/12 flex-col gap-8 overflow-x-hidden rounded-form bg-white p-10',
       )}
     >
       <div className="flex items-center">
@@ -136,6 +137,7 @@ const TableSection = (props: TableProps) => {
             startDateSchedule={startDateSchedule}
             endDateSchedule={endDateSchedule}
             handleCheckboxChange={handleCheckboxChange}
+            field={props.field}
           />
         </div>
       </div>

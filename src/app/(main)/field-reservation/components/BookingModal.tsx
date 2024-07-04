@@ -1,4 +1,4 @@
-import QRBooking from '@/app/(owner)/table-booking/components/QRBooking';
+import QRBooking from '@/app/(owner)/test/components/QRBooking';
 import { cn } from '@/libs/utils';
 import { CloseOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
