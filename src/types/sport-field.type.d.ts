@@ -18,6 +18,7 @@ type SportField = {
   endTime: string;
   price: number;
   rule: string | '';
+  distanceMeters?: number;
   sportFieldTypeId: string;
   ownerId: string;
   sportFieldType: any;

@@ -12,6 +12,7 @@ const PopularPlaces = () => {
   const page = searchParams.get('popular-page') ?? 1;
   const typeId = searchParams.get('popular') ?? 'all';
   const size = 4;
+
   const { sportFields, isLoading, totalPage } = useSearchSportFields({
     page: Number(page),
     typeId,
@@ -52,7 +53,7 @@ export default PopularPlaces;
 export const PopularPlacesSkeleton = () => {
   return (
     <div className="container mx-auto mb-6 mt-8 flex flex-col gap-6 divide-y xl:divide-y-0">
-      {Array.from({ length: 4 }).map((_, index) => (
+      {Array.from({ length: 1 }).map((_, index) => (
         <div className="grid grid-cols-4 gap-4" key={index}>
           {Array.from({ length: 4 }).map((_, index) => (
             <Skeleton.Button

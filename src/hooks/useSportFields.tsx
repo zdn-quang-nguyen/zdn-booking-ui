@@ -8,7 +8,6 @@ type SportFieldType = {
   typeId: string;
 };
 const useSportFields = ({ page, size, typeId }: SportFieldType) => {
-  console.log(typeId);
   const [fields, setFields] = useState<SportField[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
@@ -21,7 +20,7 @@ const useSportFields = ({ page, size, typeId }: SportFieldType) => {
         const response = await axiosInstance.get(
           `/sport-field/me?page=${page - 1}&size=${size}${sportFieldTypeParam}`,
         );
-        console.log('🚀 ~ fetchSportFieldTypes ~ response:', response);
+        console.log('🚀 ~ fetchSportField ~ response:', response);
 
         setFields(response.data.data);
       } catch (error: any) {

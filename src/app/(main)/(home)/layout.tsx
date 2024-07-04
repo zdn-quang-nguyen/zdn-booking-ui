@@ -1,6 +1,4 @@
 import Footer from '@/components/footer/Footer';
-import GetLocation from '@/components/location/GetLocation';
-
 type HomeLayoutProps = {
   children: React.ReactNode;
 };
@@ -11,7 +9,6 @@ export default function HomeLayout({ children }: HomeLayoutProps) {
       <div className="flex-grow">{children}</div>
       <div className="justify-self-end">
         <Footer />
-      <GetLocation />
       </div>
     </main>
   );
