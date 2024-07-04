@@ -55,7 +55,6 @@ export const getSportFields = async ({
   location = '',
   typeId = 'all',
 }: GetSportFieldParams) => {
-  'use server';
   const accessToken = cookies().get('access_token')?.value;
   const filter = {
     query: query,
@@ -64,6 +63,10 @@ export const getSportFields = async ({
     page: page - 1,
     limit: size,
   };
+  console.log(
+    '🚀 ~ file: sport-field.api.ts ~ line 100 ~ getSportFields ~ filter',
+    filter,
+  );
 
   try {
     const res = await axios.get(`${API_HOST}/sport-field`, {

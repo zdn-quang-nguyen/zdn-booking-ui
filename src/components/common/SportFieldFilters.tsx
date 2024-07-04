@@ -1,13 +1,23 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FilterItem } from './components/FilterItem';
 import { CloseOutlined } from '@ant-design/icons';
 import AccentButton from './components/AccentButton';
+import {
+  usePathname,
+  useParams,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
 
 const distanceFilter = {
   title: 'Khoảng cách',
   name: 'distanceOrder',
   options: [
+    {
+      label: 'Mặc định',
+      value: '',
+    },
     {
       label: 'Gan nhat',
       value: 'ASC',
@@ -23,6 +33,10 @@ const priceFilter = {
   title: 'Gia ca',
   name: 'priceOrder',
   options: [
+    {
+      label: 'Mặc định',
+      value: '',
+    },
     {
       label: 'Thap nhat',
       value: 'ASC',
@@ -42,9 +56,16 @@ const timeFilter = {
 
 interface FilterProps {
   isOpen: boolean;
+  onClick: (value: boolean) => void;
 }
 
-export const SportFieldFilters: React.FC = () => {
+export const SportFieldFilters: React.FC<FilterProps> = ({
+  isOpen,
+  onClick,
+}) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isOpened, setIsOpened] = React.useState<boolean>(true);
   const [price, setPrice] = React.useState<string>(
     priceFilter.options[0].value,
@@ -55,13 +76,48 @@ export const SportFieldFilters: React.FC = () => {
     distanceFilter.options[0].value,
   );
 
+  const [timeDate, setTimeDate] = React.useState<string>('');
+
   const handleApplyFilter = () => {
+    const params = new URLSearchParams(searchParams);
+    const { date, start, end } = timeDate
+      ? JSON.parse(timeDate)
+      : {
+          date: '',
+          start: '',
+          end: '',
+        };
+    params.set('date', date);
+    params.set('start', start);
+    params.set('end', end);
+    params.set('distance', distance);
+    params.set('price', price);
+    router.push(`${pathname}?${params.toString()}` as any);
+
     console.log('Apply filter', distance, price);
+    handleCloseFilter(false);
   };
 
   const handleClearFilter = () => {
     setIsNeedReset(true);
+    setDistance(distanceFilter.options[0].value);
+    setPrice(priceFilter.options[0].value);
+    setTimeDate('');
+    // handleApplyFilter();
   };
+
+  const handleCloseFilter = (value: boolean) => {
+    setIsOpened(value);
+    onClick(false);
+  };
+
+  useEffect(() => {
+    setIsOpened(isOpen);
+  }, [isOpen]);
+
+  // useEffect(() => {
+  //   onClick(isOpened);
+  // }, [isOpened]);
 
   return (
     <div
@@ -76,7 +132,11 @@ export const SportFieldFilters: React.FC = () => {
           className={`body-1 flex h-[88px] flex-row items-center justify-between py-6 font-bold`}
         >
           <span>Bộ lọc</span>
-          <button className="h-10 w-10" onClick={() => setIsOpened(false)}>
+          <button
+            disabled={!isOpened}
+            className="h-10 w-10 hover:text-accent-600"
+            onClick={() => handleCloseFilter(false)}
+          >
             <CloseOutlined
               style={{ fontSize: '24px' }}
               className="hover-spin"
@@ -100,7 +160,7 @@ export const SportFieldFilters: React.FC = () => {
 
           <FilterItem
             filter={timeFilter}
-            onFilterChange={() => {}}
+            onFilterChange={setTimeDate}
             isNeedReset={isNeedReset}
             setIsNeedReset={() => setIsNeedReset(false)}
           ></FilterItem>

@@ -9,11 +9,24 @@ const PopularList = () => {
   const searchParams = useSearchParams();
   const page = searchParams.get('popular-page') ?? 1;
   const typeId = searchParams.get('popular') ?? 'all';
+  const date = searchParams.get('date') ?? '';
+  const startTime = searchParams.get('start') ?? '';
+  const endTime = searchParams.get('end') ?? '';
+  const distance = searchParams.get('distance') ?? '';
+  const price = searchParams.get('price') ?? '';
   const size = 4;
+  const query = {
+    date,
+    startTime,
+    endTime,
+    distanceOrder: distance,
+    priceOrder: price,
+  };
   const { sportFields, isLoading, totalPage } = useSearchSportFields({
     page: Number(page),
     typeId,
     size,
+    query: JSON.stringify(query),
   });
 
   if (isLoading) {
