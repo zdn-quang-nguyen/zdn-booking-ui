@@ -1,11 +1,17 @@
-import { parseDateFromString, parseTimeToMinutes } from '@/libs/utils';
+import {
+  cn,
+  fetcher,
+  parseDateFromString,
+  parseTimeToMinutes,
+} from '@/libs/utils';
 import React from 'react';
 import { CheckStatus } from './TableSection';
 import styles from './ScheduleTable.module.scss';
-import { Tooltip } from 'antd';
+import { Button, Tooltip } from 'antd';
+import { useSearchParams } from 'next/navigation';
+import useSWR from 'swr';
 
 interface ScheduleTableProps {
-  bookingResponse: BookingResponse[];
   labelColumns: {
     label: string;
     start: number;
@@ -13,54 +19,87 @@ interface ScheduleTableProps {
   }[];
   labelRows: string[];
   startDateSchedule: Date;
+  endDateSchedule: Date;
   handleCheckboxChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const ScheduleTable = (props: ScheduleTableProps) => {
   const {
-    bookingResponse,
     labelColumns,
     labelRows,
     startDateSchedule,
+    endDateSchedule,
     handleCheckboxChange,
   } = props;
+  const searchParams = useSearchParams();
+  const fieldId = searchParams.get('fieldId') || '';
+  const statusQuery = 'accepted';
+
+  const params = new URLSearchParams({
+    fieldId: fieldId || '',
+    startTime: startDateSchedule.toISOString(),
+    endTime: endDateSchedule.toISOString(),
+    ...(statusQuery && { statusQuery }),
+  });
+
+  const {
+    data: bookingData,
+    error: bookingError,
+    isLoading: bookingLoading,
+  } = useSWR(
+    `/booking/user?${params.toString()}`,
+    (url: string) => fetcher(url),
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    },
+  );
+
+  if (!bookingData || bookingLoading) {
+    return <div>Loading...</div>;
+  }
+
+  const bookingResponse = bookingData.data;
+
+  const bookingMap = bookingResponse.reduce((acc: any, booking: any) => {
+    const bookingDate = `${new Date(booking.startTime).toISOString()}`;
+    const slot = Math.floor(
+      (new Date(booking.endTime).getTime() -
+        new Date(booking.startTime).getTime()) /
+        (30 * 60 * 1000),
+    );
+
+    const newBooking = JSON.parse(JSON.stringify(booking));
+
+    newBooking.slot = slot;
+    acc[bookingDate] = newBooking;
+    console.log('date', acc);
+
+    for (let i = 1; i < slot; i++) {
+      const bookingSlot = new Date(booking.startTime);
+      const newBooking = JSON.parse(JSON.stringify(booking));
+
+      newBooking.slot = 0;
+      bookingSlot.setMinutes(bookingSlot.getMinutes() + i * 30);
+      acc[bookingSlot.toISOString()] = newBooking;
+    }
+
+    return acc;
+  }, {});
+  console.log(bookingMap);
 
   function isTimeSlotBooked(
     columnStart: number,
     columnEnd: number,
     date: string,
   ) {
-    const matchedBooking = bookingResponse.find((booking) => {
-      console.log('abccc', booking);
-      const bookingStart = parseTimeToMinutes(
-        new Date(booking.startTime).toLocaleTimeString('en-US', {
-          hourCycle: 'h24',
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-      );
-      const bookingEnd = parseTimeToMinutes(
-        new Date(booking.endTime).toLocaleTimeString('en-US', {
-          hourCycle: 'h24',
-          hour: '2-digit',
-          minute: '2-digit',
-        }),
-      );
-      const inputDate = parseDateFromString(date);
-      const bookingDate = new Date(booking.startTime);
+    const inputDate = parseDateFromString(date);
+    inputDate.setHours(Math.floor(columnStart / 60), columnStart % 60);
 
-      if (
-        inputDate &&
-        new Date(inputDate).toLocaleDateString() ===
-          new Date(bookingDate).toLocaleDateString()
-      ) {
-        if (columnStart >= bookingStart && columnEnd <= bookingEnd)
-          return columnStart >= bookingStart && columnEnd <= bookingEnd;
-      }
-      return false;
-    });
+    console.log('aaaaaa', bookingMap[inputDate.toISOString()]);
 
-    return matchedBooking;
+    return bookingMap[inputDate.toISOString()];
   }
 
   const isPastSlot = (date: string, time: string) => {
@@ -113,8 +152,8 @@ const ScheduleTable = (props: ScheduleTableProps) => {
         </thead>
         <tbody>
           {labelRows.map((labelRow) => (
-            <tr key={labelRow}>
-              <td className="body-3 absolute w-24 truncate bg-white font-medium">
+            <tr key={labelRow} className="min-h-10">
+              <td className="body-3 absolute z-[99] w-24 truncate bg-white font-medium">
                 {labelRow}
               </td>
               <td
@@ -129,18 +168,25 @@ const ScheduleTable = (props: ScheduleTableProps) => {
                   labelColumn.end,
                   labelRow,
                 );
+                const countSlot = booking?.slot ?? 1;
+
+                if (countSlot === 0) {
+                  return null;
+                }
+                console.log(
+                  'count' + countSlot,
+                  labelColumn.label,
+                  startDateSchedule.toDateString(),
+                );
                 return (
                   <td
+                    colSpan={countSlot}
                     key={labelColumn.label + startDateSchedule.toDateString()}
-                    className={
-                      isPastSlot(labelRow, labelColumn.label.split('-')[1])
-                        ? styles.pastSlot
-                        : status === CheckStatus.UNCHECKED_BOOKING && booking
-                          ? styles.checkedBooking
-                          : status === CheckStatus.CHECKED_BOOKING && !booking
-                            ? styles.uncheckedBooking
-                            : ''
-                    }
+                    className={cn(
+                      'h-1 min-h-10',
+                      isPastSlot(labelRow, labelColumn.label.split('-')[1]) &&
+                        styles.pastSlot,
+                    )}
                   >
                     {booking ? (
                       <Tooltip
@@ -167,31 +213,44 @@ const ScheduleTable = (props: ScheduleTableProps) => {
                         color={'green'}
                         key={'green'}
                       >
-                        <input
-                          data-id={booking?.id}
-                          data-date={labelRow}
-                          data-time={labelColumn.label}
-                          type="checkbox"
-                          defaultChecked={!!booking}
-                          onChange={(e) => handleCheckboxChange(e)}
-                          disabled={
-                            isPastSlot(
-                              labelRow,
-                              labelColumn.label.split('-')[1],
-                            ) ||
-                            (status === CheckStatus.UNCHECKED_BOOKING &&
-                              !!booking) ||
-                            (status === CheckStatus.CHECKED_BOOKING && !booking)
-                          }
-                        />
+                        <Button
+                          type="text"
+                          className="h-full w-full bg-accent-600"
+                        >
+                          {/* <input
+                            data-id={booking?.id}
+                            data-date={labelRow}
+                            data-time={labelColumn.label}
+                            type="checkbox"
+                            defaultChecked={!!booking}
+                            onChange={(e) => handleCheckboxChange(e)}
+                            disabled={
+                              isPastSlot(
+                                labelRow,
+                                labelColumn.label.split('-')[1],
+                              ) ||
+                              (status === CheckStatus.UNCHECKED_BOOKING &&
+                                !!booking) ||
+                              (status === CheckStatus.CHECKED_BOOKING &&
+                                !booking)
+                            }
+                          /> */}
+                        </Button>
+                      </Tooltip>
+                    ) : isPastSlot(
+                        labelRow,
+                        labelColumn.label.split('-')[1],
+                      ) ? (
+                      <Tooltip title={'Sân cũ'} color={'green'} key={'green'}>
+                        <button></button>
                       </Tooltip>
                     ) : (
                       <Tooltip
                         title={'Sân trống'}
-                        color={'green'}
+                        color={'geekblue-inverse'}
                         key={'green'}
                       >
-                        <p>Trống</p>
+                        <button className="h-full w-full"></button>
                       </Tooltip>
                     )}
                   </td>

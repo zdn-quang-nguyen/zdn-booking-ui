@@ -2,6 +2,7 @@ import { VALID_ROLES } from '@/constants/constant';
 import { ClassValue, clsx } from 'clsx';
 import dayjs from 'dayjs';
 import { twMerge } from 'tailwind-merge';
+import axiosInstance from './axios';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -89,7 +90,7 @@ export function generateRows(startDateSchedule: Date) {
 
 export function parseDateFromString(dateStr: string) {
   if (!dateStr) {
-    return null;
+    return new Date();
   }
   // Split the input string into components
   const parts = dateStr.split(' - '); // E.g., ['T2', '30/6']
@@ -125,4 +126,21 @@ export const getTime = (date: string | null, startTime: string) => {
 
   console.log(date, startTime, currentDate);
   return currentDate;
+};
+
+export const fetcher = (url: string) =>
+  axiosInstance.get(url).then((res) => res.data);
+
+export const getStartOfWeek = (date: Date): Date => {
+  const result = new Date(date); // Create a copy to avoid mutating the original date
+  result.setDate(
+    result.getDate() - result.getDay() + (result.getDay() === 0 ? -6 : 1),
+  );
+  return new Date(result.setHours(0, 0, 0, 0)); // Set time to the start of the day
+};
+
+export const getEndOfWeek = (date: Date): Date => {
+  const result = new Date(getStartOfWeek(date));
+  result.setDate(result.getDate() + 6);
+  return new Date(result.setHours(23, 59, 59, 999)); // Set time to the end of the day
 };

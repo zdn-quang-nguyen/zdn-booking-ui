@@ -1,7 +1,13 @@
 'use client';
-import { cn, generateColumns, generateRows } from '@/libs/utils';
+import {
+  cn,
+  generateColumns,
+  generateRows,
+  getStartOfWeek,
+  getEndOfWeek,
+} from '@/libs/utils';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ScheduleTable from './ScheduleTable';
 import styles from './ScheduleTable.module.scss';
 import {
@@ -11,16 +17,11 @@ import {
 } from '@ant-design/icons';
 
 interface TableProps {
-  bookingResponse: BookingResponse[];
   SportFieldTimeProps: {
     startTimeSportField: string;
     endTimeSportField: string;
     nameSportField: string;
   };
-  startDateSchedule: Date;
-  endDateSchedule: Date;
-  setStartDateSchedule: (date: Date) => void;
-  setEndDateSchedule: (date: Date) => void;
 }
 
 export enum CheckStatus {
@@ -33,17 +34,17 @@ const TableSection = (props: TableProps) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pathname = usePathname();
-  const { bookingResponse } = props;
+  const [startDateSchedule, setStartDateSchedule] = useState<Date>(
+    new Date(searchParams.get('startDate') ?? getStartOfWeek(new Date())),
+  );
+  const [endDateSchedule, setEndDateSchedule] = useState<Date>(
+    new Date(
+      searchParams.get('endDate') ?? getEndOfWeek(new Date(startDateSchedule)),
+    ),
+  );
+
   const { startTimeSportField, endTimeSportField, nameSportField } =
     props.SportFieldTimeProps;
-  const {
-    startDateSchedule,
-    endDateSchedule,
-    setStartDateSchedule,
-    setEndDateSchedule,
-  } = props;
-
-  console.log(startDateSchedule, endDateSchedule);
 
   const handleNextWeek = () => {
     setStartDateSchedule(
@@ -68,7 +69,7 @@ const TableSection = (props: TableProps) => {
     params.set('startDate', startDateSchedule.toISOString());
     params.set('endDate', endDateSchedule.toISOString());
 
-    router.push(`${pathname}?${params.toString()}`);
+    router.push(`${pathname}?${params.toString()}` as any);
   }, [startDateSchedule, endDateSchedule]);
 
   const labelColumns = generateColumns(startTimeSportField, endTimeSportField);
@@ -130,10 +131,10 @@ const TableSection = (props: TableProps) => {
       <div className="relative">
         <div className="w-full overflow-auto">
           <ScheduleTable
-            bookingResponse={bookingResponse}
             labelColumns={labelColumns}
             labelRows={labelRows}
             startDateSchedule={startDateSchedule}
+            endDateSchedule={endDateSchedule}
             handleCheckboxChange={handleCheckboxChange}
           />
         </div>
