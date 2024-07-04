@@ -277,7 +277,7 @@ export default function ReservationBooking({
             </div>
           </div>
         </div>
-        <QRBooking isClose={isDeleteForm} onClose={onClose} />
+        <QRBooking isOpacity isClose={isDeleteForm} onClose={onClose} />
       </div>
     </div>
   );
