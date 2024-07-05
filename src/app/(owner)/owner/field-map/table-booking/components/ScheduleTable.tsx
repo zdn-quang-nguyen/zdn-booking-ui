@@ -66,7 +66,7 @@ const ScheduleTable = (props: ScheduleTableProps) => {
   );
 
   if (!bookingData || bookingLoading) {
-    return <div>Loading...</div>;
+    return <div>Vui lòng chờ ...</div>;
   }
 
   const bookingResponse = bookingData.data;

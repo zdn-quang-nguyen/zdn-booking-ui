@@ -14,10 +14,13 @@ const SearchList = () => {
   const type = searchParams.get('type') ?? 'all';
   const q = searchParams.get('q') ?? '';
   const size = 6;
+  const query = {
+    name: q,
+  };
   const { sportFields, isLoading, totalPage } = useSearchSportFields({
     page: +page,
     size,
-    query: q,
+    query: JSON.stringify(query),
     typeId: type,
   });
 
@@ -52,7 +55,7 @@ export default SearchList;
 export const SearchListSkeleton = () => {
   return (
     <div className="container mx-auto grid grid-cols-2 gap-4">
-      {Array.from({ length: 12 }).map((_, index) => (
+      {Array.from({ length: 2 }).map((_, index) => (
         <Skeleton.Button
           key={index}
           style={{ width: '736px', height: '312px', borderRadius: '40px' }}

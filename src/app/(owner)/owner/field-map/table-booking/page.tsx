@@ -25,7 +25,7 @@ const OwnerHomePage = ({ searchParams }: OwnerHomePageProps) => {
   });
 
   if (!sportFieldData || sportFieldLoading) {
-    return <div>Loading...</div>;
+    return <div>Vui lòng chờ ...</div>;
   }
 
   const { startTime: startTimeSportField, endTime: endTimeSportField } =

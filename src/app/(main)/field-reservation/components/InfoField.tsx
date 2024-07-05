@@ -259,7 +259,7 @@ export default function InfoField({ sportField }: InfoFieldProps) {
             </div>
           </div>
           {isLoading ? (
-            <div>Loading...</div>
+            <div>Vui lòng chờ ...</div>
           ) : (
             <div className="gap-x-18 mt-8 grid grid-cols-1 gap-y-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6">
               {timesWithBooking.map((slot, index) => (
