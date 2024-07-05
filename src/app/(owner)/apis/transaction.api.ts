@@ -4,13 +4,15 @@
 import axios from 'axios';
 // import { cookies } from 'next/headers';
 import Cookies from 'js-cookie';
-const API_URL = 'http://localhost:5000';
+// const API_URL = 'http://localhost:5000';
+
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
 
 export const getTransactions = async (filter: any) => {
   const auth = `Bearer ${Cookies.get('access_token')}`;
 
   try {
-    const res = await axios.get(`http://localhost:5000/booking/transactions`, {
+    const res = await axios.get(`${API_HOST}/booking/transactions`, {
       headers: {
         Authorization: auth,
       },

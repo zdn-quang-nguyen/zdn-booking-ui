@@ -2,13 +2,15 @@
 'use server';
 import { cookies } from 'next/headers';
 
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
+
 export const uploadImage = async (file: FormData) => {
   // formData.append('file', file);
   const auth = `Bearer ${cookies().get('access_token')?.value}`;
 
   try {
     const response = await fetch(
-      `http://localhost:5000/firebase/upload-sport-field-image`,
+      `${API_HOST}/firebase/upload-sport-field-image`,
       {
         method: 'POST',
         headers: {
@@ -29,6 +31,4 @@ export const uploadImage = async (file: FormData) => {
       error: 'Failed to upload image',
     };
   }
-
-  
 };

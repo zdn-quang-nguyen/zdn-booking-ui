@@ -3,7 +3,7 @@
 
 const nextConfig = {
   env: {
-    API_URL: process.env.NEXT_PUBLIC_API_HOST,
+    API_HOST: process.env.NEXT_PUBLIC_API_HOST,
   },
   experimental: {
     typedRoutes: true,

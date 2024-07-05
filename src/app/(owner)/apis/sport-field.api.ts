@@ -2,20 +2,19 @@
 
 import { cookies } from 'next/headers';
 
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
+
 export const getSportFieldTypes = async () => {
   const auth = `Bearer ${cookies().get('access_token')?.value}`;
   let sportFieldTypes: SportFieldType[] = [];
   try {
-    const sportFieldTypeResponse = await fetch(
-      'http://localhost:5000/sport-field-type',
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: auth,
-        },
+    const sportFieldTypeResponse = await fetch(`${API_HOST}/sport-field-type`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: auth,
       },
-    );
+    });
     if (!sportFieldTypeResponse.ok) {
       throw new Error('Failed to fetch sport field types');
     }
@@ -37,21 +36,17 @@ export const getSportField = async (slug: string) => {
   let sportField: SportField;
   const auth = `Bearer ${cookies().get('access_token')?.value}`;
   try {
-    const sportFieldResponse = await fetch(
-      `http://localhost:5000/sport-field/${slug}`,
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: auth,
-        },
+    const sportFieldResponse = await fetch(`${API_HOST}/sport-field/${slug}`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: auth,
       },
-    );
+    });
     if (!sportFieldResponse.ok) {
       throw new Error('Failed to fetch sport field');
     }
     const response: BaseResponse = await sportFieldResponse.json();
-
 
     sportField = response.data;
 
