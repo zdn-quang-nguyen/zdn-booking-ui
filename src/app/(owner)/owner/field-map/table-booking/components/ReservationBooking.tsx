@@ -14,7 +14,6 @@ import { useRouter } from 'next/navigation';
 import { mutate } from 'swr';
 import RangePickerComponent from '@/components/common/RangePickerComponent';
 import dayjs, { Dayjs } from 'dayjs';
-import { start } from 'repl';
 
 type ReservationBookingProps = {
   isDeleteForm: boolean;
@@ -75,7 +74,7 @@ export default function ReservationBooking({
           (key) => typeof key === 'string' && key.startsWith('/booking/user?'),
         );
         onClose();
-        route.push(`/table-booking?fieldId=${field.id}&id=${id}`);
+        route.push(`table-booking?fieldId=${field.id}&id=${id}` as any);
       }
     } catch (error) {
       message.error('Xóa thất bại');
@@ -112,7 +111,7 @@ export default function ReservationBooking({
         mutate(
           (key) => typeof key === 'string' && key.startsWith('/booking/user?'),
         );
-        route.push(`/table-booking?fieldId=${field.id}&id=${id}`);
+        route.push(`table-booking?fieldId=${field.id}&id=${id}` as any);
       }
     } catch (error) {
       message.error('Tạo thất bại');

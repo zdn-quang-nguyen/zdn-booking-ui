@@ -1,8 +1,8 @@
 import React from 'react';
-import qr1 from '../../../../../public/images/QRReservation.png';
+import qr1 from '@public/images/QRReservation.png';
 import Image from 'next/image';
 import { CloseOutlined } from '@ant-design/icons';
-import dowload from '../../../../../public/icons/dowload.svg';
+import dowload from '@public/icons/dowload.svg';
 export default function QRBooking({
   isClose,
   onClose,
