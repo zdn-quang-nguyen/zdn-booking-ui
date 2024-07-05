@@ -40,13 +40,13 @@ const ScheduleTable = (props: ScheduleTableProps) => {
   } = props;
   const searchParams = useSearchParams();
   const fieldId = searchParams.get('fieldId') || '';
-  const statusQuery = 'accepted';
+  const statusQuery = ['accepted', 'disabled'];
 
   const params = new URLSearchParams({
     fieldId: fieldId || '',
     startTime: startDateSchedule.toISOString(),
     endTime: endDateSchedule.toISOString(),
-    ...(statusQuery && { statusQuery }),
+    status: statusQuery.toString(),
   });
 
   console.log('params', params.toString());
@@ -56,7 +56,7 @@ const ScheduleTable = (props: ScheduleTableProps) => {
     error: bookingError,
     isLoading: bookingLoading,
   } = useSWR(
-    `/booking/user?${params.toString()}`,
+    `/booking/owner-schedule?${params.toString()}`,
     (url: string) => fetcher(url),
     {
       revalidateIfStale: false,
@@ -215,6 +215,10 @@ const ScheduleTable = (props: ScheduleTableProps) => {
                         key={'green'}
                       >
                         <Button
+                          disabled={isPastSlot(
+                            labelRow,
+                            labelColumn.label.split('-')[1],
+                          )}
                           type="text"
                           className="h-full w-full bg-accent-600"
                           onClick={() => {
