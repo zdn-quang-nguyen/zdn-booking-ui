@@ -47,7 +47,7 @@ export default function SignUpForm() {
       const newParams = params.toString();
       if (!VALID_ROLES.includes(role)) {
         params.set('role', 'user');
-        router.push(`/sign-up?${newParams}`);
+        router.push(`sign-up?${newParams}` as any);
       }
     };
 
@@ -70,7 +70,7 @@ export default function SignUpForm() {
     if (res.status === 'Success') {
       messageApi.success('Đăng kí thành công');
 
-      router.push(`/login?role=${role}`);
+      router.push(`login?role=${role}` as any);
     } else {
       messageApi.open({
         type: 'error',

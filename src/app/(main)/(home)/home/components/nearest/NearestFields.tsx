@@ -1,5 +1,4 @@
 'use client';
-import { sportField } from '@/mocks/sport-fields';
 import NearestCard from './NearestCard';
 import NearestImage from './NearestImage';
 import { getSportFields } from '@/libs/api/sport-field.api';
