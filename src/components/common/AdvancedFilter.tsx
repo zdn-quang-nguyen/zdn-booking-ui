@@ -16,7 +16,7 @@ const AdvancedFilter = () => {
         <FilterOutlined />
         <span>Lọc</span>
       </Button>
-      {isFilterOpen && <SportFieldFilters />}
+      <SportFieldFilters isOpen={isFilterOpen} onClick={setIsFilterOpen} />
     </>
   );
 };

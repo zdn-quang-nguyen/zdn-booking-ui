@@ -3,7 +3,6 @@
 import { fetcher } from '@/libs/utils';
 import useSWR from 'swr';
 import TableSection from './components/TableSection';
-import { FieldResponse } from '../test/page';
 
 const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
 

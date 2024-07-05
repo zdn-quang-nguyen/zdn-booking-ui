@@ -6,15 +6,15 @@ import { cn } from '@/libs/utils';
 import styles from './fieldMap.module.scss';
 import { useRouter } from 'next/navigation';
 
-const FieldMap = ({ sportField }: { sportField: SportField }) => {
-  const fieldNames = sportField.fields || [];
+const FieldMap = ({ sportField }: { sportField?: SportField }) => {
+  const fieldNames = sportField?.fields || [];
   const router = useRouter();
 
   console.log(fieldNames, 'fieldNames');
 
   const handleButtonClick = (index: number) => {
     console.log(`Đã chọn sân ${fieldNames[index].id}`);
-    router.push(`/table-booking?fieldId=${fieldNames[index].id}`);
+    router.push(`table-booking?fieldId=${fieldNames[index].id}` as any);
   };
 
   const onCancel = () => {
@@ -25,7 +25,7 @@ const FieldMap = ({ sportField }: { sportField: SportField }) => {
     <div
       className={cn(
         styles.fieldMapContainer,
-        'rounded-large-sm mx-auto mt-12 flex h-fit w-fit flex-col gap-8 bg-neutral p-10',
+        'mx-auto mt-12 flex h-fit w-fit flex-col gap-8 rounded-large-sm bg-neutral p-10',
       )}
     >
       <div className="flex items-center">

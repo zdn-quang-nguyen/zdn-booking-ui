@@ -18,7 +18,7 @@ export default function RoleForm() {
   }
 
   const handleNavigate = (role: string) => {
-    router.push(`/login?role=${role}`);
+    router.push(`login?role=${role}` as any);
   };
   return (
     <div className="flex items-center justify-center h-screen">

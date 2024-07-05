@@ -49,6 +49,8 @@ const ScheduleTable = (props: ScheduleTableProps) => {
     ...(statusQuery && { statusQuery }),
   });
 
+  console.log('params', params.toString());
+
   const {
     data: bookingData,
     error: bookingError,

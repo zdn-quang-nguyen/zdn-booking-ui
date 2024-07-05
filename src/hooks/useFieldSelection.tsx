@@ -1,4 +1,5 @@
 import { DatePickerProps, SelectProps } from 'antd';
+import dayjs from 'dayjs';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
@@ -18,16 +19,16 @@ const useFieldSelection = (sportField: SportField) => {
   const handleSelect = (value: string) => {
     const params = new URLSearchParams(searchParams);
     params.set('field', value);
-    router.push(`/${pathname}?${params.toString()}` as any, { scroll: false });
+    router.push(`${pathname}?${params.toString()}` as any, { scroll: false });
   };
 
   const handleDateChange: DatePickerProps['onChange'] = (
-    date,
-    dateString: string,
+    date: dayjs.Dayjs,
+    dateString: string | string[],
   ) => {
     const params = new URLSearchParams(searchParams);
-    params.set('date', dateString);
-    router.push(`/${pathname}?${params.toString()}` as any, { scroll: false });
+    params.set('date', dateString as string);
+    router.push(`${pathname}?${params.toString()}` as any, { scroll: false });
   };
 
   function splitTimeRange(startTime: string, endTime: string) {
