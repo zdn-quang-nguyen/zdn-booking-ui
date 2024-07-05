@@ -64,11 +64,11 @@ export const FilterItem: React.FC<FilterItemProps> = ({
     }
     const start = value[0] ? dayjs(value[0]).format('HH:mm') : '';
     const end = value[1] ? dayjs(value[1]).format('HH:mm') : '';
-    setTime([start < end ? start : end, end > start ? start : end]);
+    setTime([start < end ? start : end, end > start ? end : start]);
     handleSetTimeDate(
       date,
       start < end ? start : end,
-      end > start ? start : end,
+      end > start ? end : start,
     );
   };
 
@@ -104,6 +104,7 @@ export const FilterItem: React.FC<FilterItemProps> = ({
               defaultValue={date ? date : undefined}
             ></DatePickerComponent>
             <RangePickerComponent
+              disabled={!date}
               label="Thời gian"
               onChange={handleTimeChange}
               defaultValue={time[0] && time[1] ? time : undefined}

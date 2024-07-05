@@ -87,11 +87,33 @@ export const SportFieldFilters: React.FC<FilterProps> = ({
           start: '',
           end: '',
         };
-    params.set('date', date);
-    params.set('start', start);
-    params.set('end', end);
-    params.set('distance', distance);
-    params.set('price', price);
+    if (date && start && end) {
+      params.set('date', date);
+      params.set('start', start);
+      params.set('end', end);
+    } else {
+      params.delete('date');
+      params.delete('start');
+      params.delete('end');
+    }
+
+    if (distance) {
+      params.set('distance', distance);
+    } else {
+      params.delete('distance');
+    }
+
+    if (price) {
+      params.set('price', price);
+    } else {
+      params.delete('price');
+    }
+
+    // params.set('date', date);
+    // params.set('start', start);
+    // params.set('end', end);
+    // params.set('distance', distance);
+    // params.set('price', price);
     router.push(`${pathname}?${params.toString()}` as any);
 
     console.log('Apply filter', distance, price);
