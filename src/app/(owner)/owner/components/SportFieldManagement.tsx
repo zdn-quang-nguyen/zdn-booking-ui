@@ -19,7 +19,7 @@ const SportFieldManagement = () => {
 
   // }, [typeId]);
   return (
-    <div className="mx-36 h-[95%] rounded-t-large bg-white p-10">
+    <div className="mx-8 mt-4 h-[95%] w-[90%] rounded-t-large bg-white p-4 lg:mx-12 lg:p-8 xl:mx-24 xl:p-10 2xl:mx-36">
       <h4 className="mb-5 font-bold text-natural-700">Quản lý sân</h4>
       <FieldTypeFilter />
       <div className="mt-8">

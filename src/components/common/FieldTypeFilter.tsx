@@ -59,7 +59,7 @@ const FieldTypeFilter: React.FC<FieldTypeFilterProps> = ({
   };
   return (
     <div
-      className={`grid grid-cols-2 gap-3 pb-2 md:grid-cols-4 xl:flex xl:overflow-hidden xl:hover:overflow-x-auto`}
+      className={`grid grid-cols-2 gap-3 pb-2 md:grid-cols-3 lg:grid-cols-4 xl:flex xl:overflow-hidden xl:hover:overflow-x-auto`}
     >
       <AccentButton
         key={allBtn.value}

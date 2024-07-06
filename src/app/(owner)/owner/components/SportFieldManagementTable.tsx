@@ -77,7 +77,7 @@ const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
       title: 'Tên sân',
       dataIndex: 'name',
       key: 'name',
-      width: 320,
+      // width: 320,
       ellipsis: {
         showTitle: false,
       },
@@ -97,7 +97,7 @@ const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
       dataIndex: 'category',
       key: 'category',
       ellipsis: true,
-      width: 200,
+      // width: 200,
       render: (category: string) => (
         <p style={{ color: '#5D5E5B' }} key={category}>
           {CATEGORY_MAPPING[category]}
@@ -108,7 +108,7 @@ const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
       title: 'Số lượng sân/bàn',
       dataIndex: 'quantity',
       key: 'quantity',
-      width: 190,
+      // width: 190,
       render: (quantity: number) => (
         <p style={{ color: '#5D5E5B' }} key={quantity}>
           {quantity}
@@ -119,10 +119,8 @@ const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
       title: 'Địa chỉ',
       dataIndex: 'address',
       key: 'address',
-      width: 512,
-      ellipsis: {
-        showTitle: false,
-      },
+      // width: 512,
+      ellipsis: true,
       render: (address: string) => (
         <Tooltip placement="topLeft" title={address}>
           {address}
@@ -154,7 +152,7 @@ const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
         columns={columns as any}
         bordered={false}
         pagination={{ position: ['bottomCenter'], pageSize: 10 }}
-        tableLayout="fixed"
+        tableLayout="auto"
         loading={isLoading}
       />
     </div>
