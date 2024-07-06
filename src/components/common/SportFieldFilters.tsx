@@ -9,6 +9,7 @@ import {
   useRouter,
   useSearchParams,
 } from 'next/navigation';
+import { message } from 'antd';
 
 const distanceFilter = {
   title: 'Khoảng cách',
@@ -66,16 +67,15 @@ export const SportFieldFilters: React.FC<FilterProps> = ({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const [isOpened, setIsOpened] = React.useState<boolean>(true);
-  const [price, setPrice] = React.useState<string>(
-    priceFilter.options[0].value,
-  );
-
+  const [isOpened, setIsOpened] = React.useState<boolean>(isOpen);
   const [isNeedReset, setIsNeedReset] = React.useState<boolean>(false);
-  const [distance, setDistance] = React.useState<string>(
-    distanceFilter.options[0].value,
-  );
 
+  const [price, setPrice] = React.useState<string>(
+    searchParams.get('price') || priceFilter.options[0].value,
+  );
+  const [distance, setDistance] = React.useState<string>(
+    searchParams.get('distance') || distanceFilter.options[0].value,
+  );
   const [timeDate, setTimeDate] = React.useState<string>('');
 
   const handleApplyFilter = () => {
@@ -109,15 +109,13 @@ export const SportFieldFilters: React.FC<FilterProps> = ({
       params.delete('price');
     }
 
-    // params.set('date', date);
-    // params.set('start', start);
-    // params.set('end', end);
-    // params.set('distance', distance);
-    // params.set('price', price);
     router.push(`${pathname}?${params.toString()}` as any);
 
-    console.log('Apply filter', distance, price);
-    handleCloseFilter(false);
+    if (date && start && end) handleCloseFilter(false);
+    if (date === '' && start === '' && end === '') handleCloseFilter(false);
+    if (date)
+      if (start === '' || end === '')
+        message.error('Vui lòng chọn thời gian bắt đầu và kết thúc');
   };
 
   const handleClearFilter = () => {
@@ -125,7 +123,6 @@ export const SportFieldFilters: React.FC<FilterProps> = ({
     setDistance(distanceFilter.options[0].value);
     setPrice(priceFilter.options[0].value);
     setTimeDate('');
-    // handleApplyFilter();
   };
 
   const handleCloseFilter = (value: boolean) => {
@@ -167,6 +164,7 @@ export const SportFieldFilters: React.FC<FilterProps> = ({
         </div>
         <div className="flex flex-col gap-8">
           <FilterItem
+            defaultFilter={distance}
             filter={distanceFilter}
             onFilterChange={setDistance}
             isNeedReset={isNeedReset}
@@ -174,6 +172,7 @@ export const SportFieldFilters: React.FC<FilterProps> = ({
           ></FilterItem>
 
           <FilterItem
+            defaultFilter={price}
             filter={priceFilter}
             onFilterChange={setPrice}
             isNeedReset={isNeedReset}

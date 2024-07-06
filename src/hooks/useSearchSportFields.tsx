@@ -10,7 +10,7 @@ type SportFieldType = {
 };
 const useSearchSportFields = ({
   page = 1,
-  size = 12,
+  size = 15,
   typeId = 'all',
   query = '',
 }: SportFieldType) => {
@@ -20,12 +20,11 @@ const useSearchSportFields = ({
   const [error, setError] = useState('');
 
   useEffect(() => {
+    const location = localStorage.getItem('location');
     const fetchSportField = async () => {
+      setIsLoading(true);
+      console.log('Fetching sport fields'); // Log to check hook calls
       try {
-        const location = localStorage.getItem('location');
-        setIsLoading(true);
-        console.log('🚀 ~ fetchSportField ~ location', location);
-        console.log('🚀 ~ fetchSportField ~ typeId', typeId);
         const response = await getSportFields({
           page,
           size,
@@ -33,7 +32,6 @@ const useSearchSportFields = ({
           typeId,
           location: location ? location : '',
         });
-        console.log('🚀 ~ fetchSportFieldTypes ~ response:', response);
         setTotalPage(response.totalPage);
         setSportFields(response.data);
       } catch (error: any) {

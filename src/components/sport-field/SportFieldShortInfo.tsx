@@ -23,7 +23,7 @@ const SportFieldShortInfo = ({
             width={20}
             height={20}
           />
-          <p className="body-4 truncate">
+          <p className="body-4 hover:truncate-none truncate">
             {sportField.location?.addressDetail ?? 'Chưa cập nhật'}
           </p>
         </div>

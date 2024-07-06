@@ -26,6 +26,7 @@ interface FilterItemProps {
     name: string;
     options: OptionItem[];
   };
+  defaultFilter?: string;
   onFilterChange: (filter: any) => void;
   isNeedReset: boolean;
   setIsNeedReset: () => void;
@@ -36,8 +37,9 @@ export const FilterItem: React.FC<FilterItemProps> = ({
   onFilterChange,
   isNeedReset,
   setIsNeedReset,
+  defaultFilter = '',
 }) => {
-  const [activeTab, setActiveTab] = useState(filter.options[0]?.value || '');
+  const [activeTab, setActiveTab] = useState(defaultFilter);
   const [open, setOpen] = useState(true);
   const handleFilterChange = (value: string) => {
     onFilterChange(value);
@@ -50,6 +52,8 @@ export const FilterItem: React.FC<FilterItemProps> = ({
   const handleDateChange = (value: any) => {
     if (!value) {
       setDate('');
+      onFilterChange('');
+
       return;
     }
     const newDate = dayjs(value)?.format('YYYY-MM-DD');
@@ -60,6 +64,7 @@ export const FilterItem: React.FC<FilterItemProps> = ({
   const handleTimeChange = (value: any) => {
     if (!value) {
       setTime(['', '']);
+      handleSetTimeDate(date, '', '');
       return;
     }
     const start = value[0] ? dayjs(value[0]).format('HH:mm') : '';
@@ -81,7 +86,7 @@ export const FilterItem: React.FC<FilterItemProps> = ({
       console.log('Resetting filter');
       setIsNeedReset();
 
-      setActiveTab(filter.options[0]?.value || '');
+      setActiveTab('');
       setDate('');
       setTime(['', '']);
     }

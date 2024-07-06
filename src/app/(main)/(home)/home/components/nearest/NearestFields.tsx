@@ -6,6 +6,7 @@ import useGetLocation from '@/hooks/useGetLocation';
 import useSearchSportFields from '@/hooks/useSearchSportFields';
 
 const NearestFields = () => {
+  console.log('NearestFields render');
   const query = {
     distanceOrder: 'ASC',
   };

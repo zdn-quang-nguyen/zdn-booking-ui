@@ -35,7 +35,7 @@ const SearchList = () => {
   }
   return (
     <div>
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         {sportFields.map((sportField) => (
           <SearchCard key={sportField.id} sportField={sportField} />
         ))}
@@ -54,7 +54,7 @@ export default SearchList;
 
 export const SearchListSkeleton = () => {
   return (
-    <div className="container mx-auto grid grid-cols-2 gap-4">
+    <div className="container mx-auto grid grid-cols-1 gap-4 xl:grid-cols-2">
       {Array.from({ length: 2 }).map((_, index) => (
         <Skeleton.Button
           key={index}

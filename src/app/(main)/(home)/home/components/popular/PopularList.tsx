@@ -1,12 +1,15 @@
 'use client';
 import useSearchSportFields from '@/hooks/useSearchSportFields';
 import PopularItem from './PopularItem';
-import { Skeleton } from 'antd';
+import { message, Skeleton } from 'antd';
 import { useSearchParams } from 'next/navigation';
 import Pagination from '@/components/pagination/Pagination';
+import { useEffect, useMemo } from 'react';
 
 const PopularList = () => {
+  console.log('PopularList render');
   const searchParams = useSearchParams();
+
   const page = searchParams.get('popular-page') ?? 1;
   const typeId = searchParams.get('popular') ?? 'all';
   const date = searchParams.get('date') ?? '';
@@ -15,19 +18,46 @@ const PopularList = () => {
   const distance = searchParams.get('distance') ?? '';
   const price = searchParams.get('price') ?? '';
   const size = 4;
-  const query = {
-    date,
-    startTime,
-    endTime,
-    distanceOrder: distance,
-    priceOrder: price,
-  };
+
+  const query = useMemo(
+    () => ({
+      date,
+      startTime,
+      endTime,
+      distanceOrder: distance,
+      priceOrder: price,
+    }),
+    [date, startTime, endTime, distance, price],
+  );
   const { sportFields, isLoading, totalPage } = useSearchSportFields({
     page: Number(page),
     typeId,
     size,
     query: JSON.stringify(query),
   });
+
+  useEffect(() => {
+    if (navigator.permissions) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        if (result.state === 'denied') {
+          message.error(
+            'Người dùng đã từ chối truy cập vị trí. \nVui lòng cấp quyền truy cập vị trí để sử dụng tính năng này.',
+          );
+        }
+        result.onchange = () => {
+          if (result.state === 'granted') {
+            window.location.reload();
+          } else if (result.state === 'denied') {
+            message.error(
+              'Người dùng đã từ chối truy cập vị trí. \nVui lòng cấp quyền truy cập vị trí để sử dụng tính năng này.',
+            );
+          }
+        };
+      });
+    } else {
+      message.error('Định vị không được hỗ trợ trên trình duyệt của bạn.');
+    }
+  }, []);
 
   if (isLoading) {
     return <PopularPlacesSkeleton />;
