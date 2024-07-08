@@ -7,6 +7,7 @@ import { ModalData } from './BookingModal';
 import { createBookingByUser } from '@/libs/api/booking.api';
 import QRBooking from '@/app/(owner)/owner/field-map/table-booking/components/QRBooking';
 
+
 export default function BookingQRModal({
   isOpen,
   onClose: isClose,
@@ -18,6 +19,7 @@ export default function BookingQRModal({
 }) {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [bookingSuccess, setBookingSuccess] = useState<string>();
   const field = data.field;
 
   if (!field?.id) return null;
@@ -33,6 +35,8 @@ export default function BookingQRModal({
       );
 
       if (res) {
+        console.log(res);
+        setBookingSuccess(res.data.id);
         setIsSuccess(true);
       }
     } catch (error) {
@@ -133,6 +137,7 @@ export default function BookingQRModal({
           isClose={false}
           isOpacity={isLoading || isSuccess}
           onClose={isClose}
+          bookingId={bookingSuccess}
         />
       </div>
     </div>
