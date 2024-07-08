@@ -13,7 +13,7 @@ const PopularItem = ({ sportField }: PopularItemProps) => {
   return (
     <div className="grid grid-cols-2 gap-4 pt-6 xl:grid-cols-4">
       <SportFieldInfoCard sportField={sportField} />
-      <Calendar />
+      <Calendar sportField={sportField} />
       <SportFieldRuleCard>
         <SportFieldRule rulesString={sportField.rule ?? ''} />
       </SportFieldRuleCard>

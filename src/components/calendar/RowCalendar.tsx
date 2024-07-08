@@ -1,32 +1,23 @@
-import React from "react";
+import React from 'react';
 
-export default function RowCalendar() {
+type TimeData = {
+  startTime: string;
+  endTime: string;
+  isEmpty: boolean;
+};
+interface RowCalendarProps {
+  timeSlots: TimeData[];
+}
+export default function RowCalendar({ timeSlots }: RowCalendarProps) {
   return (
-    <div className="flex items-center h-6 mt-4">
-      <div>
-        <button className="mr-4 mt-4"> 7:00</button>
-      </div>
-      <div>
-        <button className="w-6 h-6 rounded-lg bg-neutral-200 mr-4 mt-4"></button>
-      </div>
-      <div>
-        <button className="w-6 h-6 rounded-lg bg-accent-500  mr-4 mt-4"></button>
-      </div>
-      <div>
-        <button className="w-6 h-6 rounded-lg bg-accent-500 mr-4 mt-4"></button>
-      </div>
-      <div>
-        <button className="w-6 h-6 rounded-lg bg-accent-500 mr-4 mt-4"></button>
-      </div>
-      <div>
-        <button className="w-6 h-6 rounded-lg bg-neutral-200 mr-4 mt-4"></button>
-      </div>
-      <div>
-        <button className="w-6 h-6 rounded-lg bg-neutral-200 mr-4 mt-4"></button>
-      </div>
-      <div>
-        <button className="w-6 h-6 rounded-lg bg-accent-500 mr-4 mt-4"></button>
-      </div>
+    <div className="mt-4 flex h-6 flex-col items-center gap-4">
+      {timeSlots.map((time, index) => (
+        <div key={index}>
+          <button
+            className={`h-6 w-6 rounded-lg ${time.isEmpty ? 'bg-accent-500' : 'bg-neutral-200'} `}
+          ></button>
+        </div>
+      ))}
     </div>
   );
 }
