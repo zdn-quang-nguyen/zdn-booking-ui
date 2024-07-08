@@ -23,7 +23,7 @@ const SportFieldShortInfo = ({
             width={20}
             height={20}
           />
-          <p className="body-4 truncate">
+          <p className="body-4 hover:truncate-none truncate">
             {sportField.location?.addressDetail ?? 'Chưa cập nhật'}
           </p>
         </div>
@@ -31,7 +31,11 @@ const SportFieldShortInfo = ({
       <div className="flex items-center gap-2">
         <Image src={bike} alt="Bike Icon" width={20} height={20} />
 
-        <p className="body-4 truncate">{`2.7 km`}</p>
+        <p className="body-4 truncate">
+          {sportField.distanceMeters
+            ? `${Math.round((sportField.distanceMeters / 1000) * 100) / 100} km`
+            : 'Chưa cập nhật'}
+        </p>
       </div>
       <div className="flex items-center gap-2">
         <Image

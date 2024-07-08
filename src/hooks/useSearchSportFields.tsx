@@ -1,6 +1,5 @@
 import { getSportFields } from '@/libs/api/sport-field.api';
 import axiosInstance from '@/libs/axios';
-
 import { useEffect, useState } from 'react';
 
 type SportFieldType = {
@@ -11,20 +10,28 @@ type SportFieldType = {
 };
 const useSearchSportFields = ({
   page = 1,
-  size = 12,
+  size = 15,
   typeId = 'all',
   query = '',
 }: SportFieldType) => {
   const [sportFields, setSportFields] = useState<SportField[]>([]);
   const [totalPage, setTotalPage] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  useEffect(() => {
-    const fetchSportField = async () => {
-      try {
-        setIsLoading(true);
 
-        const response = await getSportFields({ page, size, query, typeId });
+  useEffect(() => {
+    const location = localStorage.getItem('location');
+    const fetchSportField = async () => {
+      setIsLoading(true);
+      console.log('Fetching sport fields'); // Log to check hook calls
+      try {
+        const response = await getSportFields({
+          page,
+          size,
+          query,
+          typeId,
+          location: location ? location : '',
+        });
         setTotalPage(response.totalPage);
         setSportFields(response.data);
       } catch (error: any) {

@@ -24,7 +24,7 @@ function formatPhoneNumber(phone: string): string {
 
   const mainNumber = digits;
 
-  const formattedNumber = `+${0} ${mainNumber.slice(0, 3)} ${mainNumber.slice(3, 6)} ${mainNumber.slice(6)}`;
+  const formattedNumber = `${0} ${mainNumber.slice(0, 3)} ${mainNumber.slice(3, 6)} ${mainNumber.slice(6)}`;
 
   return formattedNumber;
 }
@@ -209,7 +209,7 @@ const ApproveBookingModal: React.FC<Props> = ({ onCancel, booking }) => {
           <span className="body-3 font-bold text-accent-600">
             {updateBooking.phone
               ? formatPhoneNumber(updateBooking.phone)
-              : '(+84) 965 724 322'}
+              : 'Đang cập nhật'}
           </span>
         </div>
         <div className={`flex flex-row gap-3 ${styles.customBtn}`}>

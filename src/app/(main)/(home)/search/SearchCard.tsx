@@ -9,9 +9,9 @@ const SearchCard = ({ sportField }: SearchCardProps) => {
   const imageUrls = sportField.sportFieldImages?.map((image) => image.url);
 
   return (
-    <div className="flex justify-between rounded-large bg-primary-100">
-      <SportFieldInfoCard className="w-[313px]" sportField={sportField} />
-      <SportFieldSwiper className="w-[336px]" images={imageUrls} />
+    <div className="grid grid-cols-1 rounded-large bg-primary-100 md:grid-cols-2">
+      <SportFieldInfoCard className="w-[312px]" sportField={sportField} />
+      <SportFieldSwiper className="" images={imageUrls} />
     </div>
   );
 };

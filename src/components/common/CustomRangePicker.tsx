@@ -30,7 +30,7 @@ const CustomRangePicker: React.FC<RangePickerProps> = (props) => {
       : [dayjs('00:00', 'HH:mm'), dayjs('00:00', 'HH:mm')],
   );
 
-  const handleRangePickerChange = (_, [start, end]: [string, string]) => {
+  const handleRangePickerChange = (_: any, [start, end]: [string, string]) => {
     const newTime: [dayjs.Dayjs, dayjs.Dayjs] = [
       dayjs(start, 'HH:mm'),
       dayjs(end, 'HH:mm'),

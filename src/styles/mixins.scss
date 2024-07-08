@@ -34,6 +34,26 @@
   // padding: 8px 20px;
   font-weight: 500;
 }
+@mixin primary-btn-6 {
+  @include btn(theme('colors.primary.500'), theme('colors.primary.600'));
+  // padding: 8px 20px;
+  font-weight: 500;
+}
+@mixin primary-btn-3 {
+  @include btn(theme('colors.primary.200'), theme('colors.primary.300'));
+  // padding: 8px 20px;
+  font-weight: 500;
+}
+@mixin primary-btn-4 {
+  @include btn(theme('colors.primary.500'), theme('colors.primary.400'));
+  // padding: 8px 20px;
+  font-weight: 500;
+}
+@mixin primary-btn-5 {
+  @include btn(theme('colors.primary.400'), theme('colors.primary.500'));
+  // padding: 8px 20px;
+  font-weight: 500;
+}
 
 @mixin neutral-btn {
   @include btn(theme('colors.accent.600'), theme('colors.neutral.DEFAULT'));

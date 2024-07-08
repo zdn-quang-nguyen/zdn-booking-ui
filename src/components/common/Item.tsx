@@ -5,6 +5,7 @@ import { BOOKING_STATUS_MAPPING, CATEGORY_MAPPING } from '@/constants/constant';
 // import { sportField } from '@/mocks/sport-fields';
 import dayjs from 'dayjs';
 import moment from 'moment';
+import { formatCurrency } from '@/libs/utils';
 
 interface ItemProps {
   data: any;
@@ -116,9 +117,7 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
         {(label == 'transaction' || label == 'booking') && (
           <div className="flex flex-col gap-1">
             <span className="body-4 flex flex-row justify-end font-medium text-natural-700">
-              {/* {data.amount.toLocaleString('en').replaceAll(',', '.')} */}
-              {data.amount}
-              <p>đ</p>
+              {formatCurrency(data.amount)}
             </span>
             {label == 'transaction' && (
               <span

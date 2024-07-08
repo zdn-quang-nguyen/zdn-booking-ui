@@ -19,7 +19,7 @@ const SearchBar: React.FC = () => {
 
   const router = useRouter();
   const onSearch: SearchProps['onSearch'] = (value, _e, info) => {
-    router.push(`/search?q=${value}`);
+    router.push(`/search?q=${value}` as any);
   };
 
   const pathname = usePathname();

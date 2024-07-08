@@ -6,7 +6,7 @@ import { cn } from '@/libs/utils';
 import { usePathname } from 'next/navigation';
 
 const links = [
-  { href: '/home', label: 'Kênh người thuê' },
+  { href: '/home', label: 'Kênh người thuê', hidden: true },
   { href: '/owner', label: 'Quản lý sân' },
   { href: '/create-sport-field', label: 'Tạo sân' },
   { href: '/transaction', label: 'Lịch sử giao dịch' },
@@ -27,7 +27,7 @@ const NavbarLink = ({
   <Link
     href={href}
     className={cn(
-      'truncate px-5 py-2.5 text-natural-700 hover:font-bold hover:text-primary-600',
+      'truncate px-2 py-2.5 text-natural-700 hover:font-bold hover:text-primary-600 xl:px-5',
       isActive && 'font-bold text-primary-600',
       hidden && 'hidden xl:block',
     )}
@@ -39,7 +39,7 @@ const NavbarLink = ({
 const Navbar = () => {
   const pathname = usePathname();
   return (
-    <div className="body-3 mx-auto flex w-fit items-center justify-between gap-5 py-4 font-medium">
+    <div className="body-3 mx-auto flex w-fit items-center justify-between py-4 font-medium md:gap-3 lg:gap-4 xl:gap-5">
       {links.map((link, index) => (
         <NavbarLink key={index} {...link} isActive={pathname === link.href} />
       ))}

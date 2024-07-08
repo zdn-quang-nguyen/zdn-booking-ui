@@ -18,4 +18,4 @@ export const getFieldById = async (fieldId: string) => {
 
   const json = await res.json();
   return json.data;
-};
+};  

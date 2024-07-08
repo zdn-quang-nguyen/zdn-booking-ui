@@ -4,7 +4,7 @@ import axios from 'axios';
 import { signOut } from 'next-auth/react';
 import { cookies } from 'next/headers';
 
-const API_HOST = process.env.NEXT_PUBLIC_API_HOST || 'http://127.0.0.1:3000';
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST || 'http://127.0.0.1:5000';
 export const signUpUser = async (signUpInfo: any): Promise<any> => {
   try {
     const data = await axios.post(`${API_HOST}/v1/auth/sign-up`, signUpInfo, {

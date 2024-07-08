@@ -10,8 +10,8 @@ import React from 'react';
 const PopularFilter = () => {
   const [isFilterOpen, setIsFilterOpen] = React.useState<boolean>(false);
 
-  const toggleFilter = () => {
-    setIsFilterOpen(!isFilterOpen);
+  const toggleFilter = (value: boolean) => {
+    setIsFilterOpen(value);
   };
 
   return (
@@ -21,11 +21,11 @@ const PopularFilter = () => {
       )}
     >
       <FieldTypeFilter name="popular" pageName="popular-page" />
-      <Button onClick={toggleFilter}>
+      <Button onClick={() => toggleFilter(!isFilterOpen)}>
         <FilterOutlined />
         <span>Lọc</span>
       </Button>
-      {isFilterOpen && <Filter />}
+      <Filter isOpen={isFilterOpen} onClick={setIsFilterOpen} />
     </div>
   );
 };

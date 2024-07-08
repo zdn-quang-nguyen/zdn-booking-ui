@@ -1,6 +1,8 @@
 'use server';
 import { cookies } from 'next/headers';
 
+const API_HOST = process.env.NEXT_PUBLIC_API_HOST;
+
 export async function getLocation() {
   let provinces: BaseResponse;
   let districts: BaseResponse;
@@ -8,39 +10,33 @@ export async function getLocation() {
   const auth = `Bearer ${cookies().get('access_token')?.value}`;
   try {
     // Fetch provinces
-    const provincesResponse = await fetch(
-      'http://localhost:5000/location/provinces',
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: auth,
-        },
+    const provincesResponse = await fetch(`${API_HOST}/location/provinces`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: auth,
       },
-    );
+    });
     if (!provincesResponse.ok) {
       throw new Error('Failed to fetch provinces');
     }
     provinces = await provincesResponse.json();
 
     // Fetch districts
-    const districtsResponse = await fetch(
-      'http://localhost:5000/location/districts',
-      {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: auth,
-        },
+    const districtsResponse = await fetch(`${API_HOST}/location/districts`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: auth,
       },
-    );
+    });
     if (!districtsResponse.ok) {
       throw new Error('Failed to fetch districts');
     }
     districts = await districtsResponse.json();
 
     // Fetch wards
-    const wardsResponse = await fetch('http://localhost:5000/location/ward', {
+    const wardsResponse = await fetch(`${API_HOST}/location/ward`, {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
@@ -74,7 +70,7 @@ export const postData = async (data: any, method: string) => {
   switch (method) {
     case 'create':
       try {
-        const response = await fetch('http://localhost:5000/sport-field', {
+        const response = await fetch(`${API_HOST}/sport-field`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -96,17 +92,14 @@ export const postData = async (data: any, method: string) => {
       break;
     case 'edit':
       try {
-        const response = await fetch(
-          `http://localhost:5000/sport-field/${data.id}`,
-          {
-            method: 'PATCH',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: auth,
-            },
-            body: JSON.stringify(data),
+        const response = await fetch(`${API_HOST}/sport-field/${data.id}`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: auth,
           },
-        );
+          body: JSON.stringify(data),
+        });
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

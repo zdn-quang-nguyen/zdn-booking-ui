@@ -1,7 +1,6 @@
 // components/GetLocation.tsx
 'use client';
 import { useEffect, useState } from 'react';
-import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 
 interface Coordinates {
   lat: number | null;
@@ -14,6 +13,8 @@ const GetLocation: React.FC = () => {
     long: null,
   });
   const [error, setError] = useState<string | null>(null);
+  const [permissionStatus, setPermissionStatus] =
+    useState<PermissionState | null>(null);
 
   const getLocation = () => {
     if (navigator.geolocation) {
@@ -37,11 +38,36 @@ const GetLocation: React.FC = () => {
   };
 
   useEffect(() => {
-    getLocation();
+    if (navigator.permissions) {
+      navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        setPermissionStatus(result.state);
+        if (result.state === 'granted') {
+          getLocation();
+        } else if (result.state === 'prompt') {
+          getLocation();
+        } else if (result.state === 'denied') {
+          setError('Location access denied by user.');
+        }
+        result.onchange = () => {
+          setPermissionStatus(result.state);
+          if (result.state === 'granted') {
+            getLocation();
+          } else if (result.state === 'denied') {
+            setError('Location access denied by user.');
+          }
+        };
+      });
+    } else {
+      getLocation();
+    }
   }, []);
 
   return (
     <div>
+      {permissionStatus === 'prompt' && (
+        <p>Requesting location permission...</p>
+      )}
+      {permissionStatus === 'denied' && <p>Location access denied by user.</p>}
       {location.lat !== null && location.long !== null ? (
         <p>
           Latitude: {location.lat}, Longitude: {location.long}

@@ -22,12 +22,22 @@ const NearestImage = ({ sportField }: NearestImageProps) => {
             height={20}
           />
         </div>
-        <p
-          title={sportField.location?.addressDetail ?? 'Đang cập nhật'}
-          className="body-4 absolute bottom-6 w-[85%] truncate rounded-large bg-white px-3 py-2 text-center font-medium text-primary-600"
+        <div
+          title={sportField.name ?? 'Đang cập nhật'}
+          className="body-4 absolute bottom-6 flex w-[85%] flex-row justify-between gap-1 truncate rounded-large bg-white px-3 py-2 text-center font-medium text-primary-600 xl:gap-2"
         >
-          {sportField.location?.addressDetail ?? 'Đang cập nhật'}
-        </p>
+          <p className="flex-grow overflow-hidden">
+            {sportField.name ?? 'Đang cập nhật'}
+          </p>
+          {sportField.distanceMeters && (
+            <p className="body-4 flex items-center justify-center gap-1 xl:gap-2">
+              <p className="">|</p>
+              {sportField.distanceMeters
+                ? `${Math.round((sportField.distanceMeters / 1000) * 100) / 100} km`
+                : 'Chưa cập nhật'}
+            </p>
+          )}
+        </div>
       </div>
     </Link>
   );

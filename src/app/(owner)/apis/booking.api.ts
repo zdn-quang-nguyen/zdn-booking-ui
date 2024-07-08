@@ -4,14 +4,14 @@
 import axios from 'axios';
 // import { cookies } from 'next/headers';
 import Cookies from 'js-cookie';
-const API_URL = 'http://localhost:5000';
+const API_URL = process.env.NEXT_PUBLIC_API_HOST;
 
 export const getOwnerBookings = async (page: number) => {
   // const auth = `Bearer ${cookies().get('access_token')?.value}`;
   const auth = `Bearer ${Cookies.get('access_token')}`;
 
   try {
-    const res = await axios.get(`http://localhost:5000/booking/owner`, {
+    const res = await axios.get(`${API_URL}/booking/owner`, {
       headers: {
         Authorization: auth,
       },
@@ -62,7 +62,7 @@ export const updateBooking = async (updateData: any, id: string) => {
     // }
 
     const res = await axios.patch(
-      `http://localhost:5000/booking/update-booking/${id}`,
+      `${API_URL}/booking/update-booking/${id}`,
       updateData,
       {
         headers: {
@@ -91,7 +91,7 @@ export const getAvailableField = async (
 
   try {
     const res = await axios.get(
-      `http://localhost:5000/field/avalable-field?sportFieldId=${sportFieldId}&startTime=${start}&endTime=${end}`,
+      `${API_URL}/field/avalable-field?sportFieldId=${sportFieldId}&startTime=${start}&endTime=${end}`,
       {
         headers: {
           Authorization: auth,

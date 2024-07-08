@@ -4,20 +4,21 @@ import React, { useEffect, useId, useState } from 'react';
 import { cn } from '@/libs/utils';
 import { Button, message } from 'antd';
 import QRBooking from './QRBooking';
-import { FieldResponse } from '../page';
 import {
   createBookingByOwner,
   CreateBookingByOwnerDto,
   getBookingById,
   removeBookingById,
 } from '../api/booking';
-import { BookingData } from './ScheduleSection';
 import { useRouter } from 'next/navigation';
+import { mutate } from 'swr';
+import RangePickerComponent from '@/components/common/RangePickerComponent';
+import dayjs, { Dayjs } from 'dayjs';
 
 type ReservationBookingProps = {
   isDeleteForm: boolean;
   isOpen: boolean;
-  isClose: () => void;
+  onClose: () => void;
   bookingId: string;
   field: FieldResponse;
   bookingTime?: any;
@@ -46,23 +47,19 @@ type CreateBookingDto = {
 export default function ReservationBooking({
   isDeleteForm,
   isOpen,
-  isClose,
+  onClose,
   bookingId,
   field,
   bookingTime,
   bookings,
 }: ReservationBookingProps) {
+  const [time, setTime] = useState<[Dayjs, Dayjs]>([
+    dayjs(bookingTime?.startTime),
+    dayjs(bookingTime?.endTime),
+  ]);
+  console.log({ bookings });
+  const [amount, setAmount] = useState(field.sportField.price ?? 0);
   const [isLoading, setIsLoading] = useState(false);
-  console.log({ bookingId, field, isDeleteForm, bookingTime });
-
-  // const [booking, setBooking] = useState<Booking>(); // [1
-  // const fetchBooking = async () => {
-  //   const res = await getBookingById(bookingId);
-  //   if (res) {
-  //     console.log(123, res.data);
-  //     setBooking(res.data);
-  //   }
-  // };
   const route = useRouter();
   const id = useId();
   const [fullName, setFullName] = useState('');
@@ -73,8 +70,11 @@ export default function ReservationBooking({
       const res = await removeBookingById(bookingId);
       if (res) {
         message.error('Xóa thành công');
-        isClose();
-        route.push(`/table-booking?fieldId=${field.id}&id=${id}`);
+        mutate(
+          (key) => typeof key === 'string' && key.startsWith('/booking/user?'),
+        );
+        onClose();
+        route.push(`table-booking?fieldId=${field.id}&id=${id}` as any);
       }
     } catch (error) {
       message.error('Xóa thất bại');
@@ -85,26 +85,52 @@ export default function ReservationBooking({
   const handleAddBooking = async () => {
     try {
       setIsLoading(true);
+      if (!time) {
+        message.error('Vui lòng chọn thời gian');
+        return;
+      }
+      const startTime = new Date(bookingTime.startTime);
+      startTime.setHours(time[0].hour(), time[0].minute());
+      const endTime = new Date(bookingTime.startTime);
+      endTime.setHours(time[1].hour(), time[1].minute());
       const data: CreateBookingByOwnerDto = {
         name: fullName,
-        amount: bookingTime.amount,
-        endTime: bookingTime.endTime,
-        startTime: bookingTime.startTime,
+        amount,
+        startTime: startTime.toISOString(),
+        endTime: endTime.toISOString(),
         fieldId: field.id as string,
         status: 'accepted',
         phone,
       };
+
+      console.log(data);
       const res = await createBookingByOwner(data);
       if (res) {
         message.success('Thêm thành công');
-        isClose();
-        route.push(`/table-booking?fieldId=${field.id}&id=${id}`);
+        onClose();
+        mutate(
+          (key) => typeof key === 'string' && key.startsWith('/booking/user?'),
+        );
+        route.push(`table-booking?fieldId=${field.id}&id=${id}` as any);
       }
     } catch (error) {
       message.error('Tạo thất bại');
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const calAmount = (startTime: Dayjs, endTime: Dayjs) => {
+    const start = startTime.unix();
+    const end = endTime.unix();
+    const SLOT_SECOND = 30 * 60;
+    const amount = ((end - start) / SLOT_SECOND) * field.sportField.price;
+    setAmount(amount);
+  };
+
+  const handleDateChange = ([startTime, endTime]: [Dayjs, Dayjs]) => {
+    calAmount(startTime, endTime);
+    setTime([startTime, endTime]);
   };
   const handleSubmit = async () => {
     if (isDeleteForm) {
@@ -114,12 +140,8 @@ export default function ReservationBooking({
     }
   };
 
-  // useEffect(() => {
-  //   if (bookingId !== '') {
-  //     fetchBooking();
-  //   }
-  // }, [bookingId]);
   let booking = bookings.find((item) => item.id === bookingId);
+  console.log(time);
   return (
     <div
       className={cn(
@@ -138,7 +160,7 @@ export default function ReservationBooking({
             </span>
             {isDeleteForm ? (
               <CloseOutlined
-                onClick={() => isClose()}
+                onClick={onClose}
                 className="cursor-pointer text-xl text-natural-700"
               />
             ) : (
@@ -164,19 +186,21 @@ export default function ReservationBooking({
                 Thời gian
               </p>
               <div className="flex flex-wrap gap-x-5 text-sm font-bold text-natural-700">
-                <p>
-                  {new Date(
-                    isDeleteForm
-                      ? (booking?.startTime as string)
-                      : (bookingTime.startTime as string),
-                  ).toLocaleTimeString()}{' '}
-                  -{' '}
-                  {new Date(
-                    isDeleteForm
-                      ? (booking?.endTime as string)
-                      : (bookingTime.endTime as string),
-                  ).toLocaleTimeString()}
-                </p>
+                <RangePickerComponent
+                  value={[time[0].format('HH:mm'), time[1].format('HH:mm')]}
+                  disabled={isDeleteForm}
+                  onChange={handleDateChange}
+                  defaultValue={[
+                    dayjs(
+                      isDeleteForm
+                        ? booking?.startTime
+                        : bookingTime?.startTime,
+                    ).format('HH:mm'),
+                    dayjs(
+                      isDeleteForm ? booking?.endTime : bookingTime?.endTime,
+                    ).format('HH:mm'),
+                  ]}
+                />
               </div>
             </div>
             <div className="flex flex-wrap text-sm font-medium leading-5 text-neutral-700">
@@ -190,7 +214,7 @@ export default function ReservationBooking({
                   {new Date(
                     isDeleteForm
                       ? (booking?.startTime as string)
-                      : (bookingTime.startTime as string),
+                      : (bookingTime?.startTime as string),
                   ).toLocaleDateString('en-US', {
                     year: 'numeric',
                     month: '2-digit',
@@ -236,7 +260,7 @@ export default function ReservationBooking({
               <div className="mt-3 flex text-sm font-medium leading-5">
                 Tổng tiền{' '}
                 <p className="ml-3 text-base font-bold text-primary-600">
-                  {isDeleteForm ? booking?.amount : bookingTime?.amount}
+                  {isDeleteForm ? booking?.amount : amount}
                 </p>
               </div>
             </div>
@@ -252,7 +276,7 @@ export default function ReservationBooking({
             </div>
           </div>
         </div>
-        <QRBooking isClose={isDeleteForm} />
+        <QRBooking isOpacity isClose={isDeleteForm} onClose={onClose} />
       </div>
     </div>
   );

@@ -1,3 +1,4 @@
+// import QRBooking from '@/app/(owner)/test/components/QRBooking';
 import { cn } from '@/libs/utils';
 import { CloseOutlined } from '@ant-design/icons';
 import { Button } from 'antd';
@@ -23,7 +24,7 @@ type BookingProps = {
 };
 
 export default function BookingModal({ isOpen, data, onClose }: BookingProps) {
-  const field = data.field; 
+  const field = data.field;
 
   const [isOpenQR, setIsOpenQR] = useState(false);
   const handleOpenQR = () => {

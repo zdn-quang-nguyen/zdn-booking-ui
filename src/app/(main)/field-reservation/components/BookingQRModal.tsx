@@ -3,9 +3,9 @@ import { Button, notification } from 'antd';
 import React, { useEffect, useState } from 'react';
 import styles from './../bookingQR.module.scss';
 import { cn } from '@/libs/utils';
-import QRBooking from '@/app/(owner)/table-booking/components/QRBooking';
 import { ModalData } from './BookingModal';
 import { createBookingByUser } from '@/libs/api/booking.api';
+import QRBooking from '@/app/(owner)/owner/field-map/table-booking/components/QRBooking';
 
 export default function BookingQRModal({
   isOpen,
