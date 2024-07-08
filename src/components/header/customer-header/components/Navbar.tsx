@@ -11,7 +11,10 @@ const Navbar = () => {
       <Link className="text-natural-700 hover:text-natural-400" href="#">
         {'Thông báo (12)'}
       </Link>
-      <Link className="text-natural-700 hover:text-natural-400" href="#">
+      <Link
+        className="text-natural-700 hover:text-natural-400"
+        href="/user-booking"
+      >
         Đặt chỗ
       </Link>
       <Link className="text-natural-700 hover:text-natural-400" href="/profile">

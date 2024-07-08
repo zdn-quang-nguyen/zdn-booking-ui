@@ -1,7 +1,11 @@
 //
 import React from 'react';
 import Link from 'next/link';
-import { BOOKING_STATUS_MAPPING, CATEGORY_MAPPING } from '@/constants/constant';
+import {
+  BOOKING_STATUS_MAPPING,
+  CATEGORY_MAPPING,
+  USER_BOOKING_STATUS_MAPPING,
+} from '@/constants/constant';
 // import { sportField } from '@/mocks/sport-fields';
 import dayjs from 'dayjs';
 import moment from 'moment';
@@ -47,6 +51,19 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
   };
 
   const textColor = (status: string) => {
+    if (label === 'user-booking') {
+      switch (status) {
+        case 'booking':
+          return 'text-primary-600';
+        case 'disabled':
+          return 'text-primary-600';
+        case 'rejected':
+          return 'text-alerts-red';
+        default:
+          return '';
+      }
+    }
+
     switch (status) {
       case 'booking':
         return 'text-primary-600';
@@ -68,40 +85,46 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
     <div className="flex w-full flex-row justify-between bg-white">
       <div className="flex flex-grow flex-col justify-start gap-1">
         <div>
-          {(label == 'transaction' || label == 'booking') && (
+          {(label === 'transaction' || label === 'booking') && (
             <div className={`flex flex-row items-center gap-2`}>
               <Link href="#" className={`body-4 text-natural-700} font-medium`}>
                 {data.fullName}
               </Link>
             </div>
           )}
-          {label == 'notification' && (
+          {(label === 'notification' || label === 'user-booking') && (
             <div className={`flex flex-row items-center gap-2`}>
-              <Link
-                href="/"
+              <span
+                // href="#"
                 className={`body-4 font-bold ${textColor(data.status)}`}
               >
-                {mockData.title}
-              </Link>
+                {label === 'notification' && mockData.title}
+                {label === 'user-booking' &&
+                  USER_BOOKING_STATUS_MAPPING[data?.status]}
+              </span>
               <DotFrame />
               <span className={`body-5 text-primary-600`}>2 giờ trước</span>
             </div>
           )}
         </div>
         <div>
-          {label == 'notification' ? (
+          {label === 'notification' ? (
             <p className={`body-5 text-neutral-400`}>{mockData.description}</p>
           ) : (
             <div
               className={`body-5 flex flex-row items-center gap-2 text-natural-500`}
             >
-              <p>
-                {
-                  CATEGORY_MAPPING[
-                    data?.field?.sportField?.sportFieldType?.name
-                  ]
-                }
-              </p>
+              {label === 'user-booking' ? (
+                <p>{data?.field?.sportField?.name}</p>
+              ) : (
+                <p>
+                  {
+                    CATEGORY_MAPPING[
+                      data?.field?.sportField?.sportFieldType?.name
+                    ]
+                  }
+                </p>
+              )}
               <DotFrame />
               <p>
                 {moment(data.startTime).local().format('HH:mm')}-{' '}

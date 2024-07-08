@@ -30,6 +30,15 @@ export const BOOKING_STATUS_MAPPING: { [key: string]: string } = {
   booking: 'Đang đặt sân',
 };
 
+export const USER_BOOKING_STATUS_MAPPING: { [key: string]: string } = {
+  all: 'Tất cả',
+  accepted: 'Đặt sân thành công',
+  rejected: 'Yêu cầu đặt sân đã bị hủy',
+  disabled: 'Đã check-in',
+  available: 'Sẵn sàng',
+  booking: 'Yêu cầu chưa được duyệt',
+};
+
 export const TRANSACTION_STATUS: { [key: string]: string } = {
   all: 'Tất cả',
   rejected: 'Hủy đặt sân',
