@@ -137,7 +137,14 @@ const SportFieldManagementTable: React.FC<SportFieldManagementTableProps> = ({
         <Space size="middle">
           <Dropdown menu={{ items: items(record.id) }} placement="bottomRight">
             <a>
-              <MoreOutlined style={{ color: '#939393' }} />
+              <MoreOutlined
+                style={{
+                  color: '#939393',
+                  padding: '6px 12px',
+
+                  fontSize: '16px',
+                }}
+              />
             </a>
           </Dropdown>
         </Space>
