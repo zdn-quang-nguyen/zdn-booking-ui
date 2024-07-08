@@ -2,6 +2,12 @@
 
 
 const nextConfig = {
+  webpack: (config, options) => {
+    if (!options.dev) {
+      config.devtool = options.isServer ? false : 'eval-source-map';
+    }
+    return config;
+  },
   env: {
     API_HOST: process.env.NEXT_PUBLIC_API_HOST,
   },
