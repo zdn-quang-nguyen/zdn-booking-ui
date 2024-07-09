@@ -1,4 +1,4 @@
-import { formatDateToTime } from '@/libs/utils';
+import { cn, formatCurrency, formatDateToTime } from '@/libs/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import dollar from '@public/icons/dollar.svg';
@@ -6,11 +6,15 @@ import bike from '@public/icons/bike.svg';
 
 type SportFieldShortInfoProps = {
   sportField: SportField;
+  className?: string;
 };
 
-const SportFieldShortInfo = ({ sportField }: SportFieldShortInfoProps) => {
+const SportFieldShortInfo = ({
+  sportField,
+  className,
+}: SportFieldShortInfoProps) => {
   return (
-    <div className="flex flex-col gap-3">
+    <div className={cn('flex flex-col gap-3', className)}>
       <div className="flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <Image
@@ -19,13 +23,19 @@ const SportFieldShortInfo = ({ sportField }: SportFieldShortInfoProps) => {
             width={20}
             height={20}
           />
-          <p className="body-4 truncate">{sportField.location.addressDetail}</p>
+          <p className="body-4 hover:truncate-none truncate">
+            {sportField.location?.addressDetail ?? 'Chưa cập nhật'}
+          </p>
         </div>
       </div>
       <div className="flex items-center gap-2">
         <Image src={bike} alt="Bike Icon" width={20} height={20} />
 
-        <p className="body-4 truncate">2.7 km</p>
+        <p className="body-4 truncate">
+          {sportField.distanceMeters
+            ? `${Math.round((sportField.distanceMeters / 1000) * 100) / 100} km`
+            : 'Chưa cập nhật'}
+        </p>
       </div>
       <div className="flex items-center gap-2">
         <Image
@@ -35,13 +45,14 @@ const SportFieldShortInfo = ({ sportField }: SportFieldShortInfoProps) => {
           height={20}
         />
         <p className="body-4 truncate">
-          {formatDateToTime(sportField.startTime)} -{' '}
-          {formatDateToTime(sportField.endTime)}
+          {sportField.startTime} - {sportField.endTime}
         </p>
       </div>
       <div className="flex items-center gap-2">
         <Image src={dollar} alt="Dollar Icon" width={20} height={20} />
-        <p className="body-4 truncate">{sportField.price} đ/30 phút</p>
+        <p className="body-4 truncate">
+          {formatCurrency(sportField.price)}/30 phút
+        </p>
       </div>
       <div className="flex items-center gap-2">
         <Image
@@ -51,10 +62,10 @@ const SportFieldShortInfo = ({ sportField }: SportFieldShortInfoProps) => {
           height={20}
         />
         <Link
-          href={`tel:${sportField.phone}`}
+          href={`tel:${sportField.phone ?? ''}`}
           className="body-4 truncate text-alerts-blue underline"
         >
-          {sportField.phone}
+          {sportField.phone ?? 'Chưa cập nhật'}
         </Link>
       </div>
     </div>

@@ -2,8 +2,9 @@
   :global {
     .ant-picker {
       border-radius: 20px;
-      padding: 10px 16px;
+      padding: 8px 12px;
       color: #40423f;
+      max-width: 312px;
     }
     .ant-picker-outlined {
       border-color: #e1e1e1;
@@ -14,18 +15,14 @@
       line-height: 20px;
       text-align: left;
       color: theme('colors.natural.700');
-      width: 42px !important;
-
-      input {
-        width: 40px;
-      }
+      width: fit-content;
+      max-width: 64px !important;
     }
     .ant-picker-separator {
       display: none;
     }
 
     .ant-picker-suffix {
-      // display: flex !important;
       flex-grow: 1 !important;
       justify-content: end;
       align-items: end;

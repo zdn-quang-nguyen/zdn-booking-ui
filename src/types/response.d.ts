@@ -1,5 +1,5 @@
 type BaseResponse = {
-  data: any[];
+  data: any[] | any | null;
   message: string;
   statusCode: number;
   timestamp: string;

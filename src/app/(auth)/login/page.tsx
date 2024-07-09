@@ -11,7 +11,6 @@ export const metadata: Metadata = {
 const LoginPage = async () => {
   const session = await getServerSession();
 
-  console.log(session);
   if (session?.user) {
     redirect('/home');
   }

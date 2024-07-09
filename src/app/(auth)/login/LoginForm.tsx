@@ -26,7 +26,7 @@ export default function LoginForm() {
     const updateSearchParams = () => {
       if (!VALID_ROLES.includes(role as string)) {
         const params = getValidRole(role as string);
-        router.push(`login?role=${params.toString()}`);
+        router.push(`login?role=${params.toString()}` as any);
       }
     };
 
@@ -44,7 +44,7 @@ export default function LoginForm() {
   const { data: session } = useSession();
 
   if (session?.user) {
-    router.push(`/home`);
+    router.push(`home` as any);
   }
 
   async function onFocus() {
@@ -133,7 +133,7 @@ export default function LoginForm() {
                 htmlFor="password"
                 className="mb-2 text-lg font-bold leading-6 text-primary-600"
               >
-                Password
+                Mật khẩu
               </label>
 
               <Controller
@@ -141,7 +141,7 @@ export default function LoginForm() {
                 control={control}
                 render={({ field }) => (
                   <Input.Password
-                    placeholder="Nhập Password"
+                    placeholder="Nhập mật khẩu"
                     id="password"
                     status={errorMessage ? 'error' : ''}
                     {...field}

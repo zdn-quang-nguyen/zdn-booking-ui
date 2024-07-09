@@ -31,22 +31,6 @@ export default function SignUpForm() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-
-  useEffect(() => {
-    const updateSearchParams = () => {
-      const params = new URLSearchParams(searchParams);
-
-      const role = searchParams.get('role') as string;
-
-      if (!VALID_ROLES.includes(role)) {
-        params.set('role', 'user');
-        router.push(`sign-up?${params.toString()}`);
-      }
-    };
-
-    updateSearchParams();
-  }, [searchParams, router]);
-  const role = searchParams.get('role');
   const {
     control,
     handleSubmit,
@@ -54,7 +38,22 @@ export default function SignUpForm() {
     // eslint-disable-next-line react-hooks/rules-of-hooks
   } = useForm<SignUpSchemaType>({
     resolver: zodResolver(SignUpSchema),
+    mode: 'onBlur',
   });
+  useEffect(() => {
+    const updateSearchParams = () => {
+      const params = new URLSearchParams(searchParams);
+      const role = searchParams.get('role') as string;
+      const newParams = params.toString();
+      if (!VALID_ROLES.includes(role)) {
+        params.set('role', 'user');
+        router.push(`sign-up?${newParams}` as any);
+      }
+    };
+
+    updateSearchParams();
+  }, [searchParams, router]);
+  const role = searchParams.get('role');
 
   const onSubmit = async (data: any) => {
     setLoading(true);
@@ -68,14 +67,10 @@ export default function SignUpForm() {
     };
 
     const res = await signUpUser(dataBody);
-    console.log(res);
     if (res.status === 'Success') {
-      messageApi.open({
-        type: 'success',
-        content: 'Đăng kí thành công',
-      });
+      messageApi.success('Đăng kí thành công');
 
-      router.push(`/login?role=${role}`);
+      router.push(`login?role=${role}` as any);
     } else {
       messageApi.open({
         type: 'error',
@@ -189,14 +184,14 @@ export default function SignUpForm() {
                 htmlFor="password"
                 className="mb-2 text-lg font-bold leading-6 text-primary-600"
               >
-                Password
+                Mật khẩu
               </label>
               <Controller
                 name="password"
                 control={control}
                 render={({ field }) => (
                   <Input.Password
-                    placeholder="Nhập password"
+                    placeholder="Nhập mật khẩu"
                     id="password"
                     iconRender={(visible) =>
                       visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
@@ -217,14 +212,14 @@ export default function SignUpForm() {
                 htmlFor="confirmPassword"
                 className="mb-2 text-lg font-bold leading-6 text-primary-600"
               >
-                Confirm password
+                Xác nhận mật khẩu
               </label>
               <Controller
                 name="confirmPassword"
                 control={control}
                 render={({ field }) => (
                   <Input.Password
-                    placeholder="Nhập password"
+                    placeholder="Nhập xác nhận mật khẩu"
                     id="confirmPassword"
                     iconRender={(visible) =>
                       visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />

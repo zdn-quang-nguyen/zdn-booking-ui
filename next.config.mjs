@@ -1,5 +1,19 @@
 /** @type {import('next').NextConfig} */
+
+
 const nextConfig = {
+  webpack: (config, options) => {
+    if (!options.dev) {
+      config.devtool = options.isServer ? false : 'eval-source-map';
+    }
+    return config;
+  },
+  env: {
+    API_HOST: process.env.NEXT_PUBLIC_API_HOST,
+  },
+  experimental: {
+    typedRoutes: true,
+  },
   images: {
     domains: ['picsum.photos', 'storage.googleapis.com/'],
     remotePatterns: [
