@@ -11,11 +11,13 @@ const NotificationList = () => {
   const router = useRouter();
   const pathname = usePathname();
   const page = searchParams.get('page') ?? 1;
+  const read = searchParams.get('read') ?? 'all';
   const size = 6;
 
   const { isLoading, notifications, totalPage } = useFetchNotifications({
     page: Number(page),
     size,
+    read,
   });
 
   if (!notifications) {

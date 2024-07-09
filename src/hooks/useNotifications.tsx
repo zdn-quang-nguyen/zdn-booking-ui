@@ -5,10 +5,12 @@ import useServerSentEvents from './useServerSentEvents';
 export type NotificationFilterType = {
   page?: number;
   size?: number;
+  read?: string;
 };
 const useFetchNotifications = ({
   page = 1,
   size = 6,
+  read = 'all',
 }: NotificationFilterType) => {
   const [notifications, setNotifications] = useState<NotificationType[]>([]);
   const prevRef = useRef<NotificationType[]>(notifications);
@@ -27,6 +29,7 @@ const useFetchNotifications = ({
         const response = await getNotifications({
           page,
           size,
+          read,
         });
         setTotalPage(response.totalPage);
         setNotifications(response.data);
@@ -43,7 +46,7 @@ const useFetchNotifications = ({
       const ids = prevRef.current.map((notification) => notification.id);
       markAsReads(ids);
     };
-  }, [page, size]);
+  }, [page, size, read]);
 
   useServerSentEvents((data) => {
     console.log({ data });

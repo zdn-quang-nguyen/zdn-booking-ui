@@ -4,13 +4,12 @@ import axiosInstance from '../axios';
 export const getNotifications = async ({
   page = 1,
   size = 6,
+  read = 'all',
 }: NotificationFilterType) => {
-  const response = await axiosInstance.get('/notification/me', {
-    params: {
-      page: page - 1,
-      size,
-    },
-  });
+  const readParam = read === 'all' ? '' : `&read=${read}`;
+  const response = await axiosInstance.get(
+    `/notification/me?page=${page - 1}&size=${size}${readParam}`,
+  );
   return response.data;
 };
 

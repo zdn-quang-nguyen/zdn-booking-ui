@@ -2,6 +2,7 @@
 
 import useUnreadNotificationCount from '@/hooks/useUnreadNotificationCount';
 import NotificationList from './NotificationList';
+import NotificationFilter from './NotificationFilter';
 
 const NotificationsSection = () => {
   const { count = 0 } = useUnreadNotificationCount();
@@ -14,6 +15,9 @@ const NotificationsSection = () => {
         <h4 className="font-bold text-natural-700">
           Thông báo {count ? `(${count})` : ''}
         </h4>
+      </div>
+      <div>
+        <NotificationFilter />
       </div>
       <NotificationList />
     </div>
