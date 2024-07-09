@@ -2,11 +2,13 @@
 
 // dotenv.config();
 
+const API_HOST = process.env.REACT_APP_API_HOST;
+
 export const uploadImage = async (file: File) => {
   const formData = new FormData();
   formData.append('file', file);
 
-  const response = await fetch(`http://localhost:5000/firebase/upload-avatar`, {
+  const response = await fetch(`${API_HOST}/firebase/upload-avatar`, {
     method: 'POST',
     // headers: {
     //   'Access-Control-Allow-Origin': 'allowedOrigin' || '*',
@@ -23,5 +25,5 @@ export const uploadImage = async (file: File) => {
   }
   const res = await response.json();
 
-  return res.data[0];
+  return res.data;
 };

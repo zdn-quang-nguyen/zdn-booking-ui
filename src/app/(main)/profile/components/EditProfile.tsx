@@ -1,9 +1,8 @@
-import Image from "next/image";
-import UploadAvatar from "./UploadAvatar";
-import { Button, Input } from "antd";
 import { cn } from "@/libs/utils";
+import { Button, Input } from "antd";
 import s from "./profile.module.scss";
-import { ArrowLeftOutlined, EyeInvisibleOutlined, EyeTwoTone } from "@ant-design/icons";
+import UploadAvatar from "./UploadAvatar";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 type EditProfileProps = {
   onCancel: () => void;

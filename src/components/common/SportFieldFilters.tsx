@@ -1,35 +1,50 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { FilterItem } from './components/FilterItem';
 import { CloseOutlined } from '@ant-design/icons';
 import AccentButton from './components/AccentButton';
+import {
+  usePathname,
+  useParams,
+  useRouter,
+  useSearchParams,
+} from 'next/navigation';
+import { message } from 'antd';
 
 const distanceFilter = {
-  title: 'Khoang cach',
-  name: 'distance',
+  title: 'Khoảng cách',
+  name: 'distanceOrder',
   options: [
     {
+      label: 'Mặc định',
+      value: '',
+    },
+    {
       label: 'Gan nhat',
-      value: 'near',
+      value: 'ASC',
     },
     {
       label: 'Xa nhat',
-      value: 'far',
+      value: 'DESC',
     },
   ],
 };
 
 const priceFilter = {
   title: 'Gia ca',
-  name: 'price',
+  name: 'priceOrder',
   options: [
     {
+      label: 'Mặc định',
+      value: '',
+    },
+    {
       label: 'Thap nhat',
-      value: 'low',
+      value: 'ASC',
     },
     {
       label: 'Cao nhat',
-      value: 'high',
+      value: 'DESC',
     },
   ],
 };
@@ -40,25 +55,88 @@ const timeFilter = {
   options: [],
 };
 
-export const SportFieldFilters: React.FC = () => {
-  const [isOpened, setIsOpened] = React.useState<boolean>(true);
-  const [price, setPrice] = React.useState<string>(
-    priceFilter.options[0].value,
-  );
+interface FilterProps {
+  isOpen: boolean;
+  onClick: (value: boolean) => void;
+}
 
+export const SportFieldFilters: React.FC<FilterProps> = ({
+  isOpen,
+  onClick,
+}) => {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isOpened, setIsOpened] = React.useState<boolean>(isOpen);
   const [isNeedReset, setIsNeedReset] = React.useState<boolean>(false);
-  const [distance, setDistance] = React.useState<string>(
-    distanceFilter.options[0].value,
+
+  const [price, setPrice] = React.useState<string>(
+    searchParams.get('price') || priceFilter.options[0].value,
   );
+  const [distance, setDistance] = React.useState<string>(
+    searchParams.get('distance') || distanceFilter.options[0].value,
+  );
+  const [timeDate, setTimeDate] = React.useState<string>('');
 
   const handleApplyFilter = () => {
-    console.log('Distance: ', distance);
-    console.log('Price: ', price);
+    const params = new URLSearchParams(searchParams);
+    const { date, start, end } = timeDate
+      ? JSON.parse(timeDate)
+      : {
+          date: '',
+          start: '',
+          end: '',
+        };
+    if (date && start && end) {
+      params.set('date', date);
+      params.set('start', start);
+      params.set('end', end);
+    } else {
+      params.delete('date');
+      params.delete('start');
+      params.delete('end');
+    }
+
+    if (distance) {
+      params.set('distance', distance);
+    } else {
+      params.delete('distance');
+    }
+
+    if (price) {
+      params.set('price', price);
+    } else {
+      params.delete('price');
+    }
+
+    router.push(`${pathname}?${params.toString()}` as any);
+
+    if (date && start && end) handleCloseFilter(false);
+    if (date === '' && start === '' && end === '') handleCloseFilter(false);
+    if (date)
+      if (start === '' || end === '')
+        message.error('Vui lòng chọn thời gian bắt đầu và kết thúc');
   };
 
   const handleClearFilter = () => {
     setIsNeedReset(true);
+    setDistance(distanceFilter.options[0].value);
+    setPrice(priceFilter.options[0].value);
+    setTimeDate('');
   };
+
+  const handleCloseFilter = (value: boolean) => {
+    setIsOpened(value);
+    onClick(false);
+  };
+
+  useEffect(() => {
+    setIsOpened(isOpen);
+  }, [isOpen]);
+
+  // useEffect(() => {
+  //   onClick(isOpened);
+  // }, [isOpened]);
 
   return (
     <div
@@ -73,12 +151,20 @@ export const SportFieldFilters: React.FC = () => {
           className={`body-1 flex h-[88px] flex-row items-center justify-between py-6 font-bold`}
         >
           <span>Bộ lọc</span>
-          <button className="h-10 w-10" onClick={() => setIsOpened(false)}>
-            <CloseOutlined style={{ fontSize: '24px' }} spin />
+          <button
+            disabled={!isOpened}
+            className="h-10 w-10 hover:text-accent-600"
+            onClick={() => handleCloseFilter(false)}
+          >
+            <CloseOutlined
+              style={{ fontSize: '24px' }}
+              className="hover-spin"
+            />
           </button>
         </div>
         <div className="flex flex-col gap-8">
           <FilterItem
+            defaultFilter={distance}
             filter={distanceFilter}
             onFilterChange={setDistance}
             isNeedReset={isNeedReset}
@@ -86,6 +172,7 @@ export const SportFieldFilters: React.FC = () => {
           ></FilterItem>
 
           <FilterItem
+            defaultFilter={price}
             filter={priceFilter}
             onFilterChange={setPrice}
             isNeedReset={isNeedReset}
@@ -94,7 +181,7 @@ export const SportFieldFilters: React.FC = () => {
 
           <FilterItem
             filter={timeFilter}
-            onFilterChange={() => {}}
+            onFilterChange={setTimeDate}
             isNeedReset={isNeedReset}
             setIsNeedReset={() => setIsNeedReset(false)}
           ></FilterItem>

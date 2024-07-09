@@ -10,16 +10,18 @@ type SportFieldImage = {
 };
 
 type SportField = {
-  id?: string;
+  id: string;
   name: string;
   quantity: number;
   phone: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   price: number;
   rule: string | '';
-  sportFieldType: SportFieldType;
+  distanceMeters?: number;
+  sportFieldTypeId: string;
   ownerId: string;
+  sportFieldType: any;
   sportFieldImages: SportFieldImage[];
   location: LocationType;
   fields?: Field[];

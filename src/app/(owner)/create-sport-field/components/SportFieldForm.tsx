@@ -1,35 +1,40 @@
 'use client';
-import RangePickerComponent from '@/components/common/RangePickerComponent';
-import { cn } from '@/libs/utils';
-import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
-import type { FormProps, GetProp, UploadProps } from 'antd';
+import type { FormProps, GetProp, UploadFile, UploadProps } from 'antd';
 import {
   Button,
   Form,
   Input,
   InputNumber,
   Select,
+  Space,
   Upload,
   message,
 } from 'antd';
+import ImgCrop from 'antd-img-crop';
 import Image from 'next/image';
-import React, { useState } from 'react';
-import styles from './SportFieldForm.module.scss';
+import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+// import dayjs from 'dayjs';
 import iconUpImage from '/public/images/icons_add_image.png';
-import { District, Province, Ward } from '@/types/location.type';
-import { getLocation, postData } from '../../apis/create-sport-field.api';
 import CustomNumberInput from './CustomNumberInput';
+import RangePickerComponent from '@/components/common/RangePickerComponent';
+// import { District, Province, Ward } from '@/types/location.type';
 import { uploadImage } from '../../apis/upload-img.api';
+import { postData } from '../../apis/create-sport-field.api';
+import styles from './SportFieldForm.module.scss';
+
+import { CATEGORY_MAPPING, CRUD_ACTIONS } from '@/constants/constant';
+
+import { cn } from '@/libs/utils';
+import { isObject } from 'util';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+
 const { TextArea } = Input;
+const { Option } = Select;
+
+const MAX_IMAGE_COUNT = 5;
 
 type FileType = Parameters<GetProp<UploadProps, 'beforeUpload'>>[0];
-
-const normalFiles = (e: any) => {
-  if (Array.isArray(e)) {
-    return e;
-  }
-  return e?.fileList;
-};
 
 const beforeUpload = (file: FileType) => {
   const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
@@ -40,7 +45,8 @@ const beforeUpload = (file: FileType) => {
   if (!isLt2M) {
     message.error('Image must smaller than 2MB!');
   }
-  return isJpgOrPng && isLt2M;
+
+  return (isJpgOrPng && isLt2M) || Upload.LIST_IGNORE;
 };
 
 type SportFieldFormProps = {
@@ -48,6 +54,8 @@ type SportFieldFormProps = {
   districts: District[];
   wards: Ward[];
   sportFieldTypes: SportFieldType[];
+  defaultValues?: SportField | null;
+  label?: string | 'create';
 };
 
 const SportFieldForm: React.FC<SportFieldFormProps> = ({
@@ -55,70 +63,190 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
   districts,
   wards,
   sportFieldTypes,
+  defaultValues,
+  label = 'create',
 }) => {
-  // const { provinces, districts, wards } = await getLocation();
-
-  const [selectedProvince, setSelectedProvince] = useState<number | undefined>(
+  const [selectedProvince, setSelectedProvince] = useState<string | undefined>(
     undefined,
   );
-  const [selectedDistrict, setSelectedDistrict] = useState<number | undefined>(
+  const [selectedDistrict, setSelectedDistrict] = useState<string | undefined>(
     undefined,
   );
-  const [selectedWard, setSelectedWard] = useState<number | undefined>(
+  const [selectedWard, setSelectedWard] = useState<string | undefined>(
     undefined,
   );
 
-  const handleProvinceChange = (value: number) => {
-    setSelectedProvince(value);
-    setSelectedDistrict(undefined); // Reset district when province changes
-    setSelectedWard(undefined); // Reset ward when province changes
+  const [fileList, setFileList] = useState<UploadFile[]>(
+    defaultValues?.sportFieldImages.map((img) => {
+      return {
+        uid: img.id || '',
+        name: img.name,
+        status: 'done',
+        url: img.url,
+      };
+    }) || [],
+  );
+
+  const [removeFile, setRemoveFile] = useState<string[]>([]);
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const router = useRouter();
+  const [form] = Form.useForm();
+
+  const handleChangeFile: UploadProps['onChange'] = ({
+    fileList: newFileList,
+  }) => {
+    setFileList(newFileList);
+    form.setFieldsValue({ images: newFileList });
   };
 
-  const handleDistrictChange = (value: number) => {
+  const handleProvinceChange = (value: string) => {
+    setSelectedProvince(value);
+    setSelectedDistrict(undefined);
+    setSelectedWard(undefined);
+    form.setFieldsValue({
+      district: undefined,
+      ward: undefined,
+    });
+  };
+
+  const handleDistrictChange = (value: string) => {
     setSelectedDistrict(value);
-    setSelectedWard(undefined); // Reset ward when district changes
+    setSelectedWard(undefined);
+    form.setFieldsValue({
+      ward: undefined,
+    });
   };
 
   const onFinish: FormProps<any>['onFinish'] = async (values) => {
-    console.log('Success:', values);
-    const { images, time, ...rest } = values;
+    setLoading(true);
+    message.loading({ content: 'Đang xử lý...', key: 'loading' });
+    const { phone, fields, images, time, ...rest } = values;
     let uploadImages: any[] = [];
 
     for (let i = 0; i < images.length; i++) {
-      const formData = new FormData();
-      formData.append('file', images[i].originFileObj as File);
-      const img = await uploadImage(formData);
-      uploadImages.push(img);
+      if (images[i].originFileObj) {
+        const formData = new FormData();
+        formData.append('file', images[i].originFileObj as File);
+        const result = await uploadImage(formData);
+        uploadImages.push(result);
+      }
     }
+    const province = provinces.find((p) => p.id === selectedProvince);
+    const district = districts.find((d) => d.id === selectedDistrict);
+    const ward = wards.find((w) => w.id === selectedWard);
 
-    const startTime = time[0].format('HH:mm');
-    const endTime = time[1].format('HH:mm');
+    const startTime = isObject(time[0]) ? time[0].format('HH:mm') : time[0];
+    const endTime = isObject(time[1]) ? time[1].format('HH:mm') : time[1];
 
-    postData(
+    const location = {
+      id: defaultValues?.location?.id,
+      provinceId: selectedProvince,
+      districtId: selectedDistrict,
+      wardId: selectedWard,
+      addressDetail: `${rest.address}, ${ward?.name}, ${district?.name}, ${province?.name}`,
+    };
+
+    const result = await postData(
       {
+        id: defaultValues?.id,
         ...rest,
+        phone: phone,
         sportFieldImages: [...uploadImages],
-        startTime,
-        endTime,
+        removeImageIds: removeFile.map((uid) => {
+          if (uid.includes('rc-upload')) {
+            return;
+          } else {
+            return uid;
+          }
+        }),
+        location,
+        startTime: startTime < endTime ? startTime : endTime,
+        endTime: startTime < endTime ? endTime : startTime,
       },
-      'create',
+      label,
     );
+
+    if (result.statusCode === 201 || result.statusCode === 200) {
+      setLoading(false);
+      message.success(result.message);
+      router.push('/owner?type=all');
+
+      // } else if (result.status === 200) {
+      //   message.success(result.message);
+    } else {
+      setLoading(false);
+      message.error(result.message);
+    }
   };
 
   const onFinishFailed: FormProps<any>['onFinishFailed'] = (errorInfo) => {
-    console.log('Failed:', errorInfo);
+    message.error('Lỗi: ' + errorInfo);
+  };
+
+  useEffect(() => {
+    if (defaultValues) {
+      form.setFieldsValue({
+        name: defaultValues.name,
+        sportFieldTypeId: defaultValues.sportFieldTypeId,
+        phone: defaultValues.phone,
+        // address: defaultValues.location ? defaultValues.location.address : '',
+        price: defaultValues.price,
+        rule: defaultValues.rule,
+        quantity: defaultValues.quantity,
+        images: defaultValues.sportFieldImages,
+        time: [defaultValues.startTime, defaultValues.endTime],
+      });
+
+      if (defaultValues.location) {
+        form.setFieldsValue({
+          province: defaultValues.location?.provinceId
+            ? defaultValues.location.provinceId
+            : '',
+          district: defaultValues.location?.districtId
+            ? defaultValues.location.districtId
+            : '',
+          ward: defaultValues.location?.wardId
+            ? defaultValues.location.wardId
+            : '',
+
+          address: defaultValues.location.addressDetail.split(', ')[0],
+        });
+        setSelectedProvince(defaultValues.location.provinceId);
+        setSelectedDistrict(defaultValues.location.districtId);
+        setSelectedWard(defaultValues.location.wardId);
+      }
+    } else {
+      form.setFieldsValue({
+        quantity: 1,
+      });
+    }
+  }, []);
+
+  const onCancel = () => {
+    router.back();
   };
 
   return (
     <div
       className={cn(
         styles.createSportFileContainer,
-        'mx-auto mt-12 flex w-1/2 flex-col gap-8 rounded-form bg-neutral p-10',
+        '3xl:w-1/2 mx-auto mt-12 flex w-1/2 flex-col gap-8 rounded-form bg-neutral p-10 md:w-11/12 lg:w-4/5 xl:w-3/4 2xl:w-2/3',
       )}
     >
-      <h4 className="font-bold text-natural-700">Tạo sân</h4>
+      <div className="flex items-center">
+        <button className="hover:opacity-75" key="back" onClick={onCancel}>
+          <ArrowLeftOutlined className="mr-4 text-xl" />
+        </button>
+
+        <h4 className="font-bold text-natural-700">
+          {`${CRUD_ACTIONS[label]} sân`}
+        </h4>
+      </div>
+
       <Form
-        // form={form}
+        form={form}
         name="Create Sport Field"
         labelCol={{ span: 4 }}
         wrapperCol={{ span: 20 }}
@@ -167,70 +295,106 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
                   key={sportFieldType.id}
                   value={sportFieldType.id}
                 >
-                  {sportFieldType.name}
+                  {CATEGORY_MAPPING[sportFieldType.name]}
                 </Select.Option>
               ))}
             </Select>
           </Form.Item>
 
-          <div>
-            <p className="body-2 mb-5 font-bold text-natural-700">Địa chỉ</p>
-            <Form.Item label="Tỉnh/Thành Phố" name="province">
-              <Select
-                placeholder="Tỉnh"
-                onChange={handleProvinceChange}
-                value={selectedProvince}
+          <Form.Item label="Địa chỉ">
+            <Space.Compact block>
+              <Form.Item
+                noStyle
+                label="Tỉnh/Thành Phố"
+                name="province"
+                rules={[
+                  { required: true, message: 'Vui lòng chọn tỉnh/thành phố' },
+                ]}
               >
-                {provinces.map((province) => (
-                  <Select.Option key={province.id} value={province.id}>
-                    {province.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item label="Quận/Huyện" name="district">
-              <Select
-                placeholder="Quận/Huyện"
-                onChange={handleDistrictChange}
-                value={selectedDistrict}
+                <Select
+                  placeholder="Tinh/Thành Phố"
+                  onChange={handleProvinceChange}
+                  value={selectedProvince}
+                >
+                  {provinces.map((province) => {
+                    return (
+                      <Select.Option key={province.id} value={province.id}>
+                        {province.name}
+                      </Select.Option>
+                    );
+                  })}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                label="Quận/Huyện"
+                noStyle
+                name="district"
+                dependencies={['province']}
+                rules={[
+                  { required: true, message: 'Vui lòng chọn quận/huyện' },
+                ]}
               >
-                {districts
-                  .filter(
-                    (district) =>
-                      district.provinceId === selectedProvince?.toString(),
-                  )
-                  .map((district) => (
-                    <Select.Option key={district.id} value={district.id}>
-                      {district.name}
-                    </Select.Option>
-                  ))}
-              </Select>
-            </Form.Item>
-            <Form.Item label="Phường/Xã" name="ward">
-              <Select
-                placeholder="Phường/Xã"
-                value={selectedWard}
-                onChange={(value) => setSelectedWard(value)}
+                <Select
+                  disabled={!selectedProvince}
+                  placeholder="Quận/Huyện"
+                  onChange={handleDistrictChange}
+                  value={selectedDistrict}
+                >
+                  {districts
+                    .filter(
+                      (district) =>
+                        district.provinceId === selectedProvince?.toString(),
+                    )
+                    .map((district) => (
+                      <Option key={district.id} value={district.id}>
+                        {district.name}
+                      </Option>
+                    ))}
+                </Select>
+              </Form.Item>
+              <Form.Item
+                noStyle
+                label="Phường/Xã"
+                name="ward"
+                dependencies={['province', 'district']}
+                rules={[
+                  { required: false, message: 'Vui lòng chọn phường/xã' },
+                ]}
               >
-                {wards
-                  .filter(
-                    (ward) => ward.districtId === selectedDistrict?.toString(),
-                  )
-                  .map((ward) => (
-                    <Select.Option key={ward.id} value={ward.id}>
-                      {ward.name}
-                    </Select.Option>
-                  ))}
-              </Select>
-            </Form.Item>
+                <Select
+                  disabled={!selectedDistrict}
+                  placeholder="Phường/Xã"
+                  value={selectedWard}
+                  onChange={(value) => setSelectedWard(value)}
+                >
+                  {wards
+                    .filter(
+                      (ward) =>
+                        ward.districtId === selectedDistrict?.toString(),
+                    )
+                    .map((ward) => (
+                      <Option key={ward.id} value={ward.id}>
+                        {ward.name}
+                      </Option>
+                    ))}
+                </Select>
+              </Form.Item>
+            </Space.Compact>
+            <br />
             <Form.Item
-              label="Địa chỉ"
+              // label="Địa chỉ"
               name="address"
-              rules={[{ required: true, message: 'Vui lòng nhập Địa chỉ' }]}
+              rules={[
+                { required: true, message: 'Vui lòng nhập Địa chỉ chi tiết' },
+              ]}
             >
-              <Input placeholder="Nhập địa chỉ" />
+              <Input
+                placeholder="Nhập địa chỉ chi tiết"
+                style={{ width: '100%', borderRadius: '40px' }}
+              />
             </Form.Item>
-          </div>
+          </Form.Item>
+
           <Form.Item
             label="Số điện thoại"
             name="phone"
@@ -239,15 +403,12 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
               { required: true, message: 'Vui lòng nhập Số điện thoại' },
               {
                 type: 'string',
-                max: 9,
-                message: 'Số điện thoại không vượt quá 9 số',
+                len: 10,
+                message: 'Số điện thoại 10 số',
               },
             ]}
           >
-            <Input
-              prefix="(+84) "
-              style={{ width: '100%', borderRadius: '40px' }}
-            />
+            <Input prefix=" " style={{ width: '100%', borderRadius: '40px' }} />
           </Form.Item>
           <Form.Item
             label="Thời gian mở cửa"
@@ -256,9 +417,17 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
             rules={[
               { required: true, message: 'Vui lòng nhập Thời gian mở cửa' },
             ]}
-            getValueFromEvent={(e) => e}
+            getValueFromEvent={(e) => {
+              return e;
+            }}
           >
-            <RangePickerComponent />
+            <RangePickerComponent
+              defaultValue={
+                defaultValues
+                  ? [defaultValues.startTime, defaultValues.endTime]
+                  : undefined
+              }
+            />
           </Form.Item>
         </div>
 
@@ -275,7 +444,8 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
             ]}
           >
             <InputNumber
-              suffix="đ / tiếng"
+              suffix="VND/giờ"
+              maxLength={10}
               style={{ width: '120%', borderRadius: '40px' }}
             />
           </Form.Item>
@@ -306,7 +476,10 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
             ]}
             getValueFromEvent={(e) => e}
           >
-            <CustomNumberInput />
+            <CustomNumberInput
+              value={defaultValues?.quantity}
+              isDisabled={label === 'edit'}
+            />
           </Form.Item>
         </div>
 
@@ -314,49 +487,63 @@ const SportFieldForm: React.FC<SportFieldFormProps> = ({
           <p className="body-2 mb-5 font-bold text-natural-700">
             Hình ảnh{' '}
             <span className="body-5 mx-3 text-natural-400">
-              Kích thước tiêu chuẩn 1200*389 px
+              Kích thước tiêu chuẩn 360*280 px
+            </span>
+            <span className="body-5 mx-3 text-natural-400">
+              Tối đa 5 hình ảnh
             </span>
           </p>
           <Form.Item
             valuePropName="fileList"
-            getValueFromEvent={normalFiles}
             name="images"
             rules={[{ required: true, message: 'Vui lòng thêm hình ảnh' }]}
           >
-            <Upload
-              action=""
-              beforeUpload={beforeUpload}
-              listType="picture-card"
-            >
-              <button
-                style={{
-                  border: '2px',
-                  background: 'none',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                }}
-                type="button"
+            <ImgCrop rotationSlider aspect={36 / 28}>
+              <Upload
+                action=""
+                fileList={fileList}
+                beforeUpload={beforeUpload}
+                onChange={handleChangeFile}
+                onRemove={(file) => setRemoveFile([...removeFile, file.uid])}
+                listType="picture-card"
+                maxCount={MAX_IMAGE_COUNT}
               >
-                <Image
-                  src={iconUpImage}
-                  alt="icon-up-image"
-                  width={40}
-                  height={40}
-                />
-                <div
-                  style={{ marginTop: 8 }}
-                  className="body-5 text-accent-600"
-                >
-                  Tải hình ảnh lên
-                </div>
-              </button>
-            </Upload>
+                {fileList.length < MAX_IMAGE_COUNT && (
+                  <button
+                    disabled={fileList.length == MAX_IMAGE_COUNT}
+                    style={{
+                      border: '2px',
+                      background: 'none',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                    }}
+                    type="button"
+                  >
+                    <Image
+                      src={iconUpImage}
+                      alt="icon-up-image"
+                      width={40}
+                      height={40}
+                    />
+                    <div
+                      style={{ marginTop: 8 }}
+                      className="body-5 text-accent-600"
+                    >
+                      Tải hình ảnh lên
+                    </div>
+                  </button>
+                )}
+              </Upload>
+            </ImgCrop>
           </Form.Item>
         </div>
 
-        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type="primary" htmlType="submit">
+        <Form.Item
+          wrapperCol={{ offset: 8, span: 16 }}
+          className={cn(styles.buttonCustom, 'flex justify-end')}
+        >
+          <Button type="primary" htmlType="submit" disabled={loading}>
             Xác nhận
           </Button>
         </Form.Item>

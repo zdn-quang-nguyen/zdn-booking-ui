@@ -1,16 +1,25 @@
-'use client';
 import React from 'react';
 import { Button } from 'antd';
 import Image from 'next/image';
 import styles from './banner.module.scss';
 import { cn } from '@/libs/utils';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { getSportFields } from '@/libs/api/sport-field.api';
+// import { getSportFields } from '@/libs/api/sport-field-server.api';
 
-const Banner = () => {
-  const router = useRouter();
-  const handleClick = () => {
-    router.push(`/field-reservation/123`);
-  };
+const Banner = async () => {
+  const sportFieldRes = await getSportFields({ size: 1 });
+
+  if (!sportFieldRes) {
+    return null;
+  }
+
+  const sportField: SportField = sportFieldRes.data?.[0];
+
+  if (!sportField) {
+    return null;
+  }
+
   return (
     <div
       className={cn(
@@ -28,27 +37,31 @@ const Banner = () => {
             cung cấp các sân tập hiện đại, đảm bảo an toàn và thoải mái cho bạn.
             Hãy đăng ký ngay để trải nghiệm những giây phút sôi động trên sân!
           </p>
-          <Button
-            onClick={handleClick}
-            className="text-h mt-4 flex items-center gap-3"
-            type="primary"
-          >
-            Đặt sân ngay
-            <Image
-              src="/icons/arrow-right-icon.svg"
-              alt="logout"
-              width={24}
-              height={24}
-            />
-          </Button>
+          <Link href={`/field-reservation/${sportField?.id}`}>
+            <Button
+              className="text-h mt-4 flex items-center gap-3"
+              type="primary"
+            >
+              Đặt sân ngay
+              <Image
+                src="/icons/arrow-right-icon.svg"
+                alt="logout"
+                width={24}
+                height={24}
+              />
+            </Button>
+          </Link>
         </div>
-        <div className="relative h-[424px] w-[612px] overflow-hidden rounded-large">
+        <Link
+          href={`/field-reservation/${sportField?.id}`}
+          className="relative block h-[424px] w-[612px] overflow-hidden rounded-large transition-all duration-500 ease-in-out hover:scale-[101%] hover:shadow-lg"
+        >
           <Image
-            src="https://picsum.photos/612/425"
+            src={sportField.sportFieldImages?.[0]?.url}
             fill
             alt={'Banner Photo'}
           />
-        </div>{' '}
+        </Link>{' '}
       </div>
     </div>
   );

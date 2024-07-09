@@ -3,22 +3,23 @@ import React, { useState, useEffect, useMemo } from "react";
 import { Carousel, Spin } from "antd";
 import styles from "./SportFieldSwiper.module.scss";
 import Image from "next/image";
+import { cn } from '@/libs/utils';
+import { DEFAULT_IMAGES } from '@/constants/constant';
 
-const SportFieldSwiper: React.FC = () => {
-  const images = useMemo(
-    () => [
-      "https://picsum.photos/360/360",
-      "https://picsum.photos/360/361",
-      "https://picsum.photos/360/362",
-      "https://picsum.photos/360/363",
-      "https://picsum.photos/360/364",
-    ],
-    []
-  );
-
+type SportFieldSwiperProps = {
+  images: string[];
+  className?: string;
+};
+const SportFieldSwiper = ({
+  images = DEFAULT_IMAGES,
+  className,
+}: SportFieldSwiperProps) => {
   const [loading, setLoading] = useState(true);
 
-  // UseEffect to handle loading state
+  if (!images.length) {
+    images = DEFAULT_IMAGES;
+  }
+
   useEffect(() => {
     const loadImage = () => {
       let loadedCount = 0;
@@ -41,14 +42,14 @@ const SportFieldSwiper: React.FC = () => {
   }, [images]);
 
   return (
-    <div className={styles.sliderContainer}>
+    <div className={cn(styles.sliderContainer, className)}>
       {loading ? (
-        <div className="h-card w-full bg-accent-100 flex justify-center items-center rounded-large">
+        <div className="flex h-card w-full items-center justify-center rounded-large bg-accent-100">
           <Spin size="large" />
         </div>
       ) : (
         <Carousel
-          className="w-full h-card relative"
+          className="relative h-card w-full"
           autoplay
           arrows
           autoplaySpeed={2000}
@@ -56,7 +57,7 @@ const SportFieldSwiper: React.FC = () => {
           effect="scrollx"
         >
           {images.map((image, index) => (
-            <div key={image} className="w-full h-card relative">
+            <div key={image} className="relative h-card w-full">
               <Image src={image} alt={`Slide ${index + 1}`} fill />
             </div>
           ))}

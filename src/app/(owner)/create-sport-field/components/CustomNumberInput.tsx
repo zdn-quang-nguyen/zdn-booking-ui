@@ -2,16 +2,17 @@
 
 import { MinusOutlined, PlusOutlined } from '@ant-design/icons';
 import { Button, InputNumber } from 'antd';
-import { useState } from 'react';
+import { use, useEffect, useState } from 'react';
 
 type CustomNumberInputProps = {
+  isDisabled?: boolean;
   value?: number;
   onChange?: (value: number) => void;
 };
 
 const CustomNumberInput: React.FC<CustomNumberInputProps> = (props) => {
-  const { value, onChange } = props;
-  const [number, setNumber] = useState<number>(value ?? 1);
+  const { value, onChange, isDisabled } = props;
+  const [number, setNumber] = useState<number>(value ? value : 1);
 
   const handleChange = (num: number) => {
     if (num < 1) return;
@@ -19,10 +20,14 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = (props) => {
     onChange && onChange(num);
   };
 
+  useEffect(() => {
+    setNumber(value ? value : 1);
+  }, [value]);
+
   return (
-    <div>
+    <div className="flex flex-row">
       <Button
-        disabled={number === 1}
+        disabled={number === 1 || isDisabled}
         type="text"
         style={{
           background: '#F4F1FF',
@@ -34,19 +39,23 @@ const CustomNumberInput: React.FC<CustomNumberInputProps> = (props) => {
         icon={<MinusOutlined style={{ color: '#967DDD' }} />}
         onClick={() => handleChange(number - 1)}
       />
-      <InputNumber
-        value={number}
-        onChange={(num) => handleChange(num as number)}
-        style={{
-          margin: '0 10px',
-          borderRadius: '40px',
-          borderColor: '#F4F1FF',
-          backgroundColor: '#F4F1FF',
-          width: '44px',
-          textAlign: 'center',
-        }}
-      />
+      <div className="flex h-full items-center justify-center">
+        <InputNumber
+          disabled={isDisabled}
+          value={number}
+          onChange={(num) => handleChange(num as number)}
+          style={{
+            margin: '0 10px',
+            borderRadius: '40px',
+            borderColor: '#F4F1FF',
+            backgroundColor: '#F4F1FF',
+            width: '44px',
+            textAlign: 'center',
+          }}
+        />
+      </div>
       <Button
+        disabled={isDisabled}
         type="text"
         style={{
           background: '#F4F1FF',

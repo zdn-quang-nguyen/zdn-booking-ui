@@ -1,4 +1,5 @@
 import CustomerHeader from '@/components/header/customer-header/CustomerHeader';
+import GetLocation from '@/components/location/GetLocation';
 import PrivateRoute from './PrivateRoute';
 
 type HomeLayoutProps = {
@@ -8,10 +9,11 @@ type HomeLayoutProps = {
 export default function MainLayout({ children }: HomeLayoutProps) {
   return (
     <PrivateRoute>
-      <main>
+      <main className="relative flex min-h-screen flex-col">
         <CustomerHeader />
-      {children}
+        {children}
       </main>
+      <GetLocation />
     </PrivateRoute>
   );
 }
