@@ -9,7 +9,7 @@ import {
 // import { sportField } from '@/mocks/sport-fields';
 import dayjs from 'dayjs';
 import moment from 'moment';
-import { formatCurrency } from '@/libs/utils';
+import { addTimezone, formatCurrency, timeAgo } from '@/libs/utils';
 
 interface ItemProps {
   data: any;
@@ -80,6 +80,7 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
         return '';
     }
   };
+  console.log({ data });
   return (
     <div className="flex w-full flex-row justify-between bg-white">
       <div className="flex flex-grow flex-col justify-start gap-1">
@@ -102,7 +103,9 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
                   USER_BOOKING_STATUS_MAPPING[data?.status]}
               </span>
               <DotFrame />
-              <span className={`body-5 text-primary-600`}>2 giờ trước</span>
+              <span className={`body-5 text-primary-600`}>
+                {timeAgo(addTimezone(new Date(data.createdAt)))}
+              </span>
             </div>
           )}
         </div>
