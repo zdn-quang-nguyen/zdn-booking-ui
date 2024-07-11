@@ -7,6 +7,10 @@ export const metadata: Metadata = {
 };
 
 const NotificationPage = () => {
-  return <NotificationsSection />;
+  return (
+    <div className="h-1 w-full flex-grow bg-primary-100">
+      <NotificationsSection />
+    </div>
+  );
 };
 export default NotificationPage;
