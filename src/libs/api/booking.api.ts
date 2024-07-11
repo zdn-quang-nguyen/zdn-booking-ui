@@ -26,3 +26,18 @@ export const createBookingByUser = async (
   });
   return response;
 };
+
+export const validateBookingTime = async (
+  fieldId: string,
+  startTime: string,
+  endTime: string,
+) => {
+  const response = await axiosInstance.get(`${API_HOST}/booking/validate`, {
+    params: {
+      fieldId,
+      startTime,
+      endTime,
+    },
+  });
+  return response;
+};
