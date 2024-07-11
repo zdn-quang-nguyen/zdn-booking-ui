@@ -13,7 +13,10 @@ import { useRouter } from 'next/navigation';
 import { mutate } from 'swr';
 import RangePickerComponent from '@/components/common/RangePickerComponent';
 import dayjs, { Dayjs } from 'dayjs';
-import { createBookingByOwner } from '@/libs/api/booking.api';
+import {
+  createBookingByOwner,
+  validateBookingTime,
+} from '@/libs/api/booking.api';
 import { errorMessageMapping } from '@/constants/constant';
 
 type ReservationBookingProps = {
@@ -61,6 +64,7 @@ export default function ReservationBooking({
   const [amount, setAmount] = useState(field.sportField.price ?? 0);
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [timeError, setTimeError] = useState('');
   const [bookingSuccess, setBookingSuccess] = useState<string>();
   const route = useRouter();
   const id = useId();
@@ -110,10 +114,7 @@ export default function ReservationBooking({
         message.error('Vui lòng chọn thời gian');
         return;
       }
-      const startTime = new Date(bookingTime.startTime);
-      startTime.setHours(time[0].hour(), time[0].minute());
-      const endTime = new Date(bookingTime.startTime);
-      endTime.setHours(time[1].hour(), time[1].minute());
+      const { startTime, endTime } = setBookingTimeRange(bookingTime, time);
       const data: CreateBookingByOwnerDto = {
         name: fullName,
         amount,
@@ -157,9 +158,27 @@ export default function ReservationBooking({
     setAmount(amount);
   };
 
-  const handleDateChange = ([startTime, endTime]: [Dayjs, Dayjs]) => {
+  const handleDateChange = async ([startTime, endTime]: [Dayjs, Dayjs]) => {
     calAmount(startTime, endTime);
     setTime([startTime, endTime]);
+
+    const { startTime: fullStartTime, endTime: fullEndTime } =
+      setBookingTimeRange(bookingTime, [startTime, endTime]);
+    try {
+      const res: any = await validateBookingTime(
+        field.id,
+        fullStartTime.toISOString(),
+        fullEndTime.toISOString(),
+      );
+      if (res.status !== 200) {
+        setTimeError(
+          errorMessageMapping[res?.response?.data?.message] ??
+            'Thời gian đã chọn không hợp lệ',
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
   const handleSubmit = async () => {
     if (isDeleteForm) {
@@ -169,7 +188,19 @@ export default function ReservationBooking({
     }
   };
 
+  const setBookingTimeRange = (
+    bookingTime: any,
+    time: [dayjs.Dayjs, dayjs.Dayjs],
+  ) => {
+    const startTime = new Date(bookingTime.startTime);
+    startTime.setHours(time[0].hour(), time[0].minute());
+    const endTime = new Date(bookingTime.startTime);
+    endTime.setHours(time[1].hour(), time[1].minute());
+    return { startTime, endTime };
+  };
+
   let booking = bookings.find((item) => item.id === bookingId);
+
   return (
     <div
       className={cn(
@@ -213,8 +244,10 @@ export default function ReservationBooking({
               <p className="text-sm font-medium leading-5 text-neutral-700">
                 Thời gian
               </p>
-              <div className="flex flex-wrap gap-x-5 text-sm font-bold text-natural-700">
+              <div className="flex flex-col flex-wrap gap-x-5 text-sm font-bold text-natural-700">
                 <RangePickerComponent
+                  onFocus={() => setTimeError('')}
+                  status={timeError ? 'error' : undefined}
                   value={[time[0].format('HH:mm'), time[1].format('HH:mm')]}
                   disabled={isDeleteForm}
                   onChange={handleDateChange}
@@ -229,6 +262,9 @@ export default function ReservationBooking({
                     ).format('HH:mm'),
                   ]}
                 />
+                <p className="ml-2 mt-2 h-4 text-xs font-normal leading-4 text-red-500">
+                  {timeError}
+                </p>
               </div>
             </div>
             <div className="flex flex-wrap text-sm font-medium leading-5 text-neutral-700">
@@ -298,6 +334,14 @@ export default function ReservationBooking({
               <Button
                 onClick={handleSubmit}
                 loading={isLoading}
+                disabled={
+                  isLoading ||
+                  !time ||
+                  !fullName ||
+                  !phone ||
+                  !!error ||
+                  !!timeError
+                }
                 type="primary"
                 {...(isDeleteForm ? { danger: true } : {})}
               >
@@ -316,3 +360,4 @@ export default function ReservationBooking({
     </div>
   );
 }
+

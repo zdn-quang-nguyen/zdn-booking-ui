@@ -1,7 +1,7 @@
 'use client';
 import React, { use, useEffect } from 'react';
 import { TimePicker } from 'antd';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 import { ClockCircleOutlined } from '@ant-design/icons';
 import locale from 'antd/es/date-picker/locale/vi_VN';
 
@@ -20,9 +20,19 @@ interface rangePickerProps {
   onChange?: (value: any) => void;
   label?: string;
   disabled?: boolean;
+  status?: 'error' | 'warning';
+  onFocus?: () => void;
 }
 const RangePickerComponent: React.FC<rangePickerProps> = (props) => {
-  const { label, onChange, defaultValue, value, disabled } = props;
+  const {
+    label,
+    onChange,
+    defaultValue,
+    value,
+    disabled,
+    status,
+    onFocus = () => {},
+  } = props;
   const [time, setTime] = React.useState<[dayjs.Dayjs, dayjs.Dayjs]>(
     defaultValue
       ? [dayjs(defaultValue[0], 'HH:mm'), dayjs(defaultValue[1], 'HH:mm')]
@@ -33,6 +43,8 @@ const RangePickerComponent: React.FC<rangePickerProps> = (props) => {
     <div className={`${styles.rangePicker} flex flex-row items-center gap-3`}>
       <label className={`body-3 text-natural-700`}>{label}</label>
       <RangePicker
+        onFocus={onFocus}
+        status={status}
         disabled={disabled && disabled}
         defaultValue={
           defaultValue
