@@ -36,7 +36,7 @@ export default function BookingQRModal({
 
       if (res.status === 201) {
         message.success('Đặt sân thành công');
-        setBookingSuccess(res.data.id);
+        setBookingSuccess(res.data.data.id);
         setIsSuccess(true);
       } else {
         notification.error({
@@ -44,7 +44,6 @@ export default function BookingQRModal({
             errorMessageMapping[res?.response?.data?.message] ?? 'Tạo thất bại',
         });
       }
-      console.log('🚀 ~ handleCreateBooking ~ res:', res);
     } catch (error) {
       console.error(error);
       notification.error({

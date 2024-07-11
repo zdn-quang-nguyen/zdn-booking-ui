@@ -80,7 +80,6 @@ const Item: React.FC<ItemProps> = ({ data, label, onClick }) => {
         return '';
     }
   };
-  console.log({ data });
   return (
     <div className="flex w-full flex-row justify-between bg-white">
       <div className="flex flex-grow flex-col justify-start gap-1">

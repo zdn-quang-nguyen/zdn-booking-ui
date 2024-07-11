@@ -203,7 +203,7 @@ export default function InfoField({ sportField }: InfoFieldProps) {
 
       <div className={cn(s.main)}>
         <div className="space-y-8">
-          <div className="grid grid-cols-1 items-center gap-3 lg:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
             <div>
               <h1 className="mb-5">{sportField.name}</h1>
 
