@@ -1,7 +1,7 @@
 import { CloseOutlined, EditOutlined } from '@ant-design/icons';
 import styles from './ScheduleTable.module.scss';
 import React, { useEffect, useId, useState } from 'react';
-import { cn } from '@/libs/utils';
+import { cn, formatCurrency } from '@/libs/utils';
 import { Button, message } from 'antd';
 import QRBooking from './QRBooking';
 import {
@@ -18,6 +18,7 @@ import {
   validateBookingTime,
 } from '@/libs/api/booking.api';
 import { errorMessageMapping } from '@/constants/constant';
+import { validatePhone } from '@/utils/validate';
 
 type ReservationBookingProps = {
   isDeleteForm: boolean;
@@ -72,19 +73,12 @@ export default function ReservationBooking({
   const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
 
-  const validatePhone = (value: string) => {
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(value)) {
-      setError('Số điện thoại phải là 10 chữ số.');
-    } else {
-      setError('');
-    }
-  };
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     if (/^\d*$/.test(value)) {
       setPhone(value);
-      validatePhone(value);
+      const errorMessage = validatePhone(value);
+      setError(errorMessage);
     }
   };
   const handleDeleteBooking = async () => {
@@ -138,8 +132,9 @@ export default function ReservationBooking({
         );
         route.push(`table-booking?fieldId=${field.id}&id=${id}` as any);
       } else {
+        console.log(res.response.data);
         message.error(
-          errorMessageMapping[res?.response?.data?.message] ?? 'Tạo thất bại',
+          errorMessageMapping[res.response.data.message] ?? 'Tạo thất bại',
         );
       }
     } catch (error: any) {
@@ -200,7 +195,6 @@ export default function ReservationBooking({
   };
 
   let booking = bookings.find((item) => item.id === bookingId);
-
   return (
     <div
       className={cn(
@@ -323,10 +317,12 @@ export default function ReservationBooking({
                 <EditOutlined className="mr-3" />
                 Note
               </span>
-              <div className="mt-3 flex text-sm font-medium leading-5">
+              <div className="mt-3 flex items-center text-sm font-medium leading-5">
                 Tổng tiền{' '}
                 <p className="ml-3 text-base font-bold text-primary-600">
-                  {isDeleteForm ? booking?.amount : amount}
+                  {isDeleteForm
+                    ? formatCurrency(booking?.amount ?? 0)
+                    : formatCurrency(amount)}
                 </p>
               </div>
             </div>
