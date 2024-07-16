@@ -4,6 +4,7 @@ import { searchSportFieldAddress } from '../../apis/create-sport-field.api';
 import { debounce, set } from 'lodash';
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import AddressSelection from './AddressSelection';
 
 interface AddressSearchProps {
   province?: Province;
@@ -13,7 +14,7 @@ interface AddressSearchProps {
   onChange?: (value: any) => void;
 }
 
-interface Location {
+export interface Location {
   lat: number;
   lon: number;
   name: string;
@@ -52,9 +53,9 @@ async function streetMapSearch(address: string): Promise<Location[]> {
 // }
 
 const AddressSearch: React.FC<AddressSearchProps> = ({
-  province,
-  district,
-  ward,
+  province = null,
+  district = null,
+  ward = null,
   onChange,
   defaultValue,
 }) => {
@@ -62,12 +63,13 @@ const AddressSearch: React.FC<AddressSearchProps> = ({
   const [defaultAddress, setDefaultAddress] = useState<string>('');
   const [searchAddress, setSearchAddress] = useState<Location[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const debouncedAddress = useCallback(debounce(setAddress, 1000), []);
+  const [selectedAddress, setSelectedAddress] = useState<string>('');
+  const debouncedAddress = useCallback(debounce(setAddress, 500), []);
 
   const handleSearch = async () => {
     setIsLoading(true);
     if (!address) {
+      console.log('address is empty');
       setIsLoading(false);
       return;
     }
@@ -78,8 +80,8 @@ const AddressSearch: React.FC<AddressSearchProps> = ({
       console.log('searching address', fullAddress);
 
       const [locations, searchings] = await Promise.all([
-        streetMapSearch(fullAddress),
         beSearch(fullAddress),
+        streetMapSearch(fullAddress),
       ]);
 
       const results = [...locations, ...searchings];
@@ -90,6 +92,11 @@ const AddressSearch: React.FC<AddressSearchProps> = ({
     } catch (error) {
       console.error(error);
     }
+  };
+
+  const handleSelect = (value: string) => {
+    setSelectedAddress(value);
+    onChange && onChange(value);
   };
 
   useEffect(() => {
@@ -107,6 +114,7 @@ const AddressSearch: React.FC<AddressSearchProps> = ({
       setDefaultAddress(
         addressObj.displayName || addressObj.display_name || addressObj.name,
       );
+      setSelectedAddress(defaultValue);
     }
     onChange && onChange(defaultValue);
   }, [defaultValue]);
@@ -114,6 +122,7 @@ const AddressSearch: React.FC<AddressSearchProps> = ({
   useLayoutEffect(() => {
     setAddress('');
     setSearchAddress([]);
+    setSelectedAddress('');
     onChange && onChange(null);
   }, [province, district, ward]);
 
@@ -125,8 +134,9 @@ const AddressSearch: React.FC<AddressSearchProps> = ({
         placeholder={defaultAddress || 'Nhập địa chỉ chi tiết'}
         style={{ width: '100%', borderRadius: '40px' }}
         onSearch={(e) => debouncedAddress(e)}
-        // value={defaultAddress || defaultValue || address}
-        onSelect={onChange && ((value) => onChange(value))}
+        value={selectedAddress}
+        // onSelect={handleSelect}
+        onChange={handleSelect}
       >
         {!isLoading && searchAddress.length > 0 ? (
           searchAddress?.map((item: Location, index: number) => {
@@ -141,7 +151,8 @@ const AddressSearch: React.FC<AddressSearchProps> = ({
             );
           })
         ) : (
-          <Select.Option key={0} value={defaultValue || ''}>
+          // <AddressSelection selections={searchAddress} />
+          <Select.Option key={0} value={selectedAddress}>
             {defaultAddress}
           </Select.Option>
         )}
